@@ -6,6 +6,13 @@ const nextConfig = {
     imageSizes: [16, 32, 40, 48, 64, 80, 96, 128, 256, 384, 400],
     minimumCacheTTL: 31536000,
     dangerouslyAllowSVG: false,
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'czpljoofhuslpewbjoit.supabase.co',
+        pathname: '/storage/v1/object/public/product-images/**',
+      },
+    ],
   },
   compress: true,
   poweredByHeader: false,
@@ -44,7 +51,7 @@ const nextConfig = {
               "style-src 'self' 'unsafe-inline'",
               "img-src 'self' data: blob: https:",
               "font-src 'self' data:",
-              "connect-src 'self' https://www.google-analytics.com",
+              "connect-src 'self' https://www.google-analytics.com https://czpljoofhuslpewbjoit.supabase.co",
               "media-src 'self'",
               "object-src 'none'",
               "frame-src 'none'",

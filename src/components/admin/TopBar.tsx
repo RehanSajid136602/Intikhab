@@ -1,17 +1,51 @@
 'use client';
 
-import { Bell, Search, Menu, Users } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Bell, Search, Menu, Users, X, Package } from 'lucide-react';
 import { ADMIN_TOPBAR_HEIGHT } from '@/lib/constants';
+import { formatPKR } from '@/lib/utils';
 
 interface TopBarProps {
   pageTitle: string;
   onMenuToggle?: () => void;
 }
 
+interface Notification {
+  id: string;
+  message: string;
+  amount: string;
+  time: string;
+  status: string;
+}
+
 /**
  * Admin top bar with hamburger (mobile), page title, notification bell, search, avatar.
  */
 function TopBar({ pageTitle, onMenuToggle }: TopBarProps) {
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+
+  useEffect(() => {
+    const fetchNotifications = async () => {
+      try {
+        const res = await fetch('/api/orders?limit=5', { credentials: 'include' });
+        if (res.ok) {
+          const orders = await res.json();
+          setNotifications(orders.map((o: Record<string, unknown>) => ({
+            id: o.id as string,
+            message: `Order from ${o.customerName}`,
+            amount: formatPKR(o.total as number),
+            time: o.date as string,
+            status: o.status as string,
+          })));
+        }
+      } catch {
+        // Silently fail
+      }
+    };
+    fetchNotifications();
+  }, []);
+
   return (
     <header
       className="sticky top-0 z-40 bg-white border-b border-brand-border flex items-center justify-between px-6"
@@ -33,12 +67,51 @@ function TopBar({ pageTitle, onMenuToggle }: TopBarProps) {
 
       {/* Right: Bell + Search + Avatar */}
       <div className="flex items-center gap-4">
-        <button className="relative p-2 text-brand-gray hover:text-brand-dark transition-colors">
-          <Bell className="w-5 h-5" />
-          <span className="absolute -top-0.5 -right-0.5 w-3.5 h-3.5 bg-brand-red text-white text-[8px] rounded-full flex items-center justify-center">
-            3
-          </span>
-        </button>
+        {/* Notification Bell */}
+        <div className="relative">
+          <button
+            onClick={() => setShowNotifications(!showNotifications)}
+            className="relative p-2 text-brand-gray hover:text-brand-dark transition-colors"
+          >
+            <Bell className="w-5 h-5" />
+            {notifications.length > 0 && (
+              <span className="absolute -top-0.5 -right-0.5 w-3.5 h-3.5 bg-brand-red text-white text-[8px] rounded-full flex items-center justify-center">
+                {notifications.length}
+              </span>
+            )}
+          </button>
+
+          {/* Notification Dropdown */}
+          {showNotifications && (
+            <div className="absolute right-0 top-full mt-2 w-80 bg-white border border-brand-border rounded-sm shadow-lg z-50">
+              <div className="flex items-center justify-between p-3 border-b border-brand-border">
+                <h3 className="text-xs font-semibold text-brand-dark uppercase">Recent Orders</h3>
+                <button onClick={() => setShowNotifications(false)} className="p-1 hover:text-brand-dark">
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+              {notifications.length === 0 ? (
+                <p className="p-4 text-xs text-brand-gray text-center">No orders yet</p>
+              ) : (
+                <div className="max-h-64 overflow-y-auto">
+                  {notifications.map((n) => (
+                    <div key={n.id} className="p-3 border-b border-brand-border hover:bg-brand-light-gray/50 transition-colors">
+                      <div className="flex items-start gap-2">
+                        <Package className="w-4 h-4 text-brand-gray mt-0.5 flex-shrink-0" />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs font-medium text-brand-dark truncate">{n.message}</p>
+                          <p className="text-xs text-brand-gray">{n.amount} — {n.status}</p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* Search */}
         <div className="hidden sm:block relative">
           <input
             type="text"
@@ -47,6 +120,8 @@ function TopBar({ pageTitle, onMenuToggle }: TopBarProps) {
           />
           <Search className="w-4 h-4 text-brand-gray absolute left-3 top-1/2 -translate-y-1/2" />
         </div>
+
+        {/* Avatar */}
         <div className="w-8 h-8 rounded-full bg-brand-light-gray flex items-center justify-center">
           <Users className="w-4 h-4 text-brand-gray" />
         </div>

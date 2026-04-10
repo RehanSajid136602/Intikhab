@@ -2,22 +2,7 @@ import type { Metadata } from 'next';
 import { Poppins } from 'next/font/google';
 import { Toaster } from 'sonner';
 import Script from 'next/script';
-import { UtilityBar } from '@/components/layout/UtilityBar';
-import { Navbar } from '@/components/layout/Navbar';
-import { MobileMenu } from '@/components/layout/MobileMenu';
-import { Footer } from '@/components/layout/Footer';
-import dynamic from 'next/dynamic';
 import './globals.css';
-
-const CartDrawer = dynamic(
-  () => import('@/components/cart/CartDrawer').then((m) => m.CartDrawer),
-  { ssr: false, loading: () => null },
-);
-
-const BackToTop = dynamic(
-  () => import('@/components/BackToTop').then((m) => m.BackToTop),
-  { ssr: false },
-);
 
 const poppins = Poppins({
   subsets: ['latin'],
@@ -86,7 +71,9 @@ export const metadata: Metadata = {
 };
 
 /**
- * Root layout with Poppins font, Toaster provider, and persistent layout components.
+ * Root layout — minimal. No navbar, no footer.
+ * Those are added in the (public) layout group.
+ * Admin pages have their own layout without site chrome.
  */
 export default function RootLayout({
   children,
@@ -96,13 +83,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={poppins.variable}>
       <body className="bg-white font-poppins">
-        <UtilityBar />
-        <Navbar />
-        <MobileMenu />
-        <CartDrawer />
-        <main>{children}</main>
-        <Footer />
-        <BackToTop />
+        {children}
         <Toaster position="top-right" richColors />
         {process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID && (
           <>

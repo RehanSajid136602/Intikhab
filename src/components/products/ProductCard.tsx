@@ -43,7 +43,7 @@ function ProductCard({ product, showImageCarousel }: ProductCardProps) {
   };
 
   return (
-    <Link href={`/products/${product.slug}`} className="block">
+    <Link href={`/product/${product.slug}`} className="block">
       <div className="product-card relative bg-white rounded-sm overflow-hidden border border-brand-border group cursor-pointer">
         {/* Badge */}
         <ProductBadgeComponent badge={product.badge} />

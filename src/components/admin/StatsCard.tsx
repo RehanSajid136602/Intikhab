@@ -23,7 +23,7 @@ function StatsCard({ title, value, change, changeType, icon: Icon, iconBg }: Sta
               changeType === 'up' ? 'text-green-500' : changeType === 'down' ? 'text-brand-red' : 'text-brand-gray'
             }`}
           >
-            {changeType === 'up' ? '+' : ''}{change}%
+            {change}
           </span>
         </div>
       </div>

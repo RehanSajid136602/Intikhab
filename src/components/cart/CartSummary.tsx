@@ -1,50 +1,25 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
 import { useCartStore } from '@/stores/cartStore';
 import { formatPKR } from '@/lib/utils';
-import { BRAND } from '@/lib/constants';
 import { ReturnPolicySnippet } from '@/components/ReturnPolicySnippet';
 
 /**
  * Cart subtotal and checkout button.
+ * Navigates to checkout form instead of opening WhatsApp directly.
  */
 function CartSummary() {
   const { totalPrice, toggleCart, items } = useCartStore();
+  const router = useRouter();
 
   const handleCheckout = () => {
-    // Check if cart is empty
     if (items.length === 0) {
       alert('Your cart is empty. Please add items to your cart before checkout.');
       return;
     }
-
-    // Build WhatsApp message with cart items
-    let message = `🛒 *New Order - Intikhab*\n\n`;
-    message += `*Order Details:*\n`;
-    message += `-------------------\n`;
-    
-    items.forEach((item, index) => {
-      message += `${index + 1}. ${item.name}\n`;
-      message += `   Quantity: ${item.quantity}\n`;
-      message += `   Price: ${formatPKR(item.price)}\n`;
-      message += `   Subtotal: ${formatPKR(item.price * item.quantity)}\n\n`;
-    });
-    
-    message += `-------------------\n`;
-    message += `*Total: ${formatPKR(totalPrice)}*\n\n`;
-    message += `Please confirm my order. Thank you!`;
-    
-    // Convert phone number to international format (0319 2776896 -> 923192776896)
-    // Remove spaces first, then replace leading 0 with 92
-    const cleanPhone = BRAND.phone.replace(/\s/g, '');
-    const phoneNumber = cleanPhone.startsWith('0') ? '92' + cleanPhone.slice(1) : cleanPhone;
-    
-    // Encode message for URL
-    const encodedMessage = encodeURIComponent(message);
-    
-    // Open WhatsApp with pre-filled message
-    const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
-    window.open(whatsappUrl, '_blank');
+    toggleCart(); // Close the cart drawer
+    router.push('/checkout');
   };
 
   return (

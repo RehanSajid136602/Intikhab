@@ -5,7 +5,6 @@ import { useRef } from 'react';
 import { SectionTitle } from '@/components/ui/SectionTitle';
 import { ProductCard } from '@/components/products/ProductCard';
 import { useProductTabs } from '@/hooks/useProductTabs';
-import { products } from '@/data/products';
 import type { Category, Product } from '@/types/product';
 
 const tabs = [
@@ -14,11 +13,15 @@ const tabs = [
   { label: 'KIDS', value: 'kids' },
 ] as const;
 
+interface ShopByCategoryProps {
+  products: Product[];
+}
+
 /**
  * Gender category tabs (MEN/WOMEN/KIDS) with product grid per tab.
- * MEN/WOMEN show "Coming Soon". KIDS shows real products with image carousel.
+ * Receives products as props from server component.
  */
-function ShopByCategory() {
+function ShopByCategory({ products }: ShopByCategoryProps) {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: '-100px' });
   const { activeTab, setActiveTab } = useProductTabs('men');

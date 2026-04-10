@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import {
   useReactTable,
@@ -27,13 +27,19 @@ interface ProductsTableProps {
 /**
  * Products management table with TanStack Table v8: image thumbnails,
  * category filter, search, sorting, status toggle, row selection, bulk delete.
+ * Fetches products from Supabase via adminStore API wrapper.
  */
 function ProductsTable({ onAddProduct, onEditProduct }: ProductsTableProps) {
-  const { products, updateProduct, deleteProduct } = useAdminStore();
+  const { products, productsLoading, fetchProducts, updateProduct, deleteProduct } = useAdminStore();
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [globalFilter, setGlobalFilter] = useState('');
   const [rowSelection, setRowSelection] = useState({});
+
+  // Fetch products on mount
+  useEffect(() => {
+    fetchProducts();
+  }, [fetchProducts]);
 
   const columns: ColumnDef<Product>[] = [
     {
@@ -110,14 +116,13 @@ function ProductsTable({ onAddProduct, onEditProduct }: ProductsTableProps) {
       header: 'Status',
       cell: (info) => {
         const status = info.getValue() as string;
-        const row = info.row;
-        const product = row.original as Product;
+        const product = info.row.original;
 
         return (
           <button
-            onClick={() => {
+            onClick={async () => {
               const newStatus = status === 'active' ? 'draft' : 'active';
-              updateProduct(product.id, { status: newStatus });
+              await updateProduct(product.id, { status: newStatus as 'active' | 'draft' });
               toast.success(`Product ${newStatus === 'active' ? 'activated' : 'set to draft'}`);
             }}
             className={`px-3 py-1 text-xs font-semibold rounded-sm uppercase transition-colors ${
@@ -146,9 +151,9 @@ function ProductsTable({ onAddProduct, onEditProduct }: ProductsTableProps) {
               <Edit className="w-4 h-4" />
             </button>
             <button
-              onClick={() => {
+              onClick={async () => {
                 if (confirm(`Delete "${product.name}"?`)) {
-                  deleteProduct(product.id);
+                  await deleteProduct(product.id);
                   toast.success('Product deleted');
                 }
               }}
@@ -179,14 +184,16 @@ function ProductsTable({ onAddProduct, onEditProduct }: ProductsTableProps) {
 
   const selectedCount = table.getFilteredSelectedRowModel().rows.length;
 
-  const handleBulkDelete = () => {
+  const handleBulkDelete = async () => {
     if (selectedCount === 0) return;
     if (!confirm(`Delete ${selectedCount} selected products?`)) return;
 
     const selectedIds = table
       .getFilteredSelectedRowModel()
       .rows.map((r) => r.original.id);
-    selectedIds.forEach((id) => deleteProduct(id));
+    for (const id of selectedIds) {
+      await deleteProduct(id);
+    }
     setRowSelection({});
     toast.success(`${selectedCount} products deleted`);
   };
@@ -295,7 +302,20 @@ function ProductsTable({ onAddProduct, onEditProduct }: ProductsTableProps) {
             ))}
           </thead>
           <tbody>
-            {table.getRowModel().rows.map((row) => (
+            {productsLoading ? (
+              <tr>
+                <td colSpan={columns.length} className="py-8 text-center text-sm text-brand-gray">
+                  Loading products...
+                </td>
+              </tr>
+            ) : table.getRowModel().rows.length === 0 ? (
+              <tr>
+                <td colSpan={columns.length} className="py-8 text-center text-sm text-brand-gray">
+                  No products found.
+                </td>
+              </tr>
+            ) : (
+              table.getRowModel().rows.map((row) => (
               <tr
                 key={row.id}
                 className={`border-b border-brand-border hover:bg-brand-light-gray/50 ${
@@ -308,7 +328,8 @@ function ProductsTable({ onAddProduct, onEditProduct }: ProductsTableProps) {
                   </td>
                 ))}
               </tr>
-            ))}
+              ))
+            )}
           </tbody>
         </table>
       </div>

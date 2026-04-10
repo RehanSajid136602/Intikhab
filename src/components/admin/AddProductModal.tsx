@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -31,32 +31,66 @@ interface AddProductModalProps {
 
 /**
  * Add/Edit product modal with React Hook Form + Zod validation,
- * image upload preview, and Sonner toast on submit.
+ * image upload to Supabase Storage, and Sonner toast on submit.
  */
 function AddProductModal({ isOpen, onClose, editProduct }: AddProductModalProps) {
-  const { addProduct, updateProduct } = useAdminStore();
+  const { addProduct, updateProduct, fetchProducts } = useAdminStore();
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
+  const [imageFiles, setImageFiles] = useState<File[]>([]);
+  const [uploading, setUploading] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
   const {
     register,
     handleSubmit,
     reset,
-    setValue,
     watch,
     formState: { errors },
   } = useForm<ProductFormData>({
     resolver: zodResolver(productSchema),
     defaultValues: {
-      name: editProduct?.name || '',
-      sku: editProduct?.sku || '',
-      category: editProduct?.category || 'men',
-      price: editProduct?.price || undefined,
-      originalPrice: editProduct?.originalPrice,
-      stock: editProduct?.stock || 0,
-      description: editProduct?.description || '',
-      status: editProduct?.status || 'active',
+      name: '',
+      sku: '',
+      category: 'men',
+      price: undefined,
+      originalPrice: undefined,
+      stock: 0,
+      description: '',
+      status: 'active',
     },
   });
+
+  // Reset form when editProduct changes (for editing existing products)
+  useEffect(() => {
+    if (editProduct) {
+      reset({
+        name: editProduct.name,
+        sku: editProduct.sku,
+        category: editProduct.category,
+        price: editProduct.price,
+        originalPrice: editProduct.originalPrice,
+        stock: editProduct.stock,
+        description: editProduct.description || '',
+        status: editProduct.status,
+      });
+      // Set existing image previews
+      if (editProduct.images && editProduct.images.length > 0) {
+        setImagePreviews(editProduct.images);
+      }
+    } else {
+      reset({
+        name: '',
+        sku: '',
+        category: 'men',
+        price: undefined,
+        originalPrice: undefined,
+        stock: 0,
+        description: '',
+        status: 'active',
+      });
+      setImagePreviews([]);
+    }
+  }, [editProduct, reset]);
 
   const category = watch('category');
 
@@ -65,6 +99,7 @@ function AddProductModal({ isOpen, onClose, editProduct }: AddProductModalProps)
     if (!files) return;
 
     const previews: string[] = [];
+    const filesArr: File[] = [];
     Array.from(files)
       .slice(0, 4)
       .forEach((file) => {
@@ -72,8 +107,10 @@ function AddProductModal({ isOpen, onClose, editProduct }: AddProductModalProps)
         reader.onload = (ev) => {
           if (ev.target?.result) {
             previews.push(ev.target.result as string);
+            filesArr.push(file);
             if (previews.length === Math.min(files.length, 4)) {
               setImagePreviews(previews);
+              setImageFiles(filesArr);
             }
           }
         };
@@ -81,44 +118,94 @@ function AddProductModal({ isOpen, onClose, editProduct }: AddProductModalProps)
       });
   };
 
-  const onSubmit = (data: ProductFormData) => {
-    const newProduct: Product = {
-      id: editProduct?.id || `INK-${Date.now()}`,
-      slug: data.name.toLowerCase().replace(/\s+/g, '-'),
-      name: data.name,
-      brand: 'Intikhab',
-      category: data.category,
-      price: data.price,
-      originalPrice: data.originalPrice,
-      images:
-        imagePreviews.length > 0
-          ? imagePreviews
-          : editProduct?.images || ['/shoe_collection.jpeg'],
-      badge: data.originalPrice ? 'SALE' : null,
-      inStock: data.stock > 0,
-      stock: data.stock,
-      installment: Math.ceil(data.price / 2),
-      description: data.description || '',
-      sku: data.sku,
-      status: data.status,
-    };
+  /** Upload images to Supabase Storage and return public URLs */
+  const uploadImages = async (): Promise<string[]> => {
+    if (imageFiles.length === 0) return [];
 
-    if (editProduct) {
-      updateProduct(editProduct.id, newProduct);
-      toast.success('Product updated successfully');
-    } else {
-      addProduct(newProduct);
-      toast.success('Product added successfully');
+    const urls: string[] = [];
+    for (const file of imageFiles) {
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const res = await fetch('/api/upload-image', {
+        method: 'POST',
+        credentials: 'include',
+        body: formData,
+      });
+
+      if (!res.ok) {
+        throw new Error('Failed to upload image');
+      }
+
+      const data = await res.json();
+      if (data.url) urls.push(data.url);
     }
 
-    reset();
-    setImagePreviews([]);
-    onClose();
+    return urls;
+  };
+
+  const onSubmit = async (data: ProductFormData) => {
+    setSubmitting(true);
+    try {
+      // Upload images if new files selected
+      let imageUrls = editProduct?.images || ['/shoe_collection.jpeg'];
+      if (imageFiles.length > 0) {
+        setUploading(true);
+        imageUrls = await uploadImages();
+        setUploading(false);
+        if (imageUrls.length === 0) {
+          toast.warning('No images uploaded, using default');
+        }
+      }
+
+      const productData = {
+        slug: data.name.toLowerCase().replace(/\s+/g, '-'),
+        name: data.name,
+        brand: 'Intikhab',
+        category: data.category,
+        price: data.price,
+        originalPrice: data.originalPrice,
+        images: imageUrls,
+        badge: data.originalPrice ? 'SALE' as const : null,
+        inStock: data.stock > 0,
+        stock: data.stock,
+        installment: Math.ceil(data.price / 2),
+        description: data.description || '',
+        sku: data.sku,
+        status: data.status,
+        sizes: editProduct?.sizes || [],
+      } as Partial<Product>;
+
+      let result;
+      if (editProduct) {
+        await updateProduct(editProduct.id, productData);
+        result = { success: true };
+        toast.success('Product updated successfully');
+      } else {
+        result = await addProduct(productData);
+        if (result) toast.success('Product added successfully');
+      }
+
+      if (result) {
+        await fetchProducts(); // Refresh the list
+      }
+
+      reset();
+      setImagePreviews([]);
+      setImageFiles([]);
+      onClose();
+    } catch (err) {
+      setUploading(false);
+      toast.error(err instanceof Error ? err.message : 'Failed to save product');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const handleClose = () => {
     reset();
     setImagePreviews([]);
+    setImageFiles([]);
     onClose();
   };
 
@@ -359,9 +446,18 @@ function AddProductModal({ isOpen, onClose, editProduct }: AddProductModalProps)
                 </button>
                 <button
                   type="submit"
-                  className="px-6 py-2.5 bg-brand-red text-white text-xs font-bold uppercase tracking-widest hover:bg-red-600 transition-colors"
+                  disabled={submitting || uploading}
+                  className="px-6 py-2.5 bg-brand-red text-white text-xs font-bold uppercase tracking-widest hover:bg-red-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {editProduct ? 'Update Product' : 'Add Product'}
+                  {uploading
+                    ? 'Uploading Images...'
+                    : submitting
+                      ? editProduct
+                        ? 'Updating...'
+                        : 'Adding...'
+                      : editProduct
+                        ? 'Update Product'
+                        : 'Add Product'}
                 </button>
               </div>
             </form>

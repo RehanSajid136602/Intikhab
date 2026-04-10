@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import {
   useReactTable,
@@ -33,9 +33,10 @@ const statusTabs = ['All', 'Pending', 'Processing', 'Shipped', 'Delivered'] as c
 /**
  * Admin orders table with status filter tabs, date range filter,
  * export button, and order detail modal.
+ * Fetches orders from Supabase via adminStore API wrapper.
  */
 function OrdersTable() {
-  const { orders, updateOrderStatus } = useAdminStore();
+  const { orders, ordersLoading, fetchOrders, updateOrderStatus } = useAdminStore();
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [globalFilter, setGlobalFilter] = useState('');
@@ -43,6 +44,11 @@ function OrdersTable() {
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+
+  // Fetch orders on mount
+  useEffect(() => {
+    fetchOrders();
+  }, [fetchOrders]);
 
   const filteredOrders = orders.filter((order) => {
     if (statusFilter !== 'All' && order.status !== statusFilter) return false;
@@ -112,8 +118,8 @@ function OrdersTable() {
     toast.info('Export feature coming soon!');
   };
 
-  const handleStatusUpdate = (orderId: string, newStatus: OrderStatus) => {
-    updateOrderStatus(orderId, newStatus);
+  const handleStatusUpdate = async (orderId: string, newStatus: OrderStatus) => {
+    await updateOrderStatus(orderId, newStatus);
     toast.success('Order status updated');
   };
 
@@ -202,7 +208,20 @@ function OrdersTable() {
             ))}
           </thead>
           <tbody>
-            {table.getRowModel().rows.map((row) => (
+            {ordersLoading ? (
+              <tr>
+                <td colSpan={columns.length} className="py-8 text-center text-sm text-brand-gray">
+                  Loading orders...
+                </td>
+              </tr>
+            ) : table.getRowModel().rows.length === 0 ? (
+              <tr>
+                <td colSpan={columns.length} className="py-8 text-center text-sm text-brand-gray">
+                  No orders found.
+                </td>
+              </tr>
+            ) : (
+              table.getRowModel().rows.map((row) => (
               <tr
                 key={row.id}
                 className="border-b border-brand-border hover:bg-brand-light-gray/50 cursor-pointer"
@@ -214,7 +233,8 @@ function OrdersTable() {
                   </td>
                 ))}
               </tr>
-            ))}
+              ))
+            )}
           </tbody>
         </table>
       </div>
@@ -338,7 +358,9 @@ function OrderDetailModal({ order, onStatusUpdate }: OrderDetailModalProps) {
           <ChevronDown className="w-4 h-4 text-brand-gray absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none" />
         </div>
         <button
-          onClick={() => onStatusUpdate(newStatus)}
+          onClick={async () => {
+            await onStatusUpdate(newStatus);
+          }}
           className="px-4 py-2 bg-brand-dark text-white text-xs font-bold uppercase tracking-widest hover:bg-black transition-colors"
         >
           Save

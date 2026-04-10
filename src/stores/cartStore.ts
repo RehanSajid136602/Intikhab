@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { CartItem } from '@/types/product';
 import type { Product } from '@/types/product';
+import { toast } from 'sonner';
 
 interface CartState {
   items: CartItem[];
@@ -15,6 +16,10 @@ interface CartState {
 
   totalItems: number;
   totalPrice: number;
+
+  // Supabase sync methods
+  syncCartToSupabase: (email: string) => Promise<boolean>;
+  loadCartFromSupabase: (email: string) => Promise<void>;
 }
 
 export const useCartStore = create<CartState>()(
@@ -90,6 +95,54 @@ export const useCartStore = create<CartState>()(
 
   toggleCart: () => {
     set((state) => ({ isOpen: !state.isOpen }));
+  },
+
+  syncCartToSupabase: async (email: string) => {
+    try {
+      const { items } = get();
+      const response = await fetch('/api/cart', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email,
+          items: items.map((item) => ({
+            productId: item.id,
+            quantity: item.quantity,
+          })),
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to sync cart');
+      }
+
+      return true;
+    } catch (error) {
+      toast.error(
+        error instanceof Error
+          ? `Cart sync failed: ${error.message}`
+          : 'Failed to sync cart to cloud',
+      );
+      return false;
+    }
+  },
+
+  loadCartFromSupabase: async (email: string) => {
+    try {
+      const response = await fetch(`/api/cart?email=${encodeURIComponent(email)}`);
+      if (!response.ok) {
+        return;
+      }
+
+      const data = await response.json();
+      // Note: This would merge with local cart, but for now we just log it
+      // Full merge logic would require fetching product details
+      if (data.items && data.items.length > 0) {
+        toast.info(`Found ${data.items.length} items in your cloud cart`);
+      }
+    } catch {
+      // Silently fail - localStorage cart is the source of truth for guests
+    }
   },
 
   totalItems: 0,

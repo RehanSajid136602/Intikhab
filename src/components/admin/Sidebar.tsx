@@ -19,17 +19,24 @@ const navLinks = [
   { label: 'Dashboard', href: ROUTES.adminDashboard, icon: LayoutDashboard },
   { label: 'Products', href: ROUTES.adminProducts, icon: Package },
   { label: 'Orders', href: ROUTES.adminOrders, icon: ShoppingCart },
-  { label: 'Customers', href: '/coming-soon', icon: Users },
-  { label: 'Appearance', href: '/coming-soon', icon: Palette },
-  { label: 'Messages', href: '/coming-soon', icon: MessageSquare },
-  { label: 'Settings', href: '/coming-soon', icon: Settings },
+  { label: 'Customers', href: '/admin/coming-soon', icon: Users },
+  { label: 'Appearance', href: '/admin/coming-soon', icon: Palette },
+  { label: 'Messages', href: '/admin/coming-soon', icon: MessageSquare },
+  { label: 'Settings', href: '/admin/coming-soon', icon: Settings },
 ];
 
 /**
  * Admin sidebar navigation with dark bg, icon links, active state, and logout.
  */
-function Sidebar() {
+function Sidebar({ userEmail }: { userEmail?: string }) {
   const pathname = usePathname();
+
+  const handleLogout = async () => {
+    const { createClient } = await import('@/lib/supabase/client');
+    const supabase = createClient();
+    await supabase.auth.signOut();
+    window.location.href = '/admin/login';
+  };
 
   return (
     <aside className="w-[260px] bg-brand-dark h-screen flex flex-col fixed left-0 top-0">
@@ -68,9 +75,12 @@ function Sidebar() {
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-sm text-white font-medium truncate">Admin</p>
-            <p className="text-xs text-white/40">admin@intikhab.pk</p>
+            <p className="text-xs text-white/40 truncate">{userEmail || 'admin@intikhab.pk'}</p>
           </div>
-          <button className="text-white/40 hover:text-white transition-colors">
+          <button
+            onClick={handleLogout}
+            className="text-white/40 hover:text-white transition-colors"
+          >
             <LogOut className="w-4 h-4" />
           </button>
         </div>

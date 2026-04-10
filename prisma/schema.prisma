@@ -1,0 +1,105 @@
+// Intikhab Ecommerce — Prisma Schema
+// Supabase Postgres database
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Product {
+  id            String   @id @default(uuid()) @db.Uuid
+  slug          String   @unique
+  name          String
+  brand         String   @default("Intikhab")
+  category      String   // men, women, kids
+  price         Int
+  originalPrice Int?
+  images        String[]
+  badge         String?  // SALE, NEW
+  inStock       Boolean  @default(true)
+  stock         Int      @default(0)
+  installment   Int      @default(0)
+  description   String   @default("")
+  sku           String   @unique
+  status        String   @default("active") // active, draft
+  sizes         Int[]
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([slug])
+  @@index([category])
+  @@index([status])
+  @@map("products")
+}
+
+model Customer {
+  id           String    @id @default(uuid()) @db.Uuid
+  email        String    @unique
+  phone        String    @default("")
+  fullName     String    @default("")
+  createdAt    DateTime  @default(now())
+  lastOrderAt  DateTime?
+
+  orders       Order[]
+  carts        Cart[]
+
+  @@index([email])
+  @@map("customers")
+}
+
+model Order {
+  id             String      @id // INK-001 format, generated server-side
+  customerEmail  String
+  customerName   String      @default("")
+  shippingAddress String
+  province       String      @default("")
+  city           String      @default("")
+  phone          String      @default("")
+  paymentMethod  String      @default("cod") // cod, jazzcash, easypaisa
+  orderNotes     String?     @default("")
+  total          Int
+  status         String      @default("Pending") // Pending, Processing, Shipped, Delivered
+  createdAt      DateTime    @default(now())
+
+  customer       Customer    @relation(fields: [customerEmail], references: [email])
+  items          OrderItem[]
+
+  @@index([customerEmail])
+  @@index([status])
+  @@index([createdAt(sort: Desc)])
+  @@map("orders")
+}
+
+model OrderItem {
+  id         String  @id @default(uuid()) @db.Uuid
+  orderId    String
+  productId  String
+  name       String
+  image      String
+  quantity   Int
+  price      Int
+
+  order      Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([orderId])
+  @@map("order_items")
+}
+
+model Cart {
+  id             String   @id @default(uuid()) @db.Uuid
+  customerEmail  String
+  productId      String
+  quantity       Int      @default(1)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  customer       Customer @relation(fields: [customerEmail], references: [email], onDelete: Cascade)
+
+  @@unique([customerEmail, productId])
+  @@index([customerEmail])
+  @@map("carts")
+}
