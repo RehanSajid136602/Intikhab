@@ -1,0 +1,1347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Intikhab - Pakistan's #1 Online Shoe Store</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'accent-red': '#E53935',
+            'accent-dark': '#1A1A1A',
+            'text-dark': '#1A1A1A',
+            'text-gray': '#6B7280',
+            'border-light': '#E8E8E8',
+          },
+          fontFamily: {
+            'poppins': ['Poppins', 'sans-serif'],
+          },
+        }
+      }
+    }
+  </script>
+  <style>
+    * { font-family: 'Poppins', sans-serif; }
+    
+    @keyframes marquee {
+      0% { transform: translateX(100%); }
+      100% { transform: translateX(-100%); }
+    }
+    .marquee-content {
+      animation: marquee 20s linear infinite;
+    }
+    
+    @keyframes blink {
+      0%, 50% { opacity: 1; }
+      51%, 100% { opacity: 0; }
+    }
+    .blink-dot {
+      animation: blink 1s infinite;
+    }
+    
+    .slide { opacity: 0; transition: opacity 0.8s ease-in-out; }
+    .slide.active { opacity: 1; }
+    
+    .product-card:hover .add-to-cart-btn { opacity: 1 !important; }
+    
+    .dropdown-menu {
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(10px);
+      transition: all 0.2s ease;
+    }
+    .nav-item:hover .dropdown-menu {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+    
+    .category-cell:hover img { transform: scale(1.05); }
+    .category-cell:hover .overlay { opacity: 1; }
+    .category-cell:hover .shop-now-text { opacity: 1; }
+    
+    .insta-cell:hover .insta-overlay { opacity: 1; }
+  </style>
+</head>
+<body class="bg-white font-poppins">
+
+  <!-- SECTION 1: ANNOUNCEMENT BAR -->
+  <div id="announcement-bar" class="bg-accent-red h-9 flex items-center overflow-hidden relative">
+    <div class="marquee-content flex items-center whitespace-nowrap pl-full">
+      <span class="text-white text-xs font-medium tracking-wider uppercase">
+        Summer Collection '25 LIVE! Enjoy up to 50% OFF on your favorite articles. Free Delivery on all Prepaid Orders above PKR 5,000. Shop Now →
+      </span>
+    </div>
+    <button id="close-bar" class="absolute right-3 top-1/2 -translate-y-1/2 text-white text-lg hover:opacity-80">×</button>
+  </div>
+
+  <!-- SECTION 2: TOP UTILITY BAR -->
+  <div class="border-b border-border-light h-8 flex items-center">
+    <div class="container mx-auto px-4 flex justify-between items-center text-xs text-text-gray w-full">
+      <div class="hidden md:flex items-center gap-4">
+        <span>📞 +92 300 0000000</span>
+        <span>📧 hello@intikhab.pk</span>
+      </div>
+      <div class="hidden md:flex items-center gap-3 ml-auto">
+        <span>Track Order</span>
+        <span class="text-border-light">|</span>
+        <span>Store Locator</span>
+        <span class="text-border-light">|</span>
+        <span>Free Delivery on Prepaid Orders</span>
+      </div>
+      <div class="md:hidden text-xs text-text-gray">
+        <span>📞 +92 300 0000000</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 3: MAIN NAVIGATION -->
+  <nav id="main-nav" class="sticky top-0 z-50 bg-white shadow-sm transition-shadow duration-300">
+    <div class="container mx-auto px-4">
+      <div class="h-16 md:h-14 flex items-center justify-between">
+        <!-- Mobile Menu Toggle -->
+        <button id="menu-toggle" class="md:hidden p-2 -ml-2">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+          </svg>
+        </button>
+        
+        <!-- Logo -->
+        <a href="#" class="text-xl font-bold tracking-tight text-accent-dark md:absolute md:left-1/2 md:-translate-x-1/2">
+          Intikhab
+        </a>
+        
+        <!-- Desktop Nav -->
+        <div class="hidden md:flex items-center gap-6 text-xs font-semibold uppercase tracking-wider">
+          <a href="#sale" class="text-accent-red flex items-center gap-1">
+            SALE
+            <span class="w-1.5 h-1.5 bg-accent-red rounded-full blink-dot"></span>
+          </a>
+          <a href="#summer" class="text-text-dark hover:text-accent-red transition-colors">SUMMER</a>
+          
+          <div class="nav-item relative">
+            <a href="#new" class="text-text-dark hover:text-accent-red transition-colors flex items-center gap-1">
+              NEW IN
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+              </svg>
+            </a>
+            <div class="dropdown-menu absolute top-full left-0 bg-white shadow-lg border-t border-border-light p-4 min-w-[180px]">
+              <a href="#" class="block py-2 text-text-gray hover:text-accent-red transition-colors">New Arrivals</a>
+              <a href="#" class="block py-2 text-text-gray hover:text-accent-red transition-colors">Trending Now</a>
+              <a href="#" class="block py-2 text-text-gray hover:text-accent-red transition-colors">Best Sellers</a>
+              <a href="#" class="block py-2 text-text-gray hover:text-accent-red transition-colors">Coming Soon</a>
+            </div>
+          </div>
+          
+          <div class="nav-item relative">
+            <a href="#women" class="text-text-dark hover:text-accent-red transition-colors flex items-center gap-1">
+              WOMEN
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+              </svg>
+            </a>
+            <div class="dropdown-menu absolute top-full left-0 bg-white shadow-lg border-t border-border-light p-4 min-w-[180px]">
+              <a href="#" class="block py-2 text-text-gray hover:text-accent-red transition-colors">Casual</a>
+              <a href="#" class="block py-2 text-text-gray hover:text-accent-red transition-colors">Formal</a>
+              <a href="#" class="block py-2 text-text-gray hover:text-accent-red transition-colors">Sports</a>
+              <a href="#" class="block py-2 text-text-gray hover:text-accent-red transition-colors">Sneakers</a>
+            </div>
+          </div>
+          
+          <div class="nav-item relative">
+            <a href="#men" class="text-text-dark hover:text-accent-red transition-colors flex items-center gap-1">
+              MEN
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+              </svg>
+            </a>
+            <div class="dropdown-menu absolute top-full left-0 bg-white shadow-lg border-t border-border-light p-4 min-w-[180px]">
+              <a href="#" class="block py-2 text-text-gray hover:text-accent-red transition-colors">Casual</a>
+              <a href="#" class="block py-2 text-text-gray hover:text-accent-red transition-colors">Formal</a>
+              <a href="#" class="block py-2 text-text-gray hover:text-accent-red transition-colors">Sports</a>
+              <a href="#" class="block py-2 text-text-gray hover:text-accent-red transition-colors">Sneakers</a>
+            </div>
+          </div>
+          
+          <div class="nav-item relative">
+            <a href="#kids" class="text-text-dark hover:text-accent-red transition-colors flex items-center gap-1">
+              KIDS
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+              </svg>
+            </a>
+            <div class="dropdown-menu absolute top-full left-0 bg-white shadow-lg border-t border-border-light p-4 min-w-[180px]">
+              <a href="#" class="block py-2 text-text-gray hover:text-accent-red transition-colors">Boys</a>
+              <a href="#" class="block py-2 text-text-gray hover:text-accent-red transition-colors">Girls</a>
+              <a href="#" class="block py-2 text-text-gray hover:text-accent-red transition-colors">Infants</a>
+            </div>
+          </div>
+          
+          <div class="nav-item relative">
+            <a href="#bags" class="text-text-dark hover:text-accent-red transition-colors flex items-center gap-1">
+              BAGS
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+              </svg>
+            </a>
+            <div class="dropdown-menu absolute top-full left-0 bg-white shadow-lg border-t border-border-light p-4 min-w-[180px]">
+              <a href="#" class="block py-2 text-text-gray hover:text-accent-red transition-colors">Handbags</a>
+              <a href="#" class="block py-2 text-text-gray hover:text-accent-red transition-colors">Backpacks</a>
+              <a href="#" class="block py-2 text-text-gray hover:text-accent-red transition-colors">Wallets</a>
+            </div>
+          </div>
+          
+          <a href="#fragrances" class="text-text-dark hover:text-accent-red transition-colors">FRAGRANCES</a>
+          <a href="#bestseller" class="text-text-dark hover:text-accent-red transition-colors">BEST SELLER</a>
+          
+          <span class="text-border-light">|</span>
+          
+          <a href="#nayza" class="text-text-dark hover:text-accent-red transition-colors">NAYZA</a>
+          <a href="#pret" class="text-text-dark hover:text-accent-red transition-colors">PRET</a>
+        </div>
+        
+        <!-- Right Icons -->
+        <div class="flex items-center gap-3">
+          <button id="search-icon" class="p-2 hover:text-accent-red transition-colors">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+            </svg>
+          </button>
+          <button class="p-2 hover:text-accent-red transition-colors relative group">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+            </svg>
+            <span class="absolute -bottom-6 left-1/2 -translate-x-1/2 text-[10px] bg-accent-dark text-white px-2 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">My Account</span>
+          </button>
+          <button class="p-2 hover:text-accent-red transition-colors relative">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+            </svg>
+            <span class="cart-count absolute -top-1 -right-1 w-4 h-4 bg-accent-red text-white text-[10px] rounded-full flex items-center justify-center">0</span>
+          </button>
+          <button class="p-2 hover:text-accent-red transition-colors relative">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+            </svg>
+            <span class="cart-count absolute -top-1 -right-1 w-4 h-4 bg-accent-dark text-white text-[10px] rounded-full flex items-center justify-center">0</span>
+          </button>
+        </div>
+      </div>
+      
+      <!-- Search Bar -->
+      <div id="search-bar" class="hidden pb-4">
+        <div class="relative">
+          <input type="text" placeholder="Search for products, brands..." class="w-full border border-border-light px-4 py-3 text-sm focus:outline-none focus:border-accent-dark">
+          <button class="absolute right-3 top-1/2 -translate-y-1/2 text-text-gray hover:text-accent-dark">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Mobile Menu Overlay -->
+  <div id="mobile-menu" class="fixed inset-0 z-[100] bg-white transform -translate-x-full transition-transform duration-300 md:hidden">
+    <div class="p-4 flex justify-between items-center border-b border-border-light">
+      <span class="text-xl font-bold">Menu</span>
+      <button id="close-menu" class="p-2">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+    <div class="p-4 space-y-4">
+      <a href="#sale" class="block text-accent-red font-semibold">SALE</a>
+      <a href="#summer" class="block text-text-dark font-semibold">SUMMER</a>
+      <a href="#new" class="block text-text-dark">NEW IN</a>
+      <a href="#women" class="block text-text-dark">WOMEN</a>
+      <a href="#men" class="block text-text-dark">MEN</a>
+      <a href="#kids" class="block text-text-dark">KIDS</a>
+      <a href="#bags" class="block text-text-dark">BAGS</a>
+      <a href="#fragrances" class="block text-text-dark">FRAGRANCES</a>
+      <a href="#bestseller" class="block text-text-dark">BEST SELLER</a>
+      <a href="#nayza" class="block text-text-dark">NAYZA</a>
+      <a href="#pret" class="block text-text-dark">PRET</a>
+    </div>
+  </div>
+
+  <!-- SECTION 4: HERO SLIDER -->
+  <div class="relative h-[320px] md:h-[480px] overflow-hidden">
+    <!-- Slides -->
+    <div class="slide active" data-slide="0">
+      <div class="absolute inset-0">
+        <img src="/intikhab-man-blazer-skyline-sunset.jpeg" alt="Hero 1" class="w-full h-full object-cover">
+        <div class="absolute inset-0 bg-gradient-to-r from-black/55 via-black/30 to-transparent"></div>
+      </div>
+      <div class="absolute inset-0 flex items-center">
+        <div class="container mx-auto px-8 md:px-20">
+          <p class="text-white/80 text-xs font-medium uppercase tracking-widest mb-2">NEW COLLECTION '25</p>
+          <h1 class="text-3xl md:text-[42px] font-bold text-white leading-tight mb-2">
+            Nationwide<br>
+            <span class="italic font-light">Free Delivery</span><br>
+            On All Prepaid Orders
+          </h1>
+          <p class="text-white/70 text-sm mb-4">Shop from PKR 3,200</p>
+          <a href="#products" class="inline-block bg-white text-accent-dark px-8 py-3 text-xs font-bold uppercase tracking-widest hover:bg-accent-dark hover:text-white transition-colors duration-200">
+            SHOP NOW
+          </a>
+        </div>
+      </div>
+    </div>
+    
+    <div class="slide" data-slide="1">
+      <div class="absolute inset-0">
+        <img src="/intikhab-walking-park-trees-blue.jpeg" alt="Hero 2" class="w-full h-full object-cover">
+        <div class="absolute inset-0 bg-gradient-to-l from-black/55 via-black/30 to-transparent"></div>
+      </div>
+      <div class="absolute inset-0 flex items-center justify-end">
+        <div class="container mx-auto px-8 md:px-20 text-right">
+          <p class="text-white/80 text-xs font-medium uppercase tracking-widest mb-2">SUMMER READY</p>
+          <h1 class="text-3xl md:text-[42px] font-bold text-white leading-tight mb-2">
+            Stay Cool<br>
+            <span class="italic font-light">This Season</span>
+          </h1>
+          <p class="text-white/70 text-sm mb-4">Explore Blue Collection</p>
+          <a href="#products" class="inline-block bg-white text-accent-dark px-8 py-3 text-xs font-bold uppercase tracking-widest hover:bg-accent-dark hover:text-white transition-colors duration-200">
+            SHOP NOW
+          </a>
+        </div>
+      </div>
+    </div>
+    
+    <div class="slide" data-slide="2">
+      <div class="absolute inset-0">
+        <img src="/intikhab-man-sofa-indoor-white.jpeg" alt="Hero 3" class="w-full h-full object-cover">
+        <div class="absolute inset-0 bg-gradient-to-r from-black/55 via-black/30 to-transparent"></div>
+      </div>
+      <div class="absolute inset-0 flex items-center">
+        <div class="container mx-auto px-8 md:px-20">
+          <p class="text-white/80 text-xs font-medium uppercase tracking-widest mb-2">YOUR FAVORITES</p>
+          <h1 class="text-3xl md:text-[42px] font-bold text-white leading-tight mb-2">
+            Timeless<br>
+            <span class="italic font-light">Classics</span>
+          </h1>
+          <p class="text-white/70 text-sm mb-4">Discover Your Style</p>
+          <a href="#products" class="inline-block bg-white text-accent-dark px-8 py-3 text-xs font-bold uppercase tracking-widest hover:bg-accent-dark hover:text-white transition-colors duration-200">
+            SHOP NOW
+          </a>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Slider Controls -->
+    <button id="prev" class="absolute left-4 top-1/2 -translate-y-1/2 w-11 h-11 bg-black/40 rounded-full flex items-center justify-center text-white hover:bg-black/60 transition-colors">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+      </svg>
+    </button>
+    <button id="next" class="absolute right-4 top-1/2 -translate-y-1/2 w-11 h-11 bg-black/40 rounded-full flex items-center justify-center text-white hover:bg-black/60 transition-colors">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+      </svg>
+    </button>
+    
+    <!-- Dots -->
+    <div class="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+      <button class="dot w-2 h-2 rounded-full bg-white/50 active transition-all" data-dot="0"></button>
+      <button class="dot w-2 h-2 rounded-full bg-white/50 transition-all" data-dot="1"></button>
+      <button class="dot w-2 h-2 rounded-full bg-white/50 transition-all" data-dot="2"></button>
+    </div>
+  </div>
+  
+  <!-- Hero Divider -->
+  <div class="py-6 flex items-center justify-center gap-4">
+    <div class="h-px w-24 bg-border-light"></div>
+    <p class="text-text-gray text-sm font-medium">Your Favorites from Sale Up to 50% OFF</p>
+    <div class="h-px w-24 bg-border-light"></div>
+  </div>
+
+  <!-- SECTION 5: GENDER CATEGORY TABS + PRODUCT CAROUSEL -->
+  <section id="products" class="bg-white py-10">
+    <div class="container mx-auto px-4">
+      <!-- Section Title -->
+      <div class="text-center mb-8">
+        <h2 class="text-lg md:text-xl font-semibold text-accent-dark">— Shop by Category —</h2>
+      </div>
+      
+      <!-- Tabs -->
+      <div class="flex justify-center gap-2 md:gap-4 mb-8" data-tab-group>
+        <button class="tab-btn px-6 md:px-8 py-2.5 text-xs md:text-sm font-semibold uppercase tracking-wider border-b-2 border-accent-dark text-accent-dark" data-tab="men">MEN</button>
+        <button class="tab-btn px-6 md:px-8 py-2.5 text-xs md:text-sm font-semibold uppercase tracking-wider border-b-2 border-transparent text-text-gray hover:text-accent-dark transition-colors" data-tab="women">WOMEN</button>
+        <button class="tab-btn px-6 md:px-8 py-2.5 text-xs md:text-sm font-semibold uppercase tracking-wider border-b-2 border-transparent text-text-gray hover:text-accent-dark transition-colors" data-tab="kids">KIDS</button>
+      </div>
+      
+      <!-- Products Container -->
+      <div class="relative">
+        <!-- MEN Products -->
+        <div class="product-panel grid grid-cols-2 md:grid-cols-4 gap-4" data-panel="men">
+          <!-- Product 1 -->
+          <div class="product-card relative bg-white rounded-sm overflow-hidden border border-border-light group cursor-pointer">
+            <div class="absolute top-3 left-3 z-10 bg-accent-red text-white text-[10px] font-semibold px-2 py-0.5 uppercase tracking-wider">SALE</div>
+            <button class="absolute top-3 right-3 z-10 opacity-0 group-hover:opacity-100 transition-opacity p-1">
+              <svg class="w-5 h-5 text-text-gray hover:text-accent-red" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+              </svg>
+            </button>
+            <div class="aspect-square overflow-hidden bg-[#F7F7F7]">
+              <img src="/shoe_black_01.jpeg" alt="Black Sneaker" class="w-full h-full object-contain p-4 transition-transform duration-500 group-hover:scale-105">
+            </div>
+            <div class="p-3">
+              <p class="text-[11px] text-text-gray uppercase tracking-wider mb-1">Intikhab</p>
+              <h3 class="text-[13px] font-medium text-accent-dark leading-tight mb-2">Black Sneaker — Classic</h3>
+              <div class="flex items-center gap-2 mb-2">
+                <span class="text-[12px] line-through text-text-gray">PKR 4,500</span>
+                <span class="text-[14px] font-semibold text-accent-red">PKR 3,500</span>
+              </div>
+              <p class="text-[11px] text-text-gray mb-3">📦 Pay only PKR 1,750 now</p>
+              <button class="add-to-cart-btn add-to-cart w-full bg-accent-dark text-white text-[11px] font-bold uppercase tracking-widest py-2.5 opacity-0 group-hover:opacity-100 transition-opacity duration-200">ADD TO CART</button>
+            </div>
+          </div>
+          
+          <!-- Product 2 -->
+          <div class="product-card relative bg-white rounded-sm overflow-hidden border border-border-light group cursor-pointer">
+            <button class="absolute top-3 right-3 z-10 opacity-0 group-hover:opacity-100 transition-opacity p-1">
+              <svg class="w-5 h-5 text-text-gray hover:text-accent-red" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+              </svg>
+            </button>
+            <div class="aspect-square overflow-hidden bg-[#F7F7F7]">
+              <img src="/shoe_black_02.jpeg" alt="Black Sneaker Alt" class="w-full h-full object-contain p-4 transition-transform duration-500 group-hover:scale-105">
+            </div>
+            <div class="p-3">
+              <p class="text-[11px] text-text-gray uppercase tracking-wider mb-1">Intikhab</p>
+              <h3 class="text-[13px] font-medium text-accent-dark leading-tight mb-2">Black Sneaker — Alt</h3>
+              <div class="flex items-center gap-2 mb-2">
+                <span class="text-[14px] font-semibold text-accent-dark">PKR 3,500</span>
+              </div>
+              <p class="text-[11px] text-text-gray mb-3">📦 Pay only PKR 1,750 now</p>
+              <button class="add-to-cart-btn add-to-cart w-full bg-accent-dark text-white text-[11px] font-bold uppercase tracking-widest py-2.5 opacity-0 group-hover:opacity-100 transition-opacity duration-200">ADD TO CART</button>
+            </div>
+          </div>
+          
+          <!-- Product 3 -->
+          <div class="product-card relative bg-white rounded-sm overflow-hidden border border-border-light group cursor-pointer">
+            <div class="absolute top-3 left-3 z-10 bg-[#2ECC71] text-white text-[10px] font-semibold px-2 py-0.5 uppercase tracking-wider">NEW</div>
+            <button class="absolute top-3 right-3 z-10 opacity-0 group-hover:opacity-100 transition-opacity p-1">
+              <svg class="w-5 h-5 text-text-gray hover:text-accent-red" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+              </svg>
+            </button>
+            <div class="aspect-square overflow-hidden bg-[#F7F7F7]">
+              <img src="/shoe_black_03.jpeg" alt="Black Sneaker Side" class="w-full h-full object-contain p-4 transition-transform duration-500 group-hover:scale-105">
+            </div>
+            <div class="p-3">
+              <p class="text-[11px] text-text-gray uppercase tracking-wider mb-1">Intikhab</p>
+              <h3 class="text-[13px] font-medium text-accent-dark leading-tight mb-2">Black Sneaker — Side View</h3>
+              <div class="flex items-center gap-2 mb-2">
+                <span class="text-[14px] font-semibold text-accent-dark">PKR 3,500</span>
+              </div>
+              <p class="text-[11px] text-text-gray mb-3">📦 Pay only PKR 1,750 now</p>
+              <button class="add-to-cart-btn add-to-cart w-full bg-accent-dark text-white text-[11px] font-bold uppercase tracking-widest py-2.5 opacity-0 group-hover:opacity-100 transition-opacity duration-200">ADD TO CART</button>
+            </div>
+          </div>
+          
+          <!-- Product 4 -->
+          <div class="product-card relative bg-white rounded-sm overflow-hidden border border-border-light group cursor-pointer">
+            <button class="absolute top-3 right-3 z-10 opacity-0 group-hover:opacity-100 transition-opacity p-1">
+              <svg class="w-5 h-5 text-text-gray hover:text-accent-red" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+              </svg>
+            </button>
+            <div class="aspect-square overflow-hidden bg-[#F7F7F7]">
+              <img src="/shoe_black_04.jpeg" alt="Black Sneaker Detail" class="w-full h-full object-contain p-4 transition-transform duration-500 group-hover:scale-105">
+            </div>
+            <div class="p-3">
+              <p class="text-[11px] text-text-gray uppercase tracking-wider mb-1">Intikhab</p>
+              <h3 class="text-[13px] font-medium text-accent-dark leading-tight mb-2">Black Sneaker — Detail</h3>
+              <div class="flex items-center gap-2 mb-2">
+                <span class="text-[14px] font-semibold text-accent-dark">PKR 3,500</span>
+              </div>
+              <p class="text-[11px] text-text-gray mb-3">📦 Pay only PKR 1,750 now</p>
+              <button class="add-to-cart-btn add-to-cart w-full bg-accent-dark text-white text-[11px] font-bold uppercase tracking-widest py-2.5 opacity-0 group-hover:opacity-100 transition-opacity duration-200">ADD TO CART</button>
+            </div>
+          </div>
+        </div>
+        
+        <!-- WOMEN Products -->
+        <div class="product-panel grid grid-cols-2 md:grid-cols-4 gap-4 hidden" data-panel="women">
+          <div class="product-card relative bg-white rounded-sm overflow-hidden border border-border-light group cursor-pointer">
+            <div class="absolute top-3 left-3 z-10 bg-[#2ECC71] text-white text-[10px] font-semibold px-2 py-0.5 uppercase tracking-wider">NEW</div>
+            <button class="absolute top-3 right-3 z-10 opacity-0 group-hover:opacity-100 transition-opacity p-1">
+              <svg class="w-5 h-5 text-text-gray hover:text-accent-red" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+              </svg>
+            </button>
+            <div class="aspect-square overflow-hidden bg-[#F7F7F7]">
+              <img src="/shoe_blue_01.jpeg" alt="Blue Sneaker" class="w-full h-full object-contain p-4 transition-transform duration-500 group-hover:scale-105">
+            </div>
+            <div class="p-3">
+              <p class="text-[11px] text-text-gray uppercase tracking-wider mb-1">Intikhab</p>
+              <h3 class="text-[13px] font-medium text-accent-dark leading-tight mb-2">Blue Sneaker — Classic</h3>
+              <div class="flex items-center gap-2 mb-2">
+                <span class="text-[14px] font-semibold text-accent-dark">PKR 3,200</span>
+              </div>
+              <p class="text-[11px] text-text-gray mb-3">📦 Pay only PKR 1,600 now</p>
+              <button class="add-to-cart-btn add-to-cart w-full bg-accent-dark text-white text-[11px] font-bold uppercase tracking-widest py-2.5 opacity-0 group-hover:opacity-100 transition-opacity duration-200">ADD TO CART</button>
+            </div>
+          </div>
+          
+          <div class="product-card relative bg-white rounded-sm overflow-hidden border border-border-light group cursor-pointer">
+            <button class="absolute top-3 right-3 z-10 opacity-0 group-hover:opacity-100 transition-opacity p-1">
+              <svg class="w-5 h-5 text-text-gray hover:text-accent-red" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+              </svg>
+            </button>
+            <div class="aspect-square overflow-hidden bg-[#F7F7F7]">
+              <img src="/shoe_blue_02.jpeg" alt="Blue Sneaker Alt" class="w-full h-full object-contain p-4 transition-transform duration-500 group-hover:scale-105">
+            </div>
+            <div class="p-3">
+              <p class="text-[11px] text-text-gray uppercase tracking-wider mb-1">Intikhab</p>
+              <h3 class="text-[13px] font-medium text-accent-dark leading-tight mb-2">Blue Sneaker — Alt</h3>
+              <div class="flex items-center gap-2 mb-2">
+                <span class="text-[14px] font-semibold text-accent-dark">PKR 3,200</span>
+              </div>
+              <p class="text-[11px] text-text-gray mb-3">📦 Pay only PKR 1,600 now</p>
+              <button class="add-to-cart-btn add-to-cart w-full bg-accent-dark text-white text-[11px] font-bold uppercase tracking-widest py-2.5 opacity-0 group-hover:opacity-100 transition-opacity duration-200">ADD TO CART</button>
+            </div>
+          </div>
+          
+          <div class="product-card relative bg-white rounded-sm overflow-hidden border border-border-light group cursor-pointer">
+            <button class="absolute top-3 right-3 z-10 opacity-0 group-hover:opacity-100 transition-opacity p-1">
+              <svg class="w-5 h-5 text-text-gray hover:text-accent-red" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+              </svg>
+            </button>
+            <div class="aspect-square overflow-hidden bg-[#F7F7F7]">
+              <img src="/shoe_blue_03.jpeg" alt="Blue Sneaker Light" class="w-full h-full object-contain p-4 transition-transform duration-500 group-hover:scale-105">
+            </div>
+            <div class="p-3">
+              <p class="text-[11px] text-text-gray uppercase tracking-wider mb-1">Intikhab</p>
+              <h3 class="text-[13px] font-medium text-accent-dark leading-tight mb-2">Blue Sneaker — Light</h3>
+              <div class="flex items-center gap-2 mb-2">
+                <span class="text-[14px] font-semibold text-accent-dark">PKR 3,200</span>
+              </div>
+              <p class="text-[11px] text-text-gray mb-3">📦 Pay only PKR 1,600 now</p>
+              <button class="add-to-cart-btn add-to-cart w-full bg-accent-dark text-white text-[11px] font-bold uppercase tracking-widest py-2.5 opacity-0 group-hover:opacity-100 transition-opacity duration-200">ADD TO CART</button>
+            </div>
+          </div>
+          
+          <div class="product-card relative bg-white rounded-sm overflow-hidden border border-border-light group cursor-pointer">
+            <button class="absolute top-3 right-3 z-10 opacity-0 group-hover:opacity-100 transition-opacity p-1">
+              <svg class="w-5 h-5 text-text-gray hover:text-accent-red" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+              </svg>
+            </button>
+            <div class="aspect-square overflow-hidden bg-[#F7F7F7]">
+              <img src="/shoe_blue_04.jpeg" alt="Blue Sneaker Style" class="w-full h-full object-contain p-4 transition-transform duration-500 group-hover:scale-105">
+            </div>
+            <div class="p-3">
+              <p class="text-[11px] text-text-gray uppercase tracking-wider mb-1">Intikhab</p>
+              <h3 class="text-[13px] font-medium text-accent-dark leading-tight mb-2">Blue Sneaker — Style</h3>
+              <div class="flex items-center gap-2 mb-2">
+                <span class="text-[14px] font-semibold text-accent-dark">PKR 3,200</span>
+              </div>
+              <p class="text-[11px] text-text-gray mb-3">📦 Pay only PKR 1,600 now</p>
+              <button class="add-to-cart-btn add-to-cart w-full bg-accent-dark text-white text-[11px] font-bold uppercase tracking-widest py-2.5 opacity-0 group-hover:opacity-100 transition-opacity duration-200">ADD TO CART</button>
+            </div>
+          </div>
+        </div>
+        
+        <!-- KIDS Products -->
+        <div class="product-panel grid grid-cols-2 md:grid-cols-4 gap-4 hidden" data-panel="kids">
+          <div class="product-card relative bg-white rounded-sm overflow-hidden border border-border-light group cursor-pointer">
+            <div class="absolute top-3 left-3 z-10 bg-[#2ECC71] text-white text-[10px] font-semibold px-2 py-0.5 uppercase tracking-wider">NEW</div>
+            <div class="aspect-square overflow-hidden bg-[#F7F7F7] flex items-center justify-center">
+              <img src="/shoe_collection.jpeg" alt="Coming Soon" class="w-full h-full object-contain p-4 opacity-60">
+            </div>
+            <div class="p-3 text-center">
+              <p class="text-[13px] font-medium text-text-gray">Coming Soon</p>
+            </div>
+          </div>
+          
+          <div class="product-card relative bg-white rounded-sm overflow-hidden border border-border-light group cursor-pointer">
+            <div class="aspect-square overflow-hidden bg-[#F7F7F7] flex items-center justify-center">
+              <img src="/shoe_collection.jpeg" alt="Coming Soon" class="w-full h-full object-contain p-4 opacity-60">
+            </div>
+            <div class="p-3 text-center">
+              <p class="text-[13px] font-medium text-text-gray">Coming Soon</p>
+            </div>
+          </div>
+          
+          <div class="product-card relative bg-white rounded-sm overflow-hidden border border-border-light group cursor-pointer">
+            <div class="aspect-square overflow-hidden bg-[#F7F7F7] flex items-center justify-center">
+              <img src="/shoe_collection.jpeg" alt="Coming Soon" class="w-full h-full object-contain p-4 opacity-60">
+            </div>
+            <div class="p-3 text-center">
+              <p class="text-[13px] font-medium text-text-gray">Coming Soon</p>
+            </div>
+          </div>
+          
+          <div class="product-card relative bg-white rounded-sm overflow-hidden border border-border-light group cursor-pointer">
+            <div class="aspect-square overflow-hidden bg-[#F7F7F7] flex items-center justify-center">
+              <img src="/shoe_collection.jpeg" alt="Coming Soon" class="w-full h-full object-contain p-4 opacity-60">
+            </div>
+            <div class="p-3 text-center">
+              <p class="text-[13px] font-medium text-text-gray">Coming Soon</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 6: SHOP BY CATEGORIES MOSAIC GRID -->
+  <section class="bg-white py-12 md:py-16">
+    <div class="container mx-auto px-4">
+      <h2 class="text-lg md:text-xl font-semibold text-accent-dark text-center mb-10">— Shop by Categories —</h2>
+      
+      <div class="grid grid-cols-2 md:grid-cols-5 gap-2 md:gap-3 h-[400px] md:h-[480px]">
+        <!-- Left Column -->
+        <div class="col-span-1 row-span-2 grid gap-2 md:gap-3">
+          <div class="category-cell relative h-full overflow-hidden cursor-pointer group">
+            <img src="/intikhab-man-bench-indoor-white.jpeg" alt="MEN" class="absolute inset-0 w-full h-full object-cover transition-transform duration-500">
+            <div class="overlay absolute inset-0 bg-black/15 opacity-0 transition-opacity duration-300"></div>
+            <div class="absolute bottom-0 left-0 p-3 md:p-4">
+              <p class="text-white font-bold text-sm md:text-base uppercase drop-shadow-lg">MEN</p>
+              <p class="shop-now-text text-white/80 text-xs opacity-0 transition-opacity duration-300 mt-1">SHOP NOW →</p>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Left Bottom -->
+        <div class="col-span-1 md:col-span-1 category-cell relative overflow-hidden cursor-pointer group">
+          <img src="/intikhab-sneakers-jute-mat-blue.jpeg" alt="WOMEN" class="absolute inset-0 w-full h-full object-cover transition-transform duration-500">
+          <div class="overlay absolute inset-0 bg-black/15 opacity-0 transition-opacity duration-300"></div>
+          <div class="absolute bottom-0 left-0 p-3 md:p-4">
+            <p class="text-white font-bold text-sm md:text-base uppercase drop-shadow-lg">WOMEN</p>
+            <p class="shop-now-text text-white/80 text-xs opacity-0 transition-opacity duration-300 mt-1">SHOP NOW →</p>
+          </div>
+        </div>
+        
+        <!-- Center Column - Tall -->
+        <div class="col-span-1 md:col-span-2 row-span-2 category-cell relative overflow-hidden cursor-pointer group">
+          <img src="/intikhab-man-blazer-skyline-sunset.jpeg" alt="NEW IN" class="absolute inset-0 w-full h-full object-cover transition-transform duration-500">
+          <div class="overlay absolute inset-0 bg-black/15 opacity-0 transition-opacity duration-300"></div>
+          <div class="absolute top-3 right-3 z-10 bg-[#2ECC71] text-white text-[10px] font-semibold px-2 py-0.5 uppercase tracking-wider">NEW IN</div>
+          <div class="absolute bottom-0 left-0 p-3 md:p-4">
+            <p class="text-white font-bold text-sm md:text-base uppercase drop-shadow-lg">NEW IN</p>
+            <p class="shop-now-text text-white/80 text-xs opacity-0 transition-opacity duration-300 mt-1">SHOP NOW →</p>
+          </div>
+        </div>
+        
+        <!-- Right Top -->
+        <div class="col-span-1 md:col-span-2 grid gap-2 md:gap-3">
+          <div class="category-cell relative overflow-hidden cursor-pointer group">
+            <img src="/intikhab-man-cafe-outdoor-white.jpeg" alt="BAGS" class="absolute inset-0 w-full h-full object-cover transition-transform duration-500">
+            <div class="overlay absolute inset-0 bg-black/15 opacity-0 transition-opacity duration-300"></div>
+            <div class="absolute bottom-0 left-0 p-3 md:p-4">
+              <p class="text-white font-bold text-sm md:text-base uppercase drop-shadow-lg">BAGS</p>
+              <p class="shop-now-text text-white/80 text-xs opacity-0 transition-opacity duration-300 mt-1">SHOP NOW →</p>
+            </div>
+          </div>
+          
+          <!-- Bottom Right -->
+          <div class="category-cell relative overflow-hidden cursor-pointer group">
+            <img src="/shoe_collection.jpeg" alt="KIDS" class="absolute inset-0 w-full h-full object-cover transition-transform duration-500">
+            <div class="overlay absolute inset-0 bg-black/15 opacity-0 transition-opacity duration-300"></div>
+            <div class="absolute bottom-0 left-0 p-3 md:p-4">
+              <p class="text-white font-bold text-sm md:text-base uppercase drop-shadow-lg">KIDS</p>
+              <p class="shop-now-text text-white/80 text-xs opacity-0 transition-opacity duration-300 mt-1">SHOP NOW →</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 7: NEW COLLECTION TABS + PRODUCT CAROUSEL -->
+  <section id="new-collection" class="bg-[#F7F7F7] py-12 md:py-16">
+    <div class="container mx-auto px-4">
+      <h2 class="text-lg md:text-xl font-semibold text-accent-dark text-center mb-8">— Your Favorites from NEW COLLECTION! —</h2>
+      
+      <!-- Tabs -->
+      <div class="flex justify-center gap-2 md:gap-4 mb-8" data-tab-group>
+        <button class="tab-btn px-6 md:px-8 py-2.5 text-xs md:text-sm font-semibold uppercase tracking-wider border-b-2 border-accent-dark text-accent-dark" data-tab="new-men">MEN</button>
+        <button class="tab-btn px-6 md:px-8 py-2.5 text-xs md:text-sm font-semibold uppercase tracking-wider border-b-2 border-transparent text-text-gray hover:text-accent-dark transition-colors" data-tab="new-women">WOMEN</button>
+        <button class="tab-btn px-6 md:px-8 py-2.5 text-xs md:text-sm font-semibold uppercase tracking-wider border-b-2 border-transparent text-text-gray hover:text-accent-dark transition-colors" data-tab="new-kids">KIDS</button>
+      </div>
+      
+      <!-- Products -->
+      <div class="relative">
+        <!-- NEW MEN Products -->
+        <div class="product-panel grid grid-cols-2 md:grid-cols-4 gap-4" data-panel="new-men">
+          <div class="product-card relative bg-white rounded-sm overflow-hidden border border-border-light group cursor-pointer">
+            <div class="absolute top-3 left-3 z-10 bg-[#2ECC71] text-white text-[10px] font-semibold px-2 py-0.5 uppercase tracking-wider">NEW</div>
+            <button class="absolute top-3 right-3 z-10 opacity-0 group-hover:opacity-100 transition-opacity p-1">
+              <svg class="w-5 h-5 text-text-gray hover:text-accent-red" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+              </svg>
+            </button>
+            <div class="aspect-square overflow-hidden bg-white">
+              <img src="/shoe_black_01.jpeg" alt="Classic Black" class="w-full h-full object-contain p-4 transition-transform duration-500 group-hover:scale-105">
+            </div>
+            <div class="p-3">
+              <p class="text-[11px] text-text-gray uppercase tracking-wider mb-1">Intikhab</p>
+              <h3 class="text-[13px] font-medium text-accent-dark leading-tight mb-2">Classic Black</h3>
+              <div class="flex items-center gap-2 mb-2">
+                <span class="text-[14px] font-semibold text-accent-dark">PKR 3,500</span>
+              </div>
+              <p class="text-[11px] text-text-gray mb-3">📦 Pay only PKR 1,750 now</p>
+              <button class="add-to-cart-btn add-to-cart w-full bg-accent-dark text-white text-[11px] font-bold uppercase tracking-widest py-2.5 opacity-0 group-hover:opacity-100 transition-opacity duration-200">ADD TO CART</button>
+            </div>
+          </div>
+          
+          <div class="product-card relative bg-white rounded-sm overflow-hidden border border-border-light group cursor-pointer">
+            <div class="absolute top-3 left-3 z-10 bg-[#2ECC71] text-white text-[10px] font-semibold px-2 py-0.5 uppercase tracking-wider">NEW</div>
+            <button class="absolute top-3 right-3 z-10 opacity-0 group-hover:opacity-100 transition-opacity p-1">
+              <svg class="w-5 h-5 text-text-gray hover:text-accent-red" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+              </svg>
+            </button>
+            <div class="aspect-square overflow-hidden bg-white">
+              <img src="/shoe_black_05.jpeg" alt="Black Runner" class="w-full h-full object-contain p-4 transition-transform duration-500 group-hover:scale-105">
+            </div>
+            <div class="p-3">
+              <p class="text-[11px] text-text-gray uppercase tracking-wider mb-1">Intikhab</p>
+              <h3 class="text-[13px] font-medium text-accent-dark leading-tight mb-2">Black Runner</h3>
+              <div class="flex items-center gap-2 mb-2">
+                <span class="text-[14px] font-semibold text-accent-dark">PKR 3,500</span>
+              </div>
+              <p class="text-[11px] text-text-gray mb-3">📦 Pay only PKR 1,750 now</p>
+              <button class="add-to-cart-btn add-to-cart w-full bg-accent-dark text-white text-[11px] font-bold uppercase tracking-widest py-2.5 opacity-0 group-hover:opacity-100 transition-opacity duration-200">ADD TO CART</button>
+            </div>
+          </div>
+          
+          <div class="product-card relative bg-white rounded-sm overflow-hidden border border-border-light group cursor-pointer">
+            <button class="absolute top-3 right-3 z-10 opacity-0 group-hover:opacity-100 transition-opacity p-1">
+              <svg class="w-5 h-5 text-text-gray hover:text-accent-red" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+              </svg>
+            </button>
+            <div class="aspect-square overflow-hidden bg-white">
+              <img src="/shoe_black_06.png" alt="Black Street" class="w-full h-full object-contain p-4 transition-transform duration-500 group-hover:scale-105">
+            </div>
+            <div class="p-3">
+              <p class="text-[11px] text-text-gray uppercase tracking-wider mb-1">Intikhab</p>
+              <h3 class="text-[13px] font-medium text-accent-dark leading-tight mb-2">Black Street</h3>
+              <div class="flex items-center gap-2 mb-2">
+                <span class="text-[14px] font-semibold text-accent-dark">PKR 3,500</span>
+              </div>
+              <p class="text-[11px] text-text-gray mb-3">📦 Pay only PKR 1,750 now</p>
+              <button class="add-to-cart-btn add-to-cart w-full bg-accent-dark text-white text-[11px] font-bold uppercase tracking-widest py-2.5 opacity-0 group-hover:opacity-100 transition-opacity duration-200">ADD TO CART</button>
+            </div>
+          </div>
+          
+          <div class="product-card relative bg-white rounded-sm overflow-hidden border border-border-light group cursor-pointer">
+            <div class="absolute top-3 left-3 z-10 bg-accent-red text-white text-[10px] font-semibold px-2 py-0.5 uppercase tracking-wider">SALE</div>
+            <button class="absolute top-3 right-3 z-10 opacity-0 group-hover:opacity-100 transition-opacity p-1">
+              <svg class="w-5 h-5 text-text-gray hover:text-accent-red" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+              </svg>
+            </button>
+            <div class="aspect-square overflow-hidden bg-white">
+              <img src="/shoe_box.jpeg" alt="Black Box Set" class="w-full h-full object-contain p-4 transition-transform duration-500 group-hover:scale-105">
+            </div>
+            <div class="p-3">
+              <p class="text-[11px] text-text-gray uppercase tracking-wider mb-1">Intikhab</p>
+              <h3 class="text-[13px] font-medium text-accent-dark leading-tight mb-2">Black Box Set</h3>
+              <div class="flex items-center gap-2 mb-2">
+                <span class="text-[12px] line-through text-text-gray">PKR 4,500</span>
+                <span class="text-[14px] font-semibold text-accent-red">PKR 3,800</span>
+              </div>
+              <p class="text-[11px] text-text-gray mb-3">📦 Pay only PKR 1,900 now</p>
+              <button class="add-to-cart-btn add-to-cart w-full bg-accent-dark text-white text-[11px] font-bold uppercase tracking-widest py-2.5 opacity-0 group-hover:opacity-100 transition-opacity duration-200">ADD TO CART</button>
+            </div>
+          </div>
+        </div>
+        
+        <!-- NEW WOMEN Products -->
+        <div class="product-panel grid grid-cols-2 md:grid-cols-4 gap-4 hidden" data-panel="new-women">
+          <div class="product-card relative bg-white rounded-sm overflow-hidden border border-border-light group cursor-pointer">
+            <div class="absolute top-3 left-3 z-10 bg-[#2ECC71] text-white text-[10px] font-semibold px-2 py-0.5 uppercase tracking-wider">NEW</div>
+            <button class="absolute top-3 right-3 z-10 opacity-0 group-hover:opacity-100 transition-opacity p-1">
+              <svg class="w-5 h-5 text-text-gray hover:text-accent-red" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+              </svg>
+            </button>
+            <div class="aspect-square overflow-hidden bg-white">
+              <img src="/shoe_blue_01.jpeg" alt="Blue Classic" class="w-full h-full object-contain p-4 transition-transform duration-500 group-hover:scale-105">
+            </div>
+            <div class="p-3">
+              <p class="text-[11px] text-text-gray uppercase tracking-wider mb-1">Intikhab</p>
+              <h3 class="text-[13px] font-medium text-accent-dark leading-tight mb-2">Blue Classic</h3>
+              <div class="flex items-center gap-2 mb-2">
+                <span class="text-[14px] font-semibold text-accent-dark">PKR 3,200</span>
+              </div>
+              <p class="text-[11px] text-text-gray mb-3">📦 Pay only PKR 1,600 now</p>
+              <button class="add-to-cart-btn add-to-cart w-full bg-accent-dark text-white text-[11px] font-bold uppercase tracking-widest py-2.5 opacity-0 group-hover:opacity-100 transition-opacity duration-200">ADD TO CART</button>
+            </div>
+          </div>
+          
+          <div class="product-card relative bg-white rounded-sm overflow-hidden border border-border-light group cursor-pointer">
+            <button class="absolute top-3 right-3 z-10 opacity-0 group-hover:opacity-100 transition-opacity p-1">
+              <svg class="w-5 h-5 text-text-gray hover:text-accent-red" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+              </svg>
+            </button>
+            <div class="aspect-square overflow-hidden bg-white">
+              <img src="/shoe_blue_02.jpeg" alt="Blue Runner" class="w-full h-full object-contain p-4 transition-transform duration-500 group-hover:scale-105">
+            </div>
+            <div class="p-3">
+              <p class="text-[11px] text-text-gray uppercase tracking-wider mb-1">Intikhab</p>
+              <h3 class="text-[13px] font-medium text-accent-dark leading-tight mb-2">Blue Runner</h3>
+              <div class="flex items-center gap-2 mb-2">
+                <span class="text-[14px] font-semibold text-accent-dark">PKR 3,200</span>
+              </div>
+              <p class="text-[11px] text-text-gray mb-3">📦 Pay only PKR 1,600 now</p>
+              <button class="add-to-cart-btn add-to-cart w-full bg-accent-dark text-white text-[11px] font-bold uppercase tracking-widest py-2.5 opacity-0 group-hover:opacity-100 transition-opacity duration-200">ADD TO CART</button>
+            </div>
+          </div>
+          
+          <div class="product-card relative bg-white rounded-sm overflow-hidden border border-border-light group cursor-pointer">
+            <div class="absolute top-3 left-3 z-10 bg-accent-red text-white text-[10px] font-semibold px-2 py-0.5 uppercase tracking-wider">SALE</div>
+            <button class="absolute top-3 right-3 z-10 opacity-0 group-hover:opacity-100 transition-opacity p-1">
+              <svg class="w-5 h-5 text-text-gray hover:text-accent-red" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+              </svg>
+            </button>
+            <div class="aspect-square overflow-hidden bg-white">
+              <img src="/shoe_blue_03.jpeg" alt="Blue Breeze" class="w-full h-full object-contain p-4 transition-transform duration-500 group-hover:scale-105">
+            </div>
+            <div class="p-3">
+              <p class="text-[11px] text-text-gray uppercase tracking-wider mb-1">Intikhab</p>
+              <h3 class="text-[13px] font-medium text-accent-dark leading-tight mb-2">Blue Breeze</h3>
+              <div class="flex items-center gap-2 mb-2">
+                <span class="text-[12px] line-through text-text-gray">PKR 3,500</span>
+                <span class="text-[14px] font-semibold text-accent-red">PKR 2,800</span>
+              </div>
+              <p class="text-[11px] text-text-gray mb-3">📦 Pay only PKR 1,400 now</p>
+              <button class="add-to-cart-btn add-to-cart w-full bg-accent-dark text-white text-[11px] font-bold uppercase tracking-widest py-2.5 opacity-0 group-hover:opacity-100 transition-opacity duration-200">ADD TO CART</button>
+            </div>
+          </div>
+          
+          <div class="product-card relative bg-white rounded-sm overflow-hidden border border-border-light group cursor-pointer">
+            <button class="absolute top-3 right-3 z-10 opacity-0 group-hover:opacity-100 transition-opacity p-1">
+              <svg class="w-5 h-5 text-text-gray hover:text-accent-red" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+              </svg>
+            </button>
+            <div class="aspect-square overflow-hidden bg-white">
+              <img src="/shoe_blue_04.jpeg" alt="Blue Style" class="w-full h-full object-contain p-4 transition-transform duration-500 group-hover:scale-105">
+            </div>
+            <div class="p-3">
+              <p class="text-[11px] text-text-gray uppercase tracking-wider mb-1">Intikhab</p>
+              <h3 class="text-[13px] font-medium text-accent-dark leading-tight mb-2">Blue Style</h3>
+              <div class="flex items-center gap-2 mb-2">
+                <span class="text-[14px] font-semibold text-accent-dark">PKR 3,200</span>
+              </div>
+              <p class="text-[11px] text-text-gray mb-3">📦 Pay only PKR 1,600 now</p>
+              <button class="add-to-cart-btn add-to-cart w-full bg-accent-dark text-white text-[11px] font-bold uppercase tracking-widest py-2.5 opacity-0 group-hover:opacity-100 transition-opacity duration-200">ADD TO CART</button>
+            </div>
+          </div>
+        </div>
+        
+        <!-- NEW KIDS Products -->
+        <div class="product-panel grid grid-cols-2 md:grid-cols-4 gap-4 hidden" data-panel="new-kids">
+          <div class="product-card relative bg-white rounded-sm overflow-hidden border border-border-light group cursor-pointer">
+            <div class="absolute top-3 left-3 z-10 bg-[#2ECC71] text-white text-[10px] font-semibold px-2 py-0.5 uppercase tracking-wider">NEW</div>
+            <div class="aspect-square overflow-hidden bg-[#F7F7F7] flex items-center justify-center">
+              <img src="/shoe_collection.jpeg" alt="Coming Soon" class="w-full h-full object-contain p-4 opacity-60">
+            </div>
+            <div class="p-3 text-center">
+              <p class="text-[13px] font-medium text-text-gray">Coming Soon</p>
+            </div>
+          </div>
+          
+          <div class="product-card relative bg-white rounded-sm overflow-hidden border border-border-light group cursor-pointer">
+            <div class="aspect-square overflow-hidden bg-[#F7F7F7] flex items-center justify-center">
+              <img src="/shoe_collection.jpeg" alt="Coming Soon" class="w-full h-full object-contain p-4 opacity-60">
+            </div>
+            <div class="p-3 text-center">
+              <p class="text-[13px] font-medium text-text-gray">Coming Soon</p>
+            </div>
+          </div>
+          
+          <div class="product-card relative bg-white rounded-sm overflow-hidden border border-border-light group cursor-pointer">
+            <div class="aspect-square overflow-hidden bg-[#F7F7F7] flex items-center justify-center">
+              <img src="/shoe_collection.jpeg" alt="Coming Soon" class="w-full h-full object-contain p-4 opacity-60">
+            </div>
+            <div class="p-3 text-center">
+              <p class="text-[13px] font-medium text-text-gray">Coming Soon</p>
+            </div>
+          </div>
+          
+          <div class="product-card relative bg-white rounded-sm overflow-hidden border border-border-light group cursor-pointer">
+            <div class="aspect-square overflow-hidden bg-[#F7F7F7] flex items-center justify-center">
+              <img src="/shoe_collection.jpeg" alt="Coming Soon" class="w-full h-full object-contain p-4 opacity-60">
+            </div>
+            <div class="p-3 text-center">
+              <p class="text-[13px] font-medium text-text-gray">Coming Soon</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 8: SHOP BY COLLECTION MOSAIC GRID -->
+  <section class="bg-white py-12 md:py-16">
+    <div class="container mx-auto px-4">
+      <h2 class="text-lg md:text-xl font-semibold text-accent-dark text-center mb-10">— Shop by Collection —</h2>
+      
+      <div class="grid grid-cols-3 md:grid-cols-5 gap-2 md:gap-3 h-[500px] md:h-[480px]">
+        <!-- Left Tall -->
+        <div class="col-span-1 row-span-2 category-cell relative overflow-hidden cursor-pointer group">
+          <img src="/intikhab-man-relaxed-chair-blue.jpeg" alt="CLASSIC" class="absolute inset-0 w-full h-full object-cover transition-transform duration-500">
+          <div class="overlay absolute inset-0 bg-black/15 opacity-0 transition-opacity duration-300"></div>
+          <div class="absolute top-3 left-3 z-10 bg-white/90 text-accent-dark text-[10px] font-semibold px-2 py-0.5 uppercase tracking-wider">CLASSIC</div>
+          <div class="absolute bottom-0 left-0 p-3 md:p-4">
+            <p class="text-white font-bold text-sm md:text-base uppercase drop-shadow-lg">GIRL B</p>
+            <p class="shop-now-text text-white/80 text-xs opacity-0 transition-opacity duration-300 mt-1">SHOP NOW →</p>
+          </div>
+        </div>
+        
+        <!-- Top Center -->
+        <div class="col-span-2 row-span-1 category-cell relative overflow-hidden cursor-pointer group">
+          <img src="/intikhab-walking-park-trees-blue.jpeg" alt="TOP SELLER" class="absolute inset-0 w-full h-full object-cover transition-transform duration-500">
+          <div class="overlay absolute inset-0 bg-black/15 opacity-0 transition-opacity duration-300"></div>
+          <div class="absolute top-3 left-3 z-10 bg-accent-red text-white text-[10px] font-semibold px-2 py-0.5 uppercase tracking-wider">TOP SELLER</div>
+          <div class="absolute bottom-0 left-0 p-3 md:p-4">
+            <p class="text-white font-bold text-sm md:text-base uppercase drop-shadow-lg">Summer '25</p>
+            <p class="shop-now-text text-white/80 text-xs opacity-0 transition-opacity duration-300 mt-1">SHOP NOW →</p>
+          </div>
+        </div>
+        
+        <!-- Top Right -->
+        <div class="col-span-2 md:col-span-1 row-span-1 category-cell relative overflow-hidden cursor-pointer group">
+          <img src="/intikhab-man-sitting-bench-white.jpeg" alt="KIDS" class="absolute inset-0 w-full h-full object-cover transition-transform duration-500">
+          <div class="overlay absolute inset-0 bg-black/15 opacity-0 transition-opacity duration-300"></div>
+          <div class="absolute bottom-0 left-0 p-3 md:p-4">
+            <p class="text-white font-bold text-sm md:text-base uppercase drop-shadow-lg">KIDS</p>
+            <p class="shop-now-text text-white/80 text-xs opacity-0 transition-opacity duration-300 mt-1">SHOP NOW →</p>
+          </div>
+        </div>
+        
+        <!-- Bottom Center -->
+        <div class="col-span-2 row-span-1 category-cell relative overflow-hidden cursor-pointer group">
+          <img src="/intikhab-sneakers-woven-mat-black.jpeg" alt="NAYZA" class="absolute inset-0 w-full h-full object-cover transition-transform duration-500">
+          <div class="overlay absolute inset-0 bg-black/15 opacity-0 transition-opacity duration-300"></div>
+          <div class="absolute bottom-0 left-0 p-3 md:p-4">
+            <p class="text-white font-bold text-sm md:text-base uppercase drop-shadow-lg">NAYZA</p>
+            <p class="shop-now-text text-white/80 text-xs opacity-0 transition-opacity duration-300 mt-1">SHOP NOW →</p>
+          </div>
+        </div>
+        
+        <!-- Bottom Right -->
+        <div class="col-span-1 row-span-1 category-cell relative overflow-hidden cursor-pointer group">
+          <img src="/intikhab-hand-holding-white-black.jpeg" alt="BAGS" class="absolute inset-0 w-full h-full object-cover transition-transform duration-500">
+          <div class="overlay absolute inset-0 bg-black/15 opacity-0 transition-opacity duration-300"></div>
+          <div class="absolute bottom-0 left-0 p-3 md:p-4">
+            <p class="text-white font-bold text-sm md:text-base uppercase drop-shadow-lg">BAGS</p>
+            <p class="shop-now-text text-white/80 text-xs opacity-0 transition-opacity duration-300 mt-1">SHOP NOW →</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 9: INSTA STYLE FEED -->
+  <section class="bg-white py-12 md:py-16">
+    <div class="container mx-auto px-4">
+      <h2 class="text-xl md:text-2xl font-bold text-accent-dark text-center mb-2">INSTA STYLE FEED</h2>
+      <a href="https://instagram.com/intikhab_pakistan" target="_blank" class="block text-center mb-8">
+        <span class="text-accent-red text-sm">@intikhab_pakistan</span>
+      </a>
+      
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-1 md:gap-0">
+        <div class="insta-cell relative aspect-[4/5] overflow-hidden cursor-pointer group">
+          <img src="/intikhab-man-sofa-indoor-white.jpeg" alt="Instagram 1" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+          <div class="insta-overlay absolute inset-0 bg-black/50 opacity-0 transition-opacity duration-300 flex flex-col items-center justify-center">
+            <svg class="w-8 h-8 text-white mb-2" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+            </svg>
+            <p class="text-white text-xs font-medium">Follow on Instagram</p>
+          </div>
+        </div>
+        
+        <div class="insta-cell relative aspect-[4/5] overflow-hidden cursor-pointer group">
+          <img src="/intikhab-man-bench-indoor-white.jpeg" alt="Instagram 2" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+          <div class="insta-overlay absolute inset-0 bg-black/50 opacity-0 transition-opacity duration-300 flex flex-col items-center justify-center">
+            <svg class="w-8 h-8 text-white mb-2" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+            </svg>
+            <p class="text-white text-xs font-medium">Follow on Instagram</p>
+          </div>
+        </div>
+        
+        <div class="insta-cell relative aspect-[4/5] overflow-hidden cursor-pointer group">
+          <img src="/intikhab-sneakers-jute-mat-blue.jpeg" alt="Instagram 3" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+          <div class="insta-overlay absolute inset-0 bg-black/50 opacity-0 transition-opacity duration-300 flex flex-col items-center justify-center">
+            <svg class="w-8 h-8 text-white mb-2" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+            </svg>
+            <p class="text-white text-xs font-medium">Follow on Instagram</p>
+          </div>
+        </div>
+        
+        <div class="insta-cell relative aspect-[4/5] overflow-hidden cursor-pointer group">
+          <img src="/intikhab-man-cafe-outdoor-white.jpeg" alt="Instagram 4" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+          <div class="insta-overlay absolute inset-0 bg-black/50 opacity-0 transition-opacity duration-300 flex flex-col items-center justify-center">
+            <svg class="w-8 h-8 text-white mb-2" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+            </svg>
+            <p class="text-white text-xs font-medium">Follow on Instagram</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 10: TRUST BADGES BAR -->
+  <section class="bg-[#F7F7F7] border-y border-border-light py-6 md:py-8">
+    <div class="container mx-auto px-4">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-4">
+        <div class="text-center">
+          <div class="flex justify-center mb-3">
+            <svg class="w-10 h-10 text-accent-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
+            </svg>
+          </div>
+          <p class="text-sm font-semibold text-accent-dark">Free Nationwide Delivery</p>
+          <p class="text-xs text-text-gray mt-1">On all prepaid orders</p>
+        </div>
+        
+        <div class="text-center">
+          <div class="flex justify-center mb-3">
+            <svg class="w-10 h-10 text-accent-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 15v-1a4 4 0 00-4-4H8m0 0l3 3m-3-3l3-3m9 14V5a2 2 0 00-2-2H6a2 2 0 00-2 2v16l4-2 4 2 4-2 4 2z"/>
+            </svg>
+          </div>
+          <p class="text-sm font-semibold text-accent-dark">Easy 30-Day Returns</p>
+          <p class="text-xs text-text-gray mt-1">Hassle-free exchange</p>
+        </div>
+        
+        <div class="text-center">
+          <div class="flex justify-center mb-3">
+            <svg class="w-10 h-10 text-accent-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+            </svg>
+          </div>
+          <p class="text-sm font-semibold text-accent-dark">Secure Payment</p>
+          <p class="text-xs text-text-gray mt-1">100% safe checkout</p>
+        </div>
+        
+        <div class="text-center">
+          <div class="flex justify-center mb-3">
+            <svg class="w-10 h-10 text-accent-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+            </svg>
+          </div>
+          <p class="text-sm font-semibold text-accent-dark">24/7 Support</p>
+          <p class="text-xs text-text-gray mt-1">+92 300 0000000</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 11: NEWSLETTER SIGNUP -->
+  <section class="bg-accent-dark py-14 md:py-16 px-6">
+    <div class="container mx-auto">
+      <div class="flex flex-col md:flex-row items-center gap-8 md:gap-12">
+        <div class="md:w-3/5">
+          <h2 class="text-2xl md:text-[28px] font-bold text-white mb-3">Stay in Style</h2>
+          <p class="text-white/60 text-sm">Subscribe for early access to new drops, exclusive offers and seasonal lookbooks.</p>
+        </div>
+        <div class="md:w-2/5 w-full">
+          <form class="flex flex-col sm:flex-row gap-2" onsubmit="event.preventDefault(); alert('Thank you for subscribing!');">
+            <input type="email" placeholder="Enter your email address" class="flex-1 px-5 py-3.5 text-sm border-0 outline-none" required>
+            <button type="submit" class="bg-accent-red text-white px-6 py-3.5 text-xs font-bold uppercase tracking-widest hover:bg-red-600 transition-colors whitespace-nowrap">SUBSCRIBE</button>
+          </form>
+          <p class="text-white/40 text-xs mt-3">No spam. Unsubscribe anytime.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 12: FOOTER -->
+  <footer class="bg-white border-t border-border-light pt-12 pb-6">
+    <div class="container mx-auto px-4">
+      <!-- Row 1: 5 Columns -->
+      <div class="grid grid-cols-2 md:grid-cols-5 gap-8 mb-10">
+        <!-- Col 1: Get In Touch -->
+        <div class="col-span-2 md:col-span-1">
+          <h3 class="text-sm font-semibold text-accent-dark mb-4">Get In Touch</h3>
+          <div class="space-y-2 text-sm text-text-gray">
+            <p class="hover:text-accent-red cursor-pointer">✉️ customercare@intikhab.pk</p>
+            <p>📞 +92 300 0000000</p>
+            <p class="font-semibold text-accent-dark mt-4">Customer Services Timing</p>
+            <p>Monday–Saturday</p>
+            <p>10:00 am to 9:30 pm</p>
+            <p class="mt-2">💬 WhatsApp Chat</p>
+            <p class="text-xs">Response Time: 24 Working Hours (excluding holidays)</p>
+          </div>
+          <div class="flex gap-3 mt-4">
+            <a href="#" class="text-text-gray hover:text-accent-red transition-colors">
+              <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+              </svg>
+            </a>
+            <a href="#" class="text-text-gray hover:text-accent-red transition-colors">
+              <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+              </svg>
+            </a>
+            <a href="#" class="text-text-gray hover:text-accent-red transition-colors">
+              <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/>
+              </svg>
+            </a>
+            <a href="#" class="text-text-gray hover:text-accent-red transition-colors">
+              <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+              </svg>
+            </a>
+          </div>
+        </div>
+        
+        <!-- Col 2: Brands -->
+        <div>
+          <h3 class="text-sm font-semibold text-accent-dark mb-4">Brands</h3>
+          <div class="space-y-2.5 text-[13px] text-text-gray">
+            <p class="hover:text-accent-dark cursor-pointer transition-colors">NAYZA</p>
+            <p class="hover:text-accent-dark cursor-pointer transition-colors">DIGGER</p>
+            <p class="hover:text-accent-dark cursor-pointer transition-colors">GIO</p>
+            <p class="hover:text-accent-dark cursor-pointer transition-colors">SKY WALK</p>
+            <p class="hover:text-accent-dark cursor-pointer transition-colors">GOV-Z</p>
+            <p class="hover:text-accent-dark cursor-pointer transition-colors">GIRL-B</p>
+            <p class="hover:text-accent-dark cursor-pointer transition-colors">TOT BE TOT</p>
+          </div>
+        </div>
+        
+        <!-- Col 3: About Us -->
+        <div>
+          <h3 class="text-sm font-semibold text-accent-dark mb-4">About Us</h3>
+          <div class="space-y-2.5 text-[13px] text-text-gray">
+            <p class="hover:text-accent-dark cursor-pointer transition-colors">THE COMPANY</p>
+            <p class="hover:text-accent-dark cursor-pointer transition-colors">CONTACT</p>
+            <p class="hover:text-accent-dark cursor-pointer transition-colors">BAADMAY</p>
+            <p class="hover:text-accent-dark cursor-pointer transition-colors">FAQ</p>
+            <p class="hover:text-accent-dark cursor-pointer transition-colors">CAREER</p>
+            <p class="hover:text-accent-dark cursor-pointer transition-colors">STORE LOCATOR</p>
+            <p class="hover:text-accent-dark cursor-pointer transition-colors">BLOG</p>
+          </div>
+        </div>
+        
+        <!-- Col 4: Exchange & Return -->
+        <div>
+          <h3 class="text-sm font-semibold text-accent-dark mb-4">Exchange & Return</h3>
+          <div class="space-y-2.5 text-[13px] text-text-gray">
+            <p class="hover:text-accent-dark cursor-pointer transition-colors">EXCHANGE & RETURN POLICY</p>
+            <p class="hover:text-accent-dark cursor-pointer transition-colors">PRIVACY POLICY</p>
+            <p class="hover:text-accent-dark cursor-pointer transition-colors">TERMS & CONDITIONS</p>
+          </div>
+        </div>
+        
+        <!-- Col 5: Newsletter Signup -->
+        <div>
+          <h3 class="text-sm font-semibold text-accent-dark mb-4">Subscribe to our newsletter</h3>
+          <form class="space-y-2" onsubmit="event.preventDefault(); alert('Thank you for subscribing!');">
+            <input type="email" placeholder="Enter your email" class="w-full border border-border-light px-3 py-2 text-[13px] outline-none focus:border-accent-dark">
+            <button type="submit" class="w-full bg-accent-red text-white py-2 text-xs font-bold uppercase tracking-wider hover:bg-red-600 transition-colors">Subscribe</button>
+          </form>
+        </div>
+      </div>
+      
+      <!-- Row 2: Payment Methods -->
+      <div class="border-t border-border-light py-5 flex flex-col md:flex-row justify-between items-center gap-4">
+        <div class="flex items-center gap-3">
+          <span class="text-xs text-text-gray">We Accept:</span>
+          <div class="flex gap-2">
+            <div class="bg-[#27ae60] text-white text-[10px] font-bold px-2 py-1 rounded">JazzCash</div>
+            <div class="bg-[#f39c12] text-white text-[10px] font-bold px-2 py-1 rounded">Easypaisa</div>
+            <div class="bg-accent-dark text-white text-[10px] font-bold px-2 py-1 rounded">COD</div>
+            <div class="bg-[#1a1f71] text-white text-[10px] font-bold px-2 py-1 rounded">VISA</div>
+            <div class="bg-[#eb001b] text-white text-[10px] font-bold px-2 py-1 rounded">MC</div>
+          </div>
+        </div>
+        <p class="text-xs font-medium text-text-gray">Pakistan's #1 Online Shoe Store</p>
+      </div>
+      
+      <!-- Row 3: Copyright -->
+      <div class="border-t border-border-light py-4 text-center">
+        <p class="text-xs text-text-gray">© 2025 Intikhab. All Rights Reserved. | Privacy Policy | Terms & Conditions | Sitemap</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- JAVASCRIPT -->
+  <script>
+    // 1. Announcement Bar Close
+    document.getElementById('close-bar').addEventListener('click', () => {
+      document.getElementById('announcement-bar').style.display = 'none';
+    });
+
+    // 2. Hero Slider
+    let current = 0;
+    const slides = document.querySelectorAll('.slide');
+    const dots = document.querySelectorAll('.dot');
+
+    function goTo(n) {
+      slides[current].classList.remove('active');
+      dots[current].classList.remove('bg-white');
+      dots[current].classList.add('bg-white/50');
+      current = (n + slides.length) % slides.length;
+      slides[current].classList.add('active');
+      dots[current].classList.add('bg-white');
+      dots[current].classList.remove('bg-white/50');
+    }
+
+    let sliderInterval = setInterval(() => goTo(current + 1), 5000);
+
+    document.getElementById('prev').addEventListener('click', () => {
+      clearInterval(sliderInterval);
+      goTo(current - 1);
+      sliderInterval = setInterval(() => goTo(current + 1), 5000);
+    });
+
+    document.getElementById('next').addEventListener('click', () => {
+      clearInterval(sliderInterval);
+      goTo(current + 1);
+      sliderInterval = setInterval(() => goTo(current + 1), 5000);
+    });
+
+    dots.forEach((dot, index) => {
+      dot.addEventListener('click', () => {
+        clearInterval(sliderInterval);
+        goTo(index);
+        sliderInterval = setInterval(() => goTo(current + 1), 5000);
+      });
+    });
+
+    // Touch/Swipe Support
+    let touchStartX = 0;
+    let touchEndX = 0;
+    const heroSlider = document.querySelector('.relative.h-\\[320px\\], .relative.h-\\[480px\\]');
+
+    document.querySelectorAll('.slide').forEach(slide => {
+      slide.addEventListener('touchstart', e => {
+        touchStartX = e.changedTouches[0].screenX;
+      });
+      slide.addEventListener('touchend', e => {
+        touchEndX = e.changedTouches[0].screenX;
+        if (touchStartX - touchEndX > 50) {
+          clearInterval(sliderInterval);
+          goTo(current + 1);
+          sliderInterval = setInterval(() => goTo(current + 1), 5000);
+        }
+        if (touchEndX - touchStartX > 50) {
+          clearInterval(sliderInterval);
+          goTo(current - 1);
+          sliderInterval = setInterval(() => goTo(current + 1), 5000);
+        }
+      });
+    });
+
+    // 3. Tab System
+    document.querySelectorAll('[data-tab-group]').forEach(tabGroup => {
+      const tabs = tabGroup.querySelectorAll('.tab-btn');
+      const panels = tabGroup.parentElement.querySelectorAll('.product-panel');
+
+      tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+          tabs.forEach(t => {
+            t.classList.remove('border-accent-dark', 'text-accent-dark');
+            t.classList.add('border-transparent', 'text-text-gray');
+          });
+          tab.classList.add('border-accent-dark', 'text-accent-dark');
+          tab.classList.remove('border-transparent', 'text-text-gray');
+
+          const panelId = tab.dataset.tab;
+          panels.forEach(p => {
+            if (p.dataset.panel === panelId) {
+              p.classList.remove('hidden');
+            } else {
+              p.classList.add('hidden');
+            }
+          });
+        });
+      });
+    });
+
+    // 4. Cart Counter
+    let cartCount = 0;
+    document.querySelectorAll('.add-to-cart').forEach(btn => {
+      btn.addEventListener('click', () => {
+        cartCount++;
+        document.querySelectorAll('.cart-count').forEach(el => {
+          el.textContent = cartCount;
+          el.classList.remove('hidden');
+        });
+        const originalText = btn.textContent;
+        btn.textContent = '✓ ADDED';
+        btn.classList.remove('bg-accent-dark');
+        btn.classList.add('bg-[#2ECC71]');
+        setTimeout(() => {
+          btn.textContent = originalText;
+          btn.classList.remove('bg-[#2ECC71]');
+          btn.classList.add('bg-accent-dark');
+        }, 1500);
+      });
+    });
+
+    // 5. Sticky Nav Shadow on Scroll
+    window.addEventListener('scroll', () => {
+      const nav = document.getElementById('main-nav');
+      if (window.scrollY > 10) {
+        nav.classList.add('shadow-md');
+      } else {
+        nav.classList.remove('shadow-md');
+      }
+    });
+
+    // 6. Mobile Menu Toggle
+    const menuBtn = document.getElementById('menu-toggle');
+    const mobileMenu = document.getElementById('mobile-menu');
+    const closeMenuBtn = document.getElementById('close-menu');
+
+    menuBtn.addEventListener('click', () => {
+      mobileMenu.classList.remove('-translate-x-full');
+      mobileMenu.classList.add('translate-x-0');
+      document.body.style.overflow = 'hidden';
+    });
+
+    closeMenuBtn.addEventListener('click', () => {
+      mobileMenu.classList.add('-translate-x-full');
+      mobileMenu.classList.remove('translate-x-0');
+      document.body.style.overflow = '';
+    });
+
+    // Close mobile menu on link click
+    mobileMenu.querySelectorAll('a').forEach(link => {
+      link.addEventListener('click', () => {
+        mobileMenu.classList.add('-translate-x-full');
+        mobileMenu.classList.remove('translate-x-0');
+        document.body.style.overflow = '';
+      });
+    });
+
+    // 7. Search Bar Toggle
+    document.getElementById('search-icon').addEventListener('click', () => {
+      const bar = document.getElementById('search-bar');
+      bar.classList.toggle('hidden');
+      if (!bar.classList.contains('hidden')) {
+        bar.querySelector('input').focus();
+      }
+    });
+  </script>
+</body>
+</html>
