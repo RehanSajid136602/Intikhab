@@ -96,8 +96,10 @@ function HeroSlider() {
                 fill
                 priority={index === 0}
                 className="object-cover"
-                sizes="(max-width: 768px) 100vw, 1024px"
-                quality={100}
+                sizes="100vw"
+                quality={90}
+                placeholder="blur"
+                blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAIAAoDASIAAhEBAxEB/8QAFgABAQEAAAAAAAAAAAAAAAAABgUE/8QAIRAAAgIBBAMBAAAAAAAAAAAAAQIDBAUREiExQVH/xAAUAQEAAAAAAAAAAAAAAAAAAAAA/8QAFBEBAAAAAAAAAAAAAAAAAAAAAP/aAAwDAQACEQMRAD8Amtz1tptx2fa9OxtNrPFJaivjX1Kc4pvpqvFdMoyp0pZUVRXj7gA7QAAH/9k="
               />
               <div
                 className={`absolute inset-0 bg-gradient-to-r ${

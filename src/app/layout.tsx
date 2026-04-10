@@ -27,6 +27,7 @@ const poppins = Poppins({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://intikhab.vercel.app'),
   title: {
     default: 'Intikhab — Pakistan\'s #1 Online Shoe Store',
     template: '%s | Intikhab',

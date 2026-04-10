@@ -1,4 +1,21 @@
 import { LegalPageLayout } from '@/components/legal/LegalPageLayout';
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Terms & Conditions | Intikhab Shoe Store',
+  description: 'Read our Terms & Conditions for purchasing shoes online in Pakistan. Learn about order placement, payment terms, shipping policies, and consumer rights.',
+  openGraph: {
+    title: 'Terms & Conditions | Intikhab Shoe Store',
+    description: 'Read our Terms & Conditions for purchasing shoes online in Pakistan. Learn about order placement, payment terms, shipping policies, and consumer rights.',
+    url: '/terms-and-conditions',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Terms & Conditions | Intikhab Shoe Store',
+    description: 'Read our Terms & Conditions for purchasing shoes online in Pakistan. Learn about order placement, payment terms, shipping policies, and consumer rights.',
+  },
+};
 
 export default function TermsAndConditionsPage() {
   const currentDate = new Date().toLocaleDateString('en-US', {
@@ -45,7 +62,39 @@ export default function TermsAndConditionsPage() {
           We reserve the right to refuse or cancel any order for any reason, including but not limited to product availability, errors in pricing or product information, or suspected fraud.
         </p>
         <p className="mb-4">
-          You may cancel your order within <span className="bg-yellow-200 px-2 py-1 rounded font-semibold">[X hours]</span> of placing it by contacting our customer service at <span className="bg-yellow-200 px-2 py-1 rounded font-semibold">[BUSINESS_EMAIL]</span>.
+          You may cancel your order within <strong>24 hours</strong> of placing it by contacting our customer service at <a href="mailto:intikhab.pakistan@gmail.com" className="font-bold text-brand-red hover:underline">intikhab.pakistan@gmail.com</a>.
+        </p>
+      </section>
+
+      <hr className="border-brand-border my-8" />
+
+      <section className="mb-8">
+        <h2 className="text-xl font-semibold text-brand-dark mb-4">
+          Return & Exchange Policy
+        </h2>
+        <p className="mb-4">
+          We offer a <strong>7-day return policy</strong> from the date of delivery. This 7-day window includes courier time, so please initiate your return promptly.
+        </p>
+        <p className="mb-4">
+          <strong>Return Conditions:</strong>
+        </p>
+        <ul className="list-disc list-inside space-y-2 mb-4">
+          <li>You must notify us within 2-3 days of delivery if you wish to return the item</li>
+          <li>Shoes should be in almost the same condition as when you received them</li>
+          <li>Original packaging and tags must be intact</li>
+          <li>Shoes must be unworn</li>
+        </ul>
+        <p className="mb-4">
+          <strong>How to Initiate a Return:</strong>
+        </p>
+        <p className="mb-4">
+          Contact us at <a href="mailto:intikhab.pakistan@gmail.com" className="font-bold text-brand-red hover:underline">intikhab.pakistan@gmail.com</a> or call <a href="tel:03192776896" className="font-bold text-brand-red hover:underline">0319 2776896</a> to initiate your return. Our team will guide you through the process and provide return shipping instructions.
+        </p>
+        <p className="mb-4">
+          <strong>Size Exchanges:</strong>
+        </p>
+        <p className="mb-4">
+          If the size doesn't fit, we offer free size exchanges within the 7-day return window, subject to availability.
         </p>
       </section>
 
@@ -65,7 +114,7 @@ export default function TermsAndConditionsPage() {
           <li>Cash on Delivery (COD)</li>
         </ul>
         <p className="mb-4">
-          Prices displayed are <span className="bg-yellow-200 px-2 py-1 rounded font-semibold">[inclusive/exclusive]</span> of applicable GST as per FBR requirements.
+          Prices displayed are <strong>inclusive</strong> of applicable GST as per FBR requirements.
         </p>
         <p className="mb-4">
           All payments are processed securely through our payment partners. We do not store your complete credit card information on our servers.
@@ -118,7 +167,7 @@ export default function TermsAndConditionsPage() {
           Governing Law
         </h2>
         <p className="mb-4">
-          This agreement is governed by the laws of Pakistan. Any disputes shall be subject to the exclusive jurisdiction of courts in <span className="bg-yellow-200 px-2 py-1 rounded font-semibold">[YOUR_CITY]</span>, Pakistan. We comply with the Consumer Protection Acts of all provinces of Pakistan.
+          This agreement is governed by the laws of Pakistan. Any disputes shall be subject to the exclusive jurisdiction of courts in <strong>Rawalpindi</strong>, Pakistan. We comply with the Consumer Protection Acts of all provinces of Pakistan.
         </p>
       </section>
 
@@ -134,15 +183,15 @@ export default function TermsAndConditionsPage() {
         <ul className="list-none space-y-2">
           <li>
             <strong>Email:</strong>{' '}
-            <span className="bg-yellow-200 px-2 py-1 rounded font-semibold">
-              [BUSINESS_EMAIL]
-            </span>
+            <a href="mailto:intikhab.pakistan@gmail.com" className="font-bold text-brand-red hover:underline">
+              intikhab.pakistan@gmail.com
+            </a>
           </li>
           <li>
             <strong>Phone:</strong>{' '}
-            <span className="bg-yellow-200 px-2 py-1 rounded font-semibold">
-              [PHONE]
-            </span>
+            <a href="tel:03192776896" className="font-bold text-brand-red hover:underline">
+              0319 2776896
+            </a>
           </li>
         </ul>
       </section>

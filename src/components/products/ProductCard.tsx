@@ -51,7 +51,8 @@ function ProductCard({ product, showImageCarousel }: ProductCardProps) {
         {/* Wishlist Heart */}
         <button
           onClick={handleWishlistClick}
-          className="absolute top-3 right-3 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-200 p-1"
+          className="absolute top-3 right-3 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-200 p-1 min-w-11 min-h-11 flex items-center justify-center"
+          aria-label={isInWishlist ? 'Remove from wishlist' : 'Add to wishlist'}
         >
           <Heart
             className={`w-5 h-5 transition-colors duration-200 ${
@@ -82,8 +83,8 @@ function ProductCard({ product, showImageCarousel }: ProductCardProps) {
                 alt={`${product.name} — ${product.brand} ${product.category} sneaker`}
                 fill
                 className="object-contain p-4 transition-transform duration-500 group-hover:scale-105"
-                sizes="(max-width: 768px) 50vw, 25vw"
-                quality={100}
+                sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                quality={85}
               />
             </motion.div>
           </AnimatePresence>

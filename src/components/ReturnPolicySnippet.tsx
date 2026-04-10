@@ -18,7 +18,7 @@ export function ReturnPolicySnippet({
   if (variant === 'mini') {
     return (
       <div className={cn('text-xs text-brand-gray', className)}>
-        🔄 30-day returns · 📦 Free size exchange · ✅ 100% authentic
+        🔄 7-day returns · 📦 Free size exchange · ✅ 100% authentic
       </div>
     );
   }
@@ -29,7 +29,7 @@ export function ReturnPolicySnippet({
         <strong>Return Policy:</strong>
       </p>
       <p className="text-sm text-brand-gray mb-2">
-        🔄 30-day easy returns on all orders
+        🔄 7-day easy returns on all orders
       </p>
       <p className="text-sm text-brand-gray mb-2">
         📦 Free exchange if size doesn't fit

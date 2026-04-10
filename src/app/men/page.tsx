@@ -1,5 +1,11 @@
+import type { Metadata } from 'next';
 import { CategoryPageLayout } from '@/components/category/CategoryPageLayout';
 import { products } from '@/data/products';
+
+export const metadata: Metadata = {
+  title: "Men's Shoes & Sneakers | Intikhab",
+  description: "Shop men's sneakers and casual shoes. Premium quality, nationwide delivery. Cash on delivery available.",
+};
 
 export default function MenCategoryPage() {
   const menProducts = products.filter((p) => p.category === 'men');

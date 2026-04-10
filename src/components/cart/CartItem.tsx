@@ -42,7 +42,7 @@ function CartItemComponent({ item }: CartItemComponentProps) {
       <div className="flex items-center gap-2">
         <button
           onClick={() => updateQuantity(item.id, item.quantity - 1)}
-          className="w-6 h-6 flex items-center justify-center border border-brand-border text-xs hover:bg-brand-light-gray transition-colors"
+          className="w-11 h-11 flex items-center justify-center border border-brand-border text-xs hover:bg-brand-light-gray transition-colors"
           aria-label="Decrease quantity"
         >
           <Minus className="w-3 h-3" />
@@ -50,7 +50,7 @@ function CartItemComponent({ item }: CartItemComponentProps) {
         <span className="text-xs font-medium w-4 text-center">{item.quantity}</span>
         <button
           onClick={() => updateQuantity(item.id, item.quantity + 1)}
-          className="w-6 h-6 flex items-center justify-center border border-brand-border text-xs hover:bg-brand-light-gray transition-colors"
+          className="w-11 h-11 flex items-center justify-center border border-brand-border text-xs hover:bg-brand-light-gray transition-colors"
           aria-label="Increase quantity"
         >
           <Plus className="w-3 h-3" />

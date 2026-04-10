@@ -1,4 +1,21 @@
 import { LegalPageLayout } from '@/components/legal/LegalPageLayout';
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Cookie Policy | Intikhab Shoe Store',
+  description: 'Understand how Intikhab uses cookies to enhance your shopping experience. Learn about cookie types, usage, and how to manage your preferences.',
+  openGraph: {
+    title: 'Cookie Policy | Intikhab Shoe Store',
+    description: 'Understand how Intikhab uses cookies to enhance your shopping experience. Learn about cookie types, usage, and how to manage your preferences.',
+    url: '/cookie-policy',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Cookie Policy | Intikhab Shoe Store',
+    description: 'Understand how Intikhab uses cookies to enhance your shopping experience. Learn about cookie types, usage, and how to manage your preferences.',
+  },
+};
 
 export default function CookiePolicyPage() {
   const currentDate = new Date().toLocaleDateString('en-US', {
@@ -62,7 +79,7 @@ export default function CookiePolicyPage() {
         <p className="mb-4">
           If you have any questions about our use of cookies, please contact us at{' '}
           <span className="bg-yellow-200 px-2 py-1 rounded font-semibold">
-            [BUSINESS_EMAIL]
+            intikhab.pakistan@gmail.com
           </span>.
         </p>
       </section>

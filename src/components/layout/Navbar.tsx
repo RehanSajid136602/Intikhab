@@ -44,6 +44,7 @@ function Navbar() {
           <Link
             href="/"
             className="text-xl font-bold tracking-tight text-brand-dark flex-shrink-0"
+            aria-label="Go to homepage"
           >
             {BRAND.name}
           </Link>

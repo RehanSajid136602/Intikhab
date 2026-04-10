@@ -1,5 +1,22 @@
 import { LegalPageLayout } from '@/components/legal/LegalPageLayout';
 import { BRAND } from '@/lib/constants';
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Privacy Policy | Intikhab Shoe Store',
+  description: 'Learn how Intikhab protects your personal information. Our Privacy Policy explains data collection, usage, and your rights under Pakistani law.',
+  openGraph: {
+    title: 'Privacy Policy | Intikhab Shoe Store',
+    description: 'Learn how Intikhab protects your personal information. Our Privacy Policy explains data collection, usage, and your rights under Pakistani law.',
+    url: '/privacy-policy',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Privacy Policy | Intikhab Shoe Store',
+    description: 'Learn how Intikhab protects your personal information. Our Privacy Policy explains data collection, usage, and your rights under Pakistani law.',
+  },
+};
 
 export default function PrivacyPolicyPage() {
   const currentDate = new Date().toLocaleDateString('en-US', {
@@ -133,7 +150,7 @@ export default function PrivacyPolicyPage() {
         <p className="mb-4">
           To exercise these rights, please contact us at{' '}
           <span className="bg-yellow-200 px-2 py-1 rounded font-semibold">
-            [BUSINESS_EMAIL]
+            intikhab.pakistan@gmail.com
           </span>
         </p>
       </section>
@@ -151,13 +168,13 @@ export default function PrivacyPolicyPage() {
           <li>
             <strong>Email:</strong>{' '}
             <span className="bg-yellow-200 px-2 py-1 rounded font-semibold">
-              [BUSINESS_EMAIL]
+              intikhab.pakistan@gmail.com
             </span>
           </li>
           <li>
             <strong>Phone:</strong>{' '}
             <span className="bg-yellow-200 px-2 py-1 rounded font-semibold">
-              [PHONE]
+              0319 2776896
             </span>
           </li>
         </ul>

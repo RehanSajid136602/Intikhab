@@ -20,11 +20,6 @@ const categories = [
     image: '/shoe_collection.jpeg',
     href: '/kids',
   },
-  {
-    label: 'BAGS',
-    image: '/intikhab-man-cafe-outdoor-white.jpeg',
-    href: '/coming-soon',
-  },
 ];
 
 /**
@@ -50,7 +45,7 @@ function CategoryMosaic() {
       </h2>
 
       {/* GRID — single unified grid, all tiles in one container */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3 
                       max-w-7xl mx-auto">
         
         {categories.map((category) => (

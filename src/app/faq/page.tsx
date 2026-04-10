@@ -16,16 +16,16 @@ export default function FAQPage() {
     },
     {
       question: 'Can I cancel my order?',
-      answer: `Yes, you can cancel your order within <span class="bg-yellow-200 px-2 py-1 rounded font-semibold">[X hours]</span> of placing it by contacting us at <span class="bg-yellow-200 px-2 py-1 rounded font-semibold">[BUSINESS_EMAIL]</span>.`,
+      answer: `Yes, you can cancel your order within <span class="bg-yellow-200 px-2 py-1 rounded font-semibold">24 hours</span> of placing it by contacting us at <span class="bg-yellow-200 px-2 py-1 rounded font-semibold">intikhab.pakistan@gmail.com</span>.`,
     },
     // Shipping
     {
       question: 'How long does delivery take?',
-      answer: `Delivery typically takes <span class="bg-yellow-200 px-2 py-1 rounded font-semibold">[X–Y business days]</span> depending on your location in Pakistan.`,
+      answer: `Delivery typically takes <span class="bg-yellow-200 px-2 py-1 rounded font-semibold">3–5 business days</span> depending on your location in Pakistan.`,
     },
     {
       question: 'Do you deliver across Pakistan?',
-      answer: `Yes, we deliver nationwide via <span class="bg-yellow-200 px-2 py-1 rounded font-semibold">[COURIER_NAME]</span>.`,
+      answer: `Yes, we deliver nationwide via <span class="bg-yellow-200 px-2 py-1 rounded font-semibold">PostEx</span>.`,
     },
     {
       question: 'How do I track my order?',
@@ -34,15 +34,19 @@ export default function FAQPage() {
     // Returns
     {
       question: 'What is your return policy?',
-      answer: `You can return unused items in their original packaging within <span class="bg-yellow-200 px-2 py-1 rounded font-semibold">[RETURN_WINDOW]</span> days of delivery.`,
+      answer: `We offer a <strong>7-day return policy</strong> from the date of delivery. This includes courier time, so please notify us within 2-3 days if you want to return. Shoes should be in almost the same condition as when you received them, unworn, with original packaging intact.`,
     },
     {
       question: 'How do I initiate a return?',
-      answer: `Contact us at <span class="bg-yellow-200 px-2 py-1 rounded font-semibold">[BUSINESS_EMAIL]</span> or call <span class="bg-yellow-200 px-2 py-1 rounded font-semibold">[PHONE]</span> to initiate your return.`,
+      answer: `Contact us at <span class="bg-yellow-200 px-2 py-1 rounded font-semibold">intikhab.pakistan@gmail.com</span> or call <span class="bg-yellow-200 px-2 py-1 rounded font-semibold">0319 2776896</span> to initiate your return. Our team will guide you through the process.`,
     },
     {
       question: 'Can I exchange for a different size?',
-      answer: 'Yes, you can exchange for a different size within the return window, subject to availability.',
+      answer: 'Yes, we offer free size exchanges within the 7-day return window, subject to availability.',
+    },
+    {
+      question: 'What condition should the shoes be in for return?',
+      answer: 'Shoes should be in almost the same condition as when you received them - unworn, with original packaging and tags intact.',
     },
     // Sizing
     {
@@ -60,19 +64,22 @@ export default function FAQPage() {
     },
     {
       question: 'Is online payment secure?',
-      answer: `Yes, all online payments are processed securely via <span class="bg-yellow-200 px-2 py-1 rounded font-semibold">[PAYMENT_GATEWAY]</span> with industry-standard encryption.`,
+      answer: `Yes, all online payments are processed securely via <span class="bg-yellow-200 px-2 py-1 rounded font-semibold">JazzCash / Easypaisa</span> with industry-standard encryption.`,
     },
     {
       question: 'Do prices include GST?',
-      answer: `<span class="bg-yellow-200 px-2 py-1 rounded font-semibold">[YES/NO]</span> - Please check the product page for pricing details.`,
+      answer: `<span class="bg-yellow-200 px-2 py-1 rounded font-semibold">Yes</span> - Please check the product page for pricing details.`,
     },
   ];
 
   return (
-    <LegalPageLayout title="Frequently Asked Questions" lastUpdated={currentDate}>
+    <LegalPageLayout title="Common Questions" lastUpdated={currentDate}>
       <section className="mb-8">
+        <p className="text-brand-gray mb-2">
+          <strong>Got questions? We've got answers.</strong>
+        </p>
         <p className="text-brand-gray mb-6">
-          Find answers to common questions about orders, shipping, returns, sizing, and payment. Can't find what you're looking for? Contact our support team.
+          Find answers to common questions about ordering, shipping, returns, sizing, and payment. Can't find what you're looking for? Contact our support team.
         </p>
       </section>
 

@@ -1,3 +1,5 @@
+'use client';
+
 import { LegalPageLayout } from '@/components/legal/LegalPageLayout';
 import { Tabs } from '@/components/ui/Tabs';
 

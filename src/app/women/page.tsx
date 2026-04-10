@@ -1,5 +1,11 @@
+import type { Metadata } from 'next';
 import { CategoryPageLayout } from '@/components/category/CategoryPageLayout';
 import { products } from '@/data/products';
+
+export const metadata: Metadata = {
+  title: "Women's Shoes & Sneakers | Intikhab",
+  description: "Explore women's footwear - sneakers, heels, and casual shoes. Free nationwide delivery on prepaid orders.",
+};
 
 export default function WomenCategoryPage() {
   const womenProducts = products.filter((p) => p.category === 'women');

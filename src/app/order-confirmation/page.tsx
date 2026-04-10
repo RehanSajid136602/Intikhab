@@ -90,6 +90,7 @@ export default function OrderConfirmationPage() {
                     fill
                     className="object-contain p-1"
                     sizes="64px"
+                    quality={75}
                   />
                 </div>
                 <div className="flex-1">

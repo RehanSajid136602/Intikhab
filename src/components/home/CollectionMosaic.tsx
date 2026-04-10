@@ -11,11 +11,10 @@ const collections = [
   { label: "Summer '25", image: '/intikhab-walking-park-trees-blue.jpeg', badge: 'TOP SELLER', badgeBg: 'bg-brand-red text-white', href: '/coming-soon' },
   { label: 'KIDS', image: '/intikhab-man-sitting-bench-white.jpeg', href: '/coming-soon' },
   { label: 'NAYZA', image: '/intikhab-sneakers-woven-mat-black.jpeg', href: '/coming-soon' },
-  { label: 'BAGS', image: '/intikhab-hand-holding-white-black.jpeg', href: '/coming-soon' },
 ];
 
 /**
- * 5-cell collection mosaic with different layout than CategoryMosaic.
+ * 4-cell collection mosaic with different layout than CategoryMosaic.
  */
 function CollectionMosaic() {
   const ref = useRef(null);
@@ -32,20 +31,20 @@ function CollectionMosaic() {
       <div className="container mx-auto px-4">
         <SectionTitle title="Shop by Collection" />
 
-        <div className="grid grid-cols-3 md:grid-cols-5 gap-2 md:gap-3 h-[500px] md:h-[480px]">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-3 h-[500px] md:h-[480px]">
           {/* Left Tall - row-span-2 */}
           <CollectionCell
             collection={collections[0]}
             className="col-span-1 row-span-2"
           />
 
-          {/* Top Center - col-span-2 */}
+          {/* Top Right - col-span-2 */}
           <CollectionCell
             collection={collections[1]}
             className="col-span-2"
           />
 
-          {/* Top Right */}
+          {/* Bottom Right */}
           <CollectionCell
             collection={collections[2]}
             className="col-span-2 md:col-span-1"
@@ -55,12 +54,6 @@ function CollectionMosaic() {
           <CollectionCell
             collection={collections[3]}
             className="col-span-2"
-          />
-
-          {/* Bottom Right */}
-          <CollectionCell
-            collection={collections[4]}
-            className="col-span-1"
           />
         </div>
       </div>
@@ -87,7 +80,7 @@ function CollectionCell({ collection, className }: CollectionCellProps) {
         fill
         className="object-cover transition-transform duration-500"
         sizes="(max-width: 768px) 33vw, 20vw"
-        quality={100}
+        quality={85}
       />
       <div className="overlay absolute inset-0 bg-black/15 opacity-0 transition-opacity duration-300" />
       {collection.badge && (

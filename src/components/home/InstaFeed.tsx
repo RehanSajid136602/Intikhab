@@ -52,11 +52,11 @@ function InstaFeed() {
             >
               <Image
                 src={src}
-                alt={`Instagram ${index + 1}`}
+                alt={`Instagram post ${index + 1}`}
                 fill
-                className="object-cover transition-transform duration-500 group-hover:scale-110"
                 sizes="(max-width: 768px) 50vw, 25vw"
-                quality={100}
+                quality={75}
+                className="object-cover transition-transform duration-500 group-hover:scale-110"
               />
               <div className="insta-overlay absolute inset-0 bg-black/50 opacity-0 transition-opacity duration-300 flex flex-col items-center justify-center">
                 <Instagram className="w-8 h-8 text-white mb-2" />

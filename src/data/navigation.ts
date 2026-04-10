@@ -56,15 +56,6 @@ export const mainNavItems: NavItem[] = [
       { label: 'Infants', href: '/kids' },
     ],
   },
-  {
-    label: 'BAGS',
-    href: '/bags',
-    dropdown: [
-      { label: 'Handbags', href: '/bags' },
-      { label: 'Backpacks', href: '/bags' },
-      { label: 'Wallets', href: '/bags' },
-    ],
-  },
   { label: 'FRAGRANCES', href: '/coming-soon' },
   { label: 'BEST SELLER', href: '/coming-soon' },
   { label: 'NAYZA', href: '/coming-soon' },
@@ -81,20 +72,20 @@ export const footerLinks = {
   quickLinks: [
     { label: 'About Us', href: '/coming-soon' },
     { label: 'Careers', href: '/coming-soon' },
-    { label: 'Blog', href: '/coming-soon' },
+    { label: 'Blog', href: '/blog' },
     { label: 'Press', href: '/coming-soon' },
   ],
   help: [
-    { label: 'FAQ', href: '/coming-soon' },
+    { label: 'FAQ', href: '/faq' },
     { label: 'Shipping', href: '/coming-soon' },
-    { label: 'Returns', href: '/coming-soon' },
+    { label: 'Returns', href: '/terms-and-conditions' },
     { label: 'Size Guide', href: '/size-guide' },
   ],
   collections: [
     { label: 'Men', href: '/men' },
     { label: 'Women', href: '/women' },
     { label: 'Kids', href: '/kids' },
-    { label: 'Bags', href: '/bags' },
+    { label: 'Bags (Coming Soon)', href: '/coming-soon' },
   ],
   legal: [
     { label: 'Privacy Policy', href: '/privacy-policy' },
