@@ -15,7 +15,9 @@ model Product {
   slug          String   @unique
   name          String
   brand         String   @default("Intikhab")
-  category      String   // men, women, kids
+  productType   String   @default("shoes") // shoes, bags, accessories, clothing
+  category      String   @default("men") // men, women, kids, unisex
+  subcategory   String?  // sneakers, formal, casual, sandals, handbags, etc.
   price         Int
   originalPrice Int?
   images        String[]
@@ -26,13 +28,17 @@ model Product {
   description   String   @default("")
   sku           String   @unique
   status        String   @default("active") // active, draft
-  sizes         Int[]
+  sizeStock     Json     @default("[]") // [{size: string, stock: number, label?: string}]
+  sizeSystem    String   @default("eu") // eu, uk, us, bag, general, numeric
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
   @@index([slug])
+  @@index([productType])
   @@index([category])
+  @@index([subcategory])
   @@index([status])
+  @@index([productType, category])
   @@map("products")
 }
 
@@ -82,6 +88,7 @@ model OrderItem {
   image      String
   quantity   Int
   price      Int
+  size       String  // Changed from Int to String for flexible size systems
 
   order      Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
 
@@ -93,6 +100,7 @@ model Cart {
   id             String   @id @default(uuid()) @db.Uuid
   customerEmail  String
   productId      String
+  size           String?  // Changed from Int to String for flexible size systems
   quantity       Int      @default(1)
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt

@@ -2,7 +2,7 @@
  * Order and order item type definitions.
  */
 
-export type OrderStatus = 'Pending' | 'Processing' | 'Shipped' | 'Delivered';
+export type OrderStatus = "Pending" | "Processing" | "Shipped" | "Delivered";
 
 export interface OrderItem {
   productId: string;
@@ -10,6 +10,7 @@ export interface OrderItem {
   image: string;
   quantity: number;
   price: number;
+  size: number;
 }
 
 export interface Order {

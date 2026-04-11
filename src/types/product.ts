@@ -2,18 +2,30 @@
  * Product, cart, and category type definitions.
  */
 
-export type Category = 'men' | 'women' | 'kids';
+export type ProductType = "shoes" | "bags" | "accessories" | "clothing";
 
-export type ProductStatus = 'active' | 'draft';
+export type Category = "men" | "women" | "kids" | "unisex";
 
-export type ProductBadge = 'SALE' | 'NEW' | null;
+export type SizeSystem = "eu" | "uk" | "us" | "bag" | "general" | "numeric";
+
+export type ProductStatus = "active" | "draft";
+
+export type ProductBadge = "SALE" | "NEW" | null;
+
+export interface SizeStock {
+  size: string;
+  stock: number;
+  label?: string;
+}
 
 export interface Product {
   id: string;
   slug: string;
   name: string;
   brand: string;
+  productType: ProductType;
   category: Category;
+  subcategory?: string;
   price: number;
   originalPrice?: number;
   images: string[];
@@ -24,7 +36,9 @@ export interface Product {
   description: string;
   sku: string;
   status: ProductStatus;
-  sizes?: number[];
+  sizeStock: SizeStock[];
+  sizeSystem: SizeSystem;
+  createdAt: string;
 }
 
 export interface CartItem {
@@ -33,5 +47,6 @@ export interface CartItem {
   price: number;
   image: string;
   quantity: number;
-  size?: string;
+  size: string;
+  productType: ProductType;
 }
