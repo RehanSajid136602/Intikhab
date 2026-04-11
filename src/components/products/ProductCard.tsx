@@ -1,16 +1,16 @@
-'use client';
+"use client";
 
-import Image from 'next/image';
-import Link from 'next/link';
-import { Heart } from 'lucide-react';
-import { AnimatePresence, motion } from 'framer-motion';
-import { useCartStore } from '@/stores/cartStore';
-import { useWishlistStore } from '@/stores/wishlistStore';
-import { useProductImageCarousel } from '@/hooks/useProductImageCarousel';
-import { ProductBadgeComponent } from './ProductBadge';
-import { formatPKR } from '@/lib/utils';
-import { toast } from 'sonner';
-import type { Product } from '@/types/product';
+import Image from "next/image";
+import Link from "next/link";
+import { Heart } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
+import { useCartStore } from "@/stores/cartStore";
+import { useWishlistStore } from "@/stores/wishlistStore";
+import { useProductImageCarousel } from "@/hooks/useProductImageCarousel";
+import { ProductBadgeComponent } from "./ProductBadge";
+import { formatPKR, isNewProduct } from "@/lib/utils";
+import { toast } from "sonner";
+import type { Product } from "@/types/product";
 
 interface ProductCardProps {
   product: Product;
@@ -25,7 +25,9 @@ interface ProductCardProps {
 function ProductCard({ product, showImageCarousel }: ProductCardProps) {
   const addItem = useCartStore((state) => state.addItem);
   const toggleWishlist = useWishlistStore((state) => state.toggleItem);
-  const isInWishlist = useWishlistStore((state) => state.isInWishlist(product.id));
+  const isInWishlist = useWishlistStore((state) =>
+    state.isInWishlist(product.id),
+  );
   const { currentImageIndex, setIsPaused } = useProductImageCarousel(
     showImageCarousel ? product.images.length : 1,
   );
@@ -37,28 +39,28 @@ function ProductCard({ product, showImageCarousel }: ProductCardProps) {
   const handleWishlistClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     toggleWishlist(product);
-    toast.success(
-      isInWishlist ? 'Removed from Wishlist' : 'Added to Wishlist'
-    );
+    toast.success(isInWishlist ? "Removed from Wishlist" : "Added to Wishlist");
   };
 
   return (
     <Link href={`/product/${product.slug}`} className="block">
       <div className="product-card relative bg-white rounded-sm overflow-hidden border border-brand-border group cursor-pointer">
-        {/* Badge */}
-        <ProductBadgeComponent badge={product.badge} />
+        {/* Badge - Auto-shows NEW if within 14 days */}
+        <ProductBadgeComponent
+          badge={isNewProduct(product.createdAt) ? "NEW" : product.badge}
+        />
 
         {/* Wishlist Heart */}
         <button
           onClick={handleWishlistClick}
           className="absolute top-3 right-3 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-200 p-1 min-w-11 min-h-11 flex items-center justify-center"
-          aria-label={isInWishlist ? 'Remove from wishlist' : 'Add to wishlist'}
+          aria-label={isInWishlist ? "Remove from wishlist" : "Add to wishlist"}
         >
           <Heart
             className={`w-5 h-5 transition-colors duration-200 ${
               isInWishlist
-                ? 'fill-brand-red text-brand-red'
-                : 'text-brand-gray hover:text-brand-red'
+                ? "fill-brand-red text-brand-red"
+                : "text-brand-gray hover:text-brand-red"
             }`}
           />
         </button>
@@ -106,7 +108,7 @@ function ProductCard({ product, showImageCarousel }: ProductCardProps) {
             )}
             <span
               className={`text-[14px] font-semibold ${
-                product.originalPrice ? 'text-brand-red' : 'text-brand-dark'
+                product.originalPrice ? "text-brand-red" : "text-brand-dark"
               }`}
             >
               {formatPKR(product.price)}
@@ -119,7 +121,8 @@ function ProductCard({ product, showImageCarousel }: ProductCardProps) {
             onClick={(e) => {
               e.stopPropagation();
               e.preventDefault();
-              addItem(product);
+              const firstSize = product.sizeStock?.[0]?.size ?? 0;
+              addItem(product, firstSize);
             }}
             className="add-to-cart-btn w-full bg-brand-dark text-white text-[11px] font-bold uppercase tracking-widest py-2.5 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
           >
