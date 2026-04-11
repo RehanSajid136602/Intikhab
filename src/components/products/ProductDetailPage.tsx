@@ -1,33 +1,56 @@
-'use client';
+"use client";
 
-import Image from 'next/image';
-import Link from 'next/link';
-import { useParams, useRouter } from 'next/navigation';
-import { useState } from 'react';
-import { useCartStore } from '@/stores/cartStore';
-import { formatPKR } from '@/lib/utils';
-import { ArrowLeft, ShoppingCart, Heart, ChevronLeft, ChevronRight } from 'lucide-react';
-import type { Product } from '@/types/product';
-import { ProductCard } from '@/components/products/ProductCard';
+import Image from "next/image";
+import Link from "next/link";
+import { useParams, useRouter } from "next/navigation";
+import { useState } from "react";
+import { useCartStore } from "@/stores/cartStore";
+import { formatPKR } from "@/lib/utils";
+import {
+  ArrowLeft,
+  ShoppingCart,
+  Heart,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
+import { toast } from "sonner";
+import type { Product, SizeStock } from "@/types/product";
+import { ProductCard } from "@/components/products/ProductCard";
 
 interface ProductDetailPageProps {
   product: Product;
   relatedProducts: Product[];
 }
 
-export function ProductDetailPage({ product, relatedProducts }: ProductDetailPageProps) {
+export function ProductDetailPage({
+  product,
+  relatedProducts,
+}: ProductDetailPageProps) {
   const { addItem } = useCartStore();
   const router = useRouter();
   const [activeImage, setActiveImage] = useState(0);
+  const [selectedSize, setSelectedSize] = useState<string | null>(null);
   const params = useParams();
 
+  const sizeStockMap: Map<string, number> = new Map(
+    (product.sizeStock || []).map((s: SizeStock) => [s.size, s.stock]),
+  );
+
   const handleAddToCart = () => {
-    addItem(product);
+    if (!selectedSize) {
+      toast.error("Please select a size");
+      return;
+    }
+    addItem(product, selectedSize);
   };
 
   const handleBuyNow = () => {
-    addItem(product);
-    router.push('/checkout');
+    if (!selectedSize) {
+      toast.error("Please select a size");
+      return;
+    }
+    addItem(product, selectedSize);
+    router.push("/checkout");
   };
 
   return (
@@ -59,7 +82,11 @@ export function ProductDetailPage({ product, relatedProducts }: ProductDetailPag
               {/* Left Arrow */}
               {product.images.length > 1 && (
                 <button
-                  onClick={() => setActiveImage(prev => prev > 0 ? prev - 1 : product.images.length - 1)}
+                  onClick={() =>
+                    setActiveImage((prev) =>
+                      prev > 0 ? prev - 1 : product.images.length - 1,
+                    )
+                  }
                   className="absolute left-2 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/90 hover:bg-white rounded-full flex items-center justify-center shadow-md transition-all opacity-0 group-hover:opacity-100"
                   aria-label="Previous image"
                 >
@@ -70,7 +97,11 @@ export function ProductDetailPage({ product, relatedProducts }: ProductDetailPag
               {/* Right Arrow */}
               {product.images.length > 1 && (
                 <button
-                  onClick={() => setActiveImage(prev => prev < product.images.length - 1 ? prev + 1 : 0)}
+                  onClick={() =>
+                    setActiveImage((prev) =>
+                      prev < product.images.length - 1 ? prev + 1 : 0,
+                    )
+                  }
                   className="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/90 hover:bg-white rounded-full flex items-center justify-center shadow-md transition-all opacity-0 group-hover:opacity-100"
                   aria-label="Next image"
                 >
@@ -95,8 +126,8 @@ export function ProductDetailPage({ product, relatedProducts }: ProductDetailPag
                     onClick={() => setActiveImage(i)}
                     className={`relative w-20 h-20 rounded-sm overflow-hidden border-2 transition-colors ${
                       activeImage === i
-                        ? 'border-brand-dark'
-                        : 'border-brand-border'
+                        ? "border-brand-dark"
+                        : "border-brand-border"
                     }`}
                   >
                     <Image
@@ -125,9 +156,7 @@ export function ProductDetailPage({ product, relatedProducts }: ProductDetailPag
               {product.name}
             </h1>
 
-            <p className="text-sm text-brand-gray">
-              SKU: {product.sku}
-            </p>
+            <p className="text-sm text-brand-gray">SKU: {product.sku}</p>
 
             {/* Price */}
             <div className="flex items-baseline gap-3">
@@ -147,32 +176,56 @@ export function ProductDetailPage({ product, relatedProducts }: ProductDetailPag
             </p>
 
             {/* Sizes */}
-            {product.sizes && product.sizes.length > 0 && (
+            {product.sizeStock && product.sizeStock.length > 0 && (
               <div>
                 <h3 className="text-sm font-semibold text-brand-dark mb-2">
-                  Available Sizes
+                  Select Size
                 </h3>
                 <div className="flex flex-wrap gap-2">
-                  {product.sizes.map((size) => (
-                    <span
-                      key={size}
-                      className="w-12 h-12 flex items-center justify-center border border-brand-border text-sm text-brand-dark rounded-sm"
-                    >
-                      {size}
-                    </span>
-                  ))}
+                  {product.sizeStock.map((ss: SizeStock) => {
+                    const hasStock = ss.stock > 0;
+                    const isSelected = selectedSize === ss.size;
+                    return (
+                      <button
+                        key={ss.size}
+                        onClick={() => hasStock && setSelectedSize(ss.size)}
+                        disabled={!hasStock}
+                        className={`w-12 h-12 flex items-center justify-center border text-sm rounded-sm transition-all ${
+                          !hasStock
+                            ? "border-brand-border text-brand-gray line-through cursor-not-allowed opacity-50"
+                            : isSelected
+                              ? "border-brand-dark bg-brand-dark text-white font-semibold"
+                              : "border-brand-border text-brand-dark hover:border-brand-dark cursor-pointer"
+                        }`}
+                        title={
+                          hasStock ? `${ss.stock} in stock` : "Out of stock"
+                        }
+                      >
+                        {ss.size}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
             )}
 
             {/* Stock Status */}
-            <p className={`text-sm font-medium ${product.inStock ? 'text-brand-green' : 'text-brand-red'}`}>
-              {product.inStock ? '✓ In Stock' : '✗ Out of Stock'}
-              {product.stock > 0 && product.stock <= 10 && (
-                <span className="ml-2 text-brand-red">
-                  (Only {product.stock} left)
-                </span>
-              )}
+            <p
+              className={`text-sm font-medium ${product.inStock && product.sizeStock.some((ss: SizeStock) => ss.stock > 0) ? "text-brand-green" : "text-brand-red"}`}
+            >
+              {product.inStock &&
+              product.sizeStock.some((ss: SizeStock) => ss.stock > 0)
+                ? "✓ In Stock"
+                : "✗ Out of Stock"}
+              {selectedSize &&
+                sizeStockMap.has(selectedSize) &&
+                sizeStockMap.get(selectedSize)! > 0 &&
+                sizeStockMap.get(selectedSize)! <= 10 && (
+                  <span className="ml-2 text-brand-red">
+                    (Only {sizeStockMap.get(selectedSize)} left in size{" "}
+                    {selectedSize})
+                  </span>
+                )}
             </p>
 
             {/* Buttons */}

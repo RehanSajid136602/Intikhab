@@ -36,13 +36,21 @@ async function main() {
   let updated = 0;
 
   for (const product of products) {
+    // Convert old sizes array to new sizeStock format
+    const sizeStock = (product.sizes || []).map((size: number) => ({
+      size: String(size),
+      stock: product.stock || 1,
+    }));
+
     const result = await prisma.product.upsert({
       where: { sku: product.sku },
       update: {
         slug: product.slug,
         name: product.name,
         brand: product.brand,
+        productType: (product as any).productType || 'shoes',
         category: product.category,
+        subcategory: (product as any).subcategory || null,
         price: product.price,
         originalPrice: product.originalPrice ?? null,
         images: product.images,
@@ -52,13 +60,16 @@ async function main() {
         installment: product.installment,
         description: product.description,
         status: product.status,
-        sizes: product.sizes ?? [],
+        sizeStock: sizeStock as any,
+        sizeSystem: (product as any).sizeSystem || 'eu',
       },
       create: {
         slug: product.slug,
         name: product.name,
         brand: product.brand,
+        productType: (product as any).productType || 'shoes',
         category: product.category,
+        subcategory: (product as any).subcategory || null,
         price: product.price,
         originalPrice: product.originalPrice ?? null,
         images: product.images,
@@ -69,7 +80,8 @@ async function main() {
         description: product.description,
         sku: product.sku,
         status: product.status,
-        sizes: product.sizes ?? [],
+        sizeStock: sizeStock as any,
+        sizeSystem: (product as any).sizeSystem || 'eu',
       },
     });
 

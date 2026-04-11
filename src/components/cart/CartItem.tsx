@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
-import Image from 'next/image';
-import { Minus, Plus, X } from 'lucide-react';
-import { useCartStore } from '@/stores/cartStore';
-import { formatPKR } from '@/lib/utils';
-import type { CartItem } from '@/types/product';
+import Image from "next/image";
+import { Minus, Plus, X } from "lucide-react";
+import { useCartStore } from "@/stores/cartStore";
+import { formatPKR } from "@/lib/utils";
+import type { CartItem } from "@/types/product";
 
 interface CartItemComponentProps {
   item: CartItem;
@@ -34,8 +34,13 @@ function CartItemComponent({ item }: CartItemComponentProps) {
 
       {/* Info */}
       <div className="flex-1 min-w-0">
-        <p className="text-xs font-medium text-brand-dark truncate">{item.name}</p>
-        <p className="text-xs text-brand-dark font-semibold">{formatPKR(item.price)}</p>
+        <p className="text-xs font-medium text-brand-dark truncate">
+          {item.name}
+        </p>
+        <p className="text-xs text-brand-gray">Size: {item.size}</p>
+        <p className="text-xs text-brand-dark font-semibold">
+          {formatPKR(item.price)}
+        </p>
       </div>
 
       {/* Quantity Controls */}
@@ -47,7 +52,9 @@ function CartItemComponent({ item }: CartItemComponentProps) {
         >
           <Minus className="w-3 h-3" />
         </button>
-        <span className="text-xs font-medium w-4 text-center">{item.quantity}</span>
+        <span className="text-xs font-medium w-4 text-center">
+          {item.quantity}
+        </span>
         <button
           onClick={() => updateQuantity(item.id, item.quantity + 1)}
           className="w-11 h-11 flex items-center justify-center border border-brand-border text-xs hover:bg-brand-light-gray transition-colors"

@@ -1,28 +1,29 @@
-'use client';
+"use client";
 
-import React from 'react';
-import Link from 'next/link';
-import { motion } from 'framer-motion';
-import { Heart, ShoppingCart, Trash2 } from 'lucide-react';
-import { useWishlistStore } from '@/stores/wishlistStore';
-import { useCartStore } from '@/stores/cartStore';
-import { ProductCard } from '@/components/products/ProductCard';
-import { formatPKR } from '@/lib/utils';
-import { toast } from 'sonner';
+import React from "react";
+import Link from "next/link";
+import { motion } from "framer-motion";
+import { Heart, ShoppingCart, Trash2 } from "lucide-react";
+import { useWishlistStore } from "@/stores/wishlistStore";
+import { useCartStore } from "@/stores/cartStore";
+import { ProductCard } from "@/components/products/ProductCard";
+import { formatPKR } from "@/lib/utils";
+import { toast } from "sonner";
 
 export default function WishlistPage() {
   const { items, removeItem, clearWishlist } = useWishlistStore();
   const { addItem } = useCartStore();
 
   const handleMoveToCart = (product: any) => {
-    addItem(product);
+    const firstSize = product.sizeStock?.[0]?.size ?? 0;
+    addItem(product, firstSize);
     removeItem(product.id);
-    toast.success('Moved to cart');
+    toast.success("Moved to cart");
   };
 
   const handleRemove = (id: string) => {
     removeItem(id);
-    toast.success('Removed from wishlist');
+    toast.success("Removed from wishlist");
   };
 
   if (items.length === 0) {
@@ -35,8 +36,12 @@ export default function WishlistPage() {
             transition={{ duration: 0.6 }}
           >
             <Heart className="w-20 h-20 text-brand-gray mx-auto mb-6" />
-            <h1 className="text-3xl font-bold text-brand-dark mb-4">Your wishlist is empty</h1>
-            <p className="text-brand-gray mb-8">Save your favorite items to see them here</p>
+            <h1 className="text-3xl font-bold text-brand-dark mb-4">
+              Your wishlist is empty
+            </h1>
+            <p className="text-brand-gray mb-8">
+              Save your favorite items to see them here
+            </p>
             <Link
               href="/"
               className="inline-block bg-brand-dark text-white px-8 py-3 rounded-lg font-semibold hover:bg-black transition-colors"
@@ -58,9 +63,11 @@ export default function WishlistPage() {
           transition={{ duration: 0.6 }}
           className="mb-8"
         >
-          <h1 className="text-3xl md:text-4xl font-bold text-brand-dark mb-2">My Wishlist</h1>
+          <h1 className="text-3xl md:text-4xl font-bold text-brand-dark mb-2">
+            My Wishlist
+          </h1>
           <p className="text-brand-gray">
-            {items.length} item{items.length !== 1 ? 's' : ''} saved
+            {items.length} item{items.length !== 1 ? "s" : ""} saved
           </p>
         </motion.div>
 

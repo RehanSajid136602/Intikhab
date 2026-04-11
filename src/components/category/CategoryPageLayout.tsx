@@ -1,12 +1,12 @@
-'use client';
+"use client";
 
-import React, { useState, useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Filter, SlidersHorizontal, X } from 'lucide-react';
-import { ProductCard } from '@/components/products/ProductCard';
-import { Breadcrumbs } from '@/components/Breadcrumbs';
-import type { Product } from '@/types/product';
-import { formatPKR } from '@/lib/utils';
+import React, { useState, useMemo } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Filter, SlidersHorizontal, X } from "lucide-react";
+import { ProductCard } from "@/components/products/ProductCard";
+import { Breadcrumbs } from "@/components/Breadcrumbs";
+import type { Product } from "@/types/product";
+import { formatPKR } from "@/lib/utils";
 
 interface CategoryPageLayoutProps {
   title: string;
@@ -14,6 +14,8 @@ interface CategoryPageLayoutProps {
   products: Product[];
   heroImage?: string;
   category?: string;
+  productType?: string;
+  subcategory?: string;
 }
 
 /**
@@ -26,38 +28,45 @@ export function CategoryPageLayout({
   products,
   heroImage,
   category,
+  productType,
+  subcategory,
 }: CategoryPageLayoutProps) {
-  const [selectedSizes, setSelectedSizes] = useState<number[]>([]);
+  const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
   const [selectedColors, setSelectedColors] = useState<string[]>([]);
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 50000]);
-  const [sortBy, setSortBy] = useState('featured');
+  const [sortBy, setSortBy] = useState("featured");
   const [isFilterOpen, setIsFilterOpen] = useState(false);
 
-  const allSizes = [6, 7, 8, 9, 10, 11];
-  const allColors = ['Black', 'Blue', 'White', 'Red', 'Brown'];
+  // Dynamic sizes based on product type
+  const allSizes = productType === "shoes" ? ["35", "36", "37", "38", "39", "40", "41", "42", "43", "44", "45", "46"] : ["small", "medium", "large", "xl", "one-size"];
+  const allColors = ["Black", "Blue", "White", "Red", "Brown"];
 
   const filteredAndSortedProducts = useMemo(() => {
     let filtered = [...products];
 
-    // Filter by size
+    // Filter by size (now using string sizes)
     if (selectedSizes.length > 0) {
       filtered = filtered.filter((p) =>
-        p.sizes?.some((size) => selectedSizes.includes(size))
+        p.sizeStock?.some(
+          (ss) => selectedSizes.includes(ss.size) && ss.stock > 0,
+        ),
       );
     }
 
     // Filter by price
-    filtered = filtered.filter((p) => p.price >= priceRange[0] && p.price <= priceRange[1]);
+    filtered = filtered.filter(
+      (p) => p.price >= priceRange[0] && p.price <= priceRange[1],
+    );
 
     // Sort
     switch (sortBy) {
-      case 'price-low':
+      case "price-low":
         filtered.sort((a, b) => a.price - b.price);
         break;
-      case 'price-high':
+      case "price-high":
         filtered.sort((a, b) => b.price - a.price);
         break;
-      case 'newest':
+      case "newest":
         filtered.sort((a, b) => b.id.localeCompare(a.id));
         break;
       default:
@@ -108,7 +117,8 @@ export function CategoryPageLayout({
           {category && (
             <Breadcrumbs
               items={[
-                { label: 'Home', href: '/' },
+                { label: "Home", href: "/" },
+                ...(productType ? [{ label: productType.charAt(0).toUpperCase() + productType.slice(1), href: `/${productType}` }] : []),
                 { label: title },
               ]}
               className="mb-6"
@@ -117,6 +127,14 @@ export function CategoryPageLayout({
 
           {/* Filter & Sort Bar */}
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 gap-4">
+            {/* Subcategory Filter Pills */}
+            {subcategory && (
+              <div className="flex items-center gap-2 mb-4 md:mb-0">
+                <span className="text-sm font-medium text-brand-gray">Style:</span>
+                <span className="px-3 py-1 bg-brand-light-gray rounded-full text-sm capitalize">{subcategory}</span>
+              </div>
+            )}
+
             <div className="flex items-center gap-4">
               <button
                 onClick={() => setIsFilterOpen(!isFilterOpen)}
@@ -142,7 +160,8 @@ export function CategoryPageLayout({
 
             <div className="flex items-center gap-4">
               <p className="text-sm text-brand-gray">
-                Showing {filteredAndSortedProducts.length} of {products.length} products
+                Showing {filteredAndSortedProducts.length} of {products.length}{" "}
+                products
               </p>
               <select
                 value={sortBy}
@@ -175,7 +194,9 @@ export function CategoryPageLayout({
 
                 {/* Size Filter */}
                 <div className="mb-6">
-                  <h4 className="text-sm font-medium text-brand-dark mb-3">Size</h4>
+                  <h4 className="text-sm font-medium text-brand-dark mb-3">
+                    Size
+                  </h4>
                   <div className="flex flex-wrap gap-2">
                     {allSizes.map((size) => (
                       <button
@@ -184,13 +205,13 @@ export function CategoryPageLayout({
                           setSelectedSizes((prev) =>
                             prev.includes(size)
                               ? prev.filter((s) => s !== size)
-                              : [...prev, size]
+                              : [...prev, size],
                           );
                         }}
                         className={`w-10 h-10 border-2 rounded-lg text-sm font-medium transition-all ${
                           selectedSizes.includes(size)
-                            ? 'border-brand-dark bg-brand-dark text-white'
-                            : 'border-brand-border text-brand-dark hover:border-brand-dark'
+                            ? "border-brand-dark bg-brand-dark text-white"
+                            : "border-brand-border text-brand-dark hover:border-brand-dark"
                         }`}
                       >
                         {size}
@@ -201,7 +222,9 @@ export function CategoryPageLayout({
 
                 {/* Price Filter */}
                 <div className="mb-6">
-                  <h4 className="text-sm font-medium text-brand-dark mb-3">Price Range</h4>
+                  <h4 className="text-sm font-medium text-brand-dark mb-3">
+                    Price Range
+                  </h4>
                   <div className="space-y-2">
                     <input
                       type="range"
@@ -209,7 +232,9 @@ export function CategoryPageLayout({
                       max={50000}
                       step={1000}
                       value={priceRange[1]}
-                      onChange={(e) => setPriceRange([priceRange[0], parseInt(e.target.value)])}
+                      onChange={(e) =>
+                        setPriceRange([priceRange[0], parseInt(e.target.value)])
+                      }
                       className="w-full"
                     />
                     <div className="flex justify-between text-sm text-brand-gray">
@@ -253,7 +278,8 @@ export function CategoryPageLayout({
                       No products found
                     </h2>
                     <p className="text-lg text-brand-gray mb-8 max-w-xl mx-auto">
-                      Try adjusting your filters to find what you're looking for.
+                      Try adjusting your filters to find what you're looking
+                      for.
                     </p>
                     <button
                       onClick={clearFilters}
@@ -281,14 +307,16 @@ export function CategoryPageLayout({
               onClick={() => setIsFilterOpen(false)}
             />
             <motion.div
-              initial={{ y: '100%' }}
+              initial={{ y: "100%" }}
               animate={{ y: 0 }}
-              exit={{ y: '100%' }}
-              transition={{ duration: 0.3, ease: 'easeInOut' }}
+              exit={{ y: "100%" }}
+              transition={{ duration: 0.3, ease: "easeInOut" }}
               className="fixed bottom-0 left-0 right-0 bg-white z-[160] rounded-t-2xl p-6 max-h-[80vh] overflow-y-auto lg:hidden"
             >
               <div className="flex items-center justify-between mb-6">
-                <h3 className="font-semibold text-brand-dark text-lg">Filters</h3>
+                <h3 className="font-semibold text-brand-dark text-lg">
+                  Filters
+                </h3>
                 <button
                   onClick={() => setIsFilterOpen(false)}
                   className="p-2 hover:bg-gray-100 rounded-full"
@@ -299,7 +327,9 @@ export function CategoryPageLayout({
 
               {/* Size Filter */}
               <div className="mb-6">
-                <h4 className="text-sm font-medium text-brand-dark mb-3">Size</h4>
+                <h4 className="text-sm font-medium text-brand-dark mb-3">
+                  Size
+                </h4>
                 <div className="flex flex-wrap gap-2">
                   {allSizes.map((size) => (
                     <button
@@ -308,13 +338,13 @@ export function CategoryPageLayout({
                         setSelectedSizes((prev) =>
                           prev.includes(size)
                             ? prev.filter((s) => s !== size)
-                            : [...prev, size]
+                            : [...prev, size],
                         );
                       }}
                       className={`w-12 h-12 border-2 rounded-lg text-sm font-medium transition-all ${
                         selectedSizes.includes(size)
-                          ? 'border-brand-dark bg-brand-dark text-white'
-                          : 'border-brand-border text-brand-dark hover:border-brand-dark'
+                          ? "border-brand-dark bg-brand-dark text-white"
+                          : "border-brand-border text-brand-dark hover:border-brand-dark"
                       }`}
                     >
                       {size}
@@ -325,7 +355,9 @@ export function CategoryPageLayout({
 
               {/* Price Filter */}
               <div className="mb-6">
-                <h4 className="text-sm font-medium text-brand-dark mb-3">Price Range</h4>
+                <h4 className="text-sm font-medium text-brand-dark mb-3">
+                  Price Range
+                </h4>
                 <div className="space-y-2">
                   <input
                     type="range"
@@ -333,7 +365,9 @@ export function CategoryPageLayout({
                     max={50000}
                     step={1000}
                     value={priceRange[1]}
-                    onChange={(e) => setPriceRange([priceRange[0], parseInt(e.target.value)])}
+                    onChange={(e) =>
+                      setPriceRange([priceRange[0], parseInt(e.target.value)])
+                    }
                     className="w-full"
                   />
                   <div className="flex justify-between text-sm text-brand-gray">
