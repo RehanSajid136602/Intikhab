@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import Image from 'next/image';
+import { useState, useEffect } from "react";
+import Image from "next/image";
 import {
   useReactTable,
   getCoreRowModel,
@@ -12,12 +12,12 @@ import {
   type SortingState,
   type ColumnDef,
   type ColumnFiltersState,
-} from '@tanstack/react-table';
-import { Search, Plus, Trash2, Edit, ChevronDown } from 'lucide-react';
-import { toast } from 'sonner';
-import { useAdminStore } from '@/stores/adminStore';
-import { formatPKR } from '@/lib/utils';
-import type { Product } from '@/types/product';
+} from "@tanstack/react-table";
+import { Search, Plus, Trash2, Edit, ChevronDown } from "lucide-react";
+import { toast } from "sonner";
+import { useAdminStore } from "@/stores/adminStore";
+import { formatPKR } from "@/lib/utils";
+import type { Product } from "@/types/product";
 
 interface ProductsTableProps {
   onAddProduct: () => void;
@@ -30,10 +30,16 @@ interface ProductsTableProps {
  * Fetches products from Supabase via adminStore API wrapper.
  */
 function ProductsTable({ onAddProduct, onEditProduct }: ProductsTableProps) {
-  const { products, productsLoading, fetchProducts, updateProduct, deleteProduct } = useAdminStore();
+  const {
+    products,
+    productsLoading,
+    fetchProducts,
+    updateProduct,
+    deleteProduct,
+  } = useAdminStore();
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
-  const [globalFilter, setGlobalFilter] = useState('');
+  const [globalFilter, setGlobalFilter] = useState("");
   const [rowSelection, setRowSelection] = useState({});
 
   // Fetch products on mount
@@ -43,7 +49,7 @@ function ProductsTable({ onAddProduct, onEditProduct }: ProductsTableProps) {
 
   const columns: ColumnDef<Product>[] = [
     {
-      id: 'select',
+      id: "select",
       header: ({ table }) => (
         <input
           type="checkbox"
@@ -62,8 +68,8 @@ function ProductsTable({ onAddProduct, onEditProduct }: ProductsTableProps) {
       ),
     },
     {
-      accessorKey: 'images',
-      header: 'Image',
+      accessorKey: "images",
+      header: "Image",
       cell: (info) => {
         const images = info.getValue() as string[];
         return (
@@ -81,39 +87,79 @@ function ProductsTable({ onAddProduct, onEditProduct }: ProductsTableProps) {
         );
       },
     },
-    { accessorKey: 'name', header: 'Product Name' },
-    { accessorKey: 'sku', header: 'SKU' },
+    { accessorKey: "name", header: "Product Name" },
+    { accessorKey: "sku", header: "SKU" },
     {
-      accessorKey: 'category',
-      header: 'Category',
+      accessorKey: "productType",
+      header: "Type",
+      cell: (info) => (
+        <span className="capitalize">{info.getValue() as string}</span>
+      ),
+    },
+    {
+      accessorKey: "category",
+      header: "Category",
       filterFn: (row, _columnId, filterValue: string) => {
         if (!filterValue) return true;
-        return (row.getValue('category') as string) === filterValue;
+        return (row.getValue("category") as string) === filterValue;
       },
       cell: (info) => (
         <span className="capitalize">{info.getValue() as string}</span>
       ),
     },
     {
-      accessorKey: 'price',
-      header: 'Price',
-      cell: (info) => formatPKR(info.getValue() as number),
-    },
-    {
-      accessorKey: 'stock',
-      header: 'Stock',
+      accessorKey: "subcategory",
+      header: "Subcategory",
       cell: (info) => {
-        const stock = info.getValue() as number;
-        return (
-          <span className={stock < 5 ? 'text-brand-red font-semibold' : ''}>
-            {stock}
-          </span>
+        const subcategory = info.getValue() as string | undefined;
+        return subcategory ? (
+          <span className="capitalize">{subcategory}</span>
+        ) : (
+          <span className="text-gray-400">-</span>
         );
       },
     },
     {
-      accessorKey: 'status',
-      header: 'Status',
+      accessorKey: "price",
+      header: "Price",
+      cell: (info) => formatPKR(info.getValue() as number),
+    },
+    {
+      accessorKey: "stock",
+      header: "Stock",
+      cell: (info) => {
+        const stock = info.getValue() as number;
+        const product = info.row.original;
+        const sizeStock = (product as any).sizeStock as
+          | { size: string; stock: number }[]
+          | undefined;
+        return (
+          <div>
+            <span className={stock < 5 ? "text-brand-red font-semibold" : ""}>
+              {stock}
+            </span>
+            {sizeStock && sizeStock.length > 0 && (
+              <div className="text-xs text-brand-gray mt-0.5">
+                {sizeStock
+                  .filter((s) => s.stock > 0)
+                  .map((s) => s.size)
+                  .join(", ")}
+              </div>
+            )}
+          </div>
+        );
+      },
+    },
+    {
+      accessorKey: "sizeSystem",
+      header: "Size System",
+      cell: (info) => (
+        <span className="uppercase text-xs">{info.getValue() as string}</span>
+      ),
+    },
+    {
+      accessorKey: "status",
+      header: "Status",
       cell: (info) => {
         const status = info.getValue() as string;
         const product = info.row.original;
@@ -121,14 +167,18 @@ function ProductsTable({ onAddProduct, onEditProduct }: ProductsTableProps) {
         return (
           <button
             onClick={async () => {
-              const newStatus = status === 'active' ? 'draft' : 'active';
-              await updateProduct(product.id, { status: newStatus as 'active' | 'draft' });
-              toast.success(`Product ${newStatus === 'active' ? 'activated' : 'set to draft'}`);
+              const newStatus = status === "active" ? "draft" : "active";
+              await updateProduct(product.id, {
+                status: newStatus as "active" | "draft",
+              });
+              toast.success(
+                `Product ${newStatus === "active" ? "activated" : "set to draft"}`,
+              );
             }}
             className={`px-3 py-1 text-xs font-semibold rounded-sm uppercase transition-colors ${
-              status === 'active'
-                ? 'bg-green-100 text-green-700 hover:bg-green-200'
-                : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
+              status === "active"
+                ? "bg-green-100 text-green-700 hover:bg-green-200"
+                : "bg-gray-100 text-gray-500 hover:bg-gray-200"
             }`}
           >
             {status}
@@ -137,8 +187,8 @@ function ProductsTable({ onAddProduct, onEditProduct }: ProductsTableProps) {
       },
     },
     {
-      id: 'actions',
-      header: 'Actions',
+      id: "actions",
+      header: "Actions",
       cell: ({ row }) => {
         const product = row.original;
         return (
@@ -154,7 +204,7 @@ function ProductsTable({ onAddProduct, onEditProduct }: ProductsTableProps) {
               onClick={async () => {
                 if (confirm(`Delete "${product.name}"?`)) {
                   await deleteProduct(product.id);
-                  toast.success('Product deleted');
+                  toast.success("Product deleted");
                 }
               }}
               className="p-1 text-brand-gray hover:text-brand-red transition-colors"
@@ -203,12 +253,8 @@ function ProductsTable({ onAddProduct, onEditProduct }: ProductsTableProps) {
       {/* Header Row */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-4">
         <div>
-          <h2 className="text-lg font-semibold text-brand-dark">
-            Products
-          </h2>
-          <p className="text-xs text-brand-gray">
-            {products.length} total
-          </p>
+          <h2 className="text-lg font-semibold text-brand-dark">Products</h2>
+          <p className="text-xs text-brand-gray">{products.length} total</p>
         </div>
         <div className="flex items-center gap-3 w-full sm:w-auto">
           {/* Search */}
@@ -227,21 +273,21 @@ function ProductsTable({ onAddProduct, onEditProduct }: ProductsTableProps) {
           <div className="relative">
             <select
               value={
-                (columnFilters.find((f) => f.id === 'category')
-                  ?.value as string) || ''
+                (columnFilters.find((f) => f.id === "category")
+                  ?.value as string) || ""
               }
               onChange={(e) => {
-                const existing = columnFilters.find((f) => f.id === 'category');
+                const existing = columnFilters.find((f) => f.id === "category");
                 if (existing) {
                   setColumnFilters(
                     columnFilters.map((f) =>
-                      f.id === 'category' ? { ...f, value: e.target.value } : f,
+                      f.id === "category" ? { ...f, value: e.target.value } : f,
                     ),
                   );
                 } else {
                   setColumnFilters([
                     ...columnFilters,
-                    { id: 'category', value: e.target.value },
+                    { id: "category", value: e.target.value },
                   ]);
                 }
               }}
@@ -251,6 +297,7 @@ function ProductsTable({ onAddProduct, onEditProduct }: ProductsTableProps) {
               <option value="men">Men</option>
               <option value="women">Women</option>
               <option value="kids">Kids</option>
+              <option value="unisex">Unisex</option>
             </select>
             <ChevronDown className="w-4 h-4 text-brand-gray absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none" />
           </div>
@@ -293,9 +340,9 @@ function ProductsTable({ onAddProduct, onEditProduct }: ProductsTableProps) {
                       header.column.columnDef.header,
                       header.getContext(),
                     )}
-                    {{ asc: ' ↑', desc: ' ↓' }[
+                    {{ asc: " ↑", desc: " ↓" }[
                       header.column.getIsSorted() as string
-                    ] ?? ''}
+                    ] ?? ""}
                   </th>
                 ))}
               </tr>
@@ -304,30 +351,39 @@ function ProductsTable({ onAddProduct, onEditProduct }: ProductsTableProps) {
           <tbody>
             {productsLoading ? (
               <tr>
-                <td colSpan={columns.length} className="py-8 text-center text-sm text-brand-gray">
+                <td
+                  colSpan={columns.length}
+                  className="py-8 text-center text-sm text-brand-gray"
+                >
                   Loading products...
                 </td>
               </tr>
             ) : table.getRowModel().rows.length === 0 ? (
               <tr>
-                <td colSpan={columns.length} className="py-8 text-center text-sm text-brand-gray">
+                <td
+                  colSpan={columns.length}
+                  className="py-8 text-center text-sm text-brand-gray"
+                >
                   No products found.
                 </td>
               </tr>
             ) : (
               table.getRowModel().rows.map((row) => (
-              <tr
-                key={row.id}
-                className={`border-b border-brand-border hover:bg-brand-light-gray/50 ${
-                  row.getIsSelected() ? 'bg-brand-light-gray' : ''
-                }`}
-              >
-                {row.getVisibleCells().map((cell) => (
-                  <td key={cell.id} className="py-3 px-4">
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </td>
-                ))}
-              </tr>
+                <tr
+                  key={row.id}
+                  className={`border-b border-brand-border hover:bg-brand-light-gray/50 ${
+                    row.getIsSelected() ? "bg-brand-light-gray" : ""
+                  }`}
+                >
+                  {row.getVisibleCells().map((cell) => (
+                    <td key={cell.id} className="py-3 px-4">
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext(),
+                      )}
+                    </td>
+                  ))}
+                </tr>
               ))
             )}
           </tbody>
@@ -337,7 +393,8 @@ function ProductsTable({ onAddProduct, onEditProduct }: ProductsTableProps) {
       {/* Pagination */}
       <div className="flex items-center justify-between mt-4">
         <p className="text-xs text-brand-gray">
-          Showing {table.getRowModel().rows.length} of {products.length} products
+          Showing {table.getRowModel().rows.length} of {products.length}{" "}
+          products
           {selectedCount > 0 && ` | ${selectedCount} selected`}
         </p>
         <div className="flex gap-2">

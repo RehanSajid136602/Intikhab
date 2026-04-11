@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import Image from 'next/image';
+import { useState, useEffect, useMemo, useRef } from "react";
+import Image from "next/image";
 import {
   useReactTable,
   getCoreRowModel,
@@ -12,23 +12,32 @@ import {
   type SortingState,
   type ColumnDef,
   type ColumnFiltersState,
-} from '@tanstack/react-table';
-import { Search, Download, ChevronDown, X } from 'lucide-react';
-import { toast } from 'sonner';
-import { useAdminStore } from '@/stores/adminStore';
-import { Badge } from '@/components/ui/Badge';
-import { Modal } from '@/components/ui/Modal';
-import { formatPKR } from '@/lib/utils';
-import type { Order, OrderStatus } from '@/types/order';
+} from "@tanstack/react-table";
+import { Search, Download, ChevronDown, X } from "lucide-react";
+import { toast } from "sonner";
+import { useAdminStore } from "@/stores/adminStore";
+import { Badge } from "@/components/ui/Badge";
+import { Modal } from "@/components/ui/Modal";
+import { formatPKR } from "@/lib/utils";
+import type { Order, OrderStatus } from "@/types/order";
 
-const statusColors: Record<OrderStatus, 'yellow' | 'blue' | 'purple' | 'green'> = {
-  Pending: 'yellow',
-  Processing: 'blue',
-  Shipped: 'purple',
-  Delivered: 'green',
+const statusColors: Record<
+  OrderStatus,
+  "yellow" | "blue" | "purple" | "green"
+> = {
+  Pending: "yellow",
+  Processing: "blue",
+  Shipped: "purple",
+  Delivered: "green",
 };
 
-const statusTabs = ['All', 'Pending', 'Processing', 'Shipped', 'Delivered'] as const;
+const statusTabs = [
+  "All",
+  "Pending",
+  "Processing",
+  "Shipped",
+  "Delivered",
+] as const;
 
 /**
  * Admin orders table with status filter tabs, date range filter,
@@ -36,60 +45,81 @@ const statusTabs = ['All', 'Pending', 'Processing', 'Shipped', 'Delivered'] as c
  * Fetches orders from Supabase via adminStore API wrapper.
  */
 function OrdersTable() {
-  const { orders, ordersLoading, fetchOrders, updateOrderStatus } = useAdminStore();
+  const { orders, ordersLoading, fetchOrders, updateOrderStatus } =
+    useAdminStore();
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
-  const [globalFilter, setGlobalFilter] = useState('');
-  const [statusFilter, setStatusFilter] = useState<string>('All');
-  const [dateFrom, setDateFrom] = useState('');
-  const [dateTo, setDateTo] = useState('');
+  const [globalFilter, setGlobalFilter] = useState("");
+  const [debouncedFilter, setDebouncedFilter] = useState("");
+  const [statusFilter, setStatusFilter] = useState<string>("All");
+  const [dateFrom, setDateFrom] = useState("");
+  const [dateTo, setDateTo] = useState("");
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+  const hasFetchedRef = useRef(false);
 
-  // Fetch orders on mount
+  // Debounce search input
   useEffect(() => {
-    fetchOrders();
-  }, [fetchOrders]);
+    const timer = setTimeout(() => setDebouncedFilter(globalFilter), 300);
+    return () => clearTimeout(timer);
+  }, [globalFilter]);
 
-  const filteredOrders = orders.filter((order) => {
-    if (statusFilter !== 'All' && order.status !== statusFilter) return false;
-    if (dateFrom && order.date < dateFrom) return false;
-    if (dateTo && order.date > dateTo) return false;
-    return true;
-  });
+  // Fetch orders on mount — only once, prevent double-fire in StrictMode
+  useEffect(() => {
+    if (!hasFetchedRef.current) {
+      hasFetchedRef.current = true;
+      fetchOrders();
+    }
+  }, []);
+
+  // Memoized filtering to prevent expensive recalculations on every render
+  const filteredOrders = useMemo(() => {
+    return orders.filter((order) => {
+      if (statusFilter !== "All" && order.status !== statusFilter) return false;
+      if (dateFrom && order.date < dateFrom) return false;
+      if (dateTo && order.date > dateTo) return false;
+      if (debouncedFilter) {
+        const q = debouncedFilter.toLowerCase();
+        const searchStr =
+          `${order.id} ${order.customerName} ${order.customerEmail} ${order.items.map((i) => i.name).join(" ")}`.toLowerCase();
+        if (!searchStr.includes(q)) return false;
+      }
+      return true;
+    });
+  }, [orders, statusFilter, dateFrom, dateTo, debouncedFilter]);
 
   const columns: ColumnDef<Order>[] = [
     {
-      accessorKey: 'id',
-      header: 'Order ID',
+      accessorKey: "id",
+      header: "Order ID",
       cell: (info) => `#${info.getValue() as string}`,
     },
-    { accessorKey: 'customerName', header: 'Customer' },
+    { accessorKey: "customerName", header: "Customer" },
     {
-      accessorKey: 'items',
-      header: 'Products',
+      accessorKey: "items",
+      header: "Products",
       cell: (info) =>
-        (info.getValue() as Order['items'])
-          .map((item) => item.name.split('—')[0].trim())
-          .join(', '),
+        (info.getValue() as Order["items"])
+          .map((item) => item.name.split("—")[0].trim())
+          .join(", "),
     },
     {
-      accessorKey: 'total',
-      header: 'Total',
+      accessorKey: "total",
+      header: "Total",
       cell: (info) => formatPKR(info.getValue() as number),
     },
     {
-      accessorKey: 'status',
-      header: 'Status',
+      accessorKey: "status",
+      header: "Status",
       cell: (info) => (
         <Badge color={statusColors[info.getValue() as OrderStatus]}>
           {info.getValue() as string}
         </Badge>
       ),
     },
-    { accessorKey: 'date', header: 'Date' },
+    { accessorKey: "date", header: "Date" },
     {
-      id: 'actions',
-      header: 'Actions',
+      id: "actions",
+      header: "Actions",
       cell: ({ row }) => (
         <button
           onClick={() => setSelectedOrder(row.original)}
@@ -104,10 +134,9 @@ function OrdersTable() {
   const table = useReactTable({
     data: filteredOrders,
     columns,
-    state: { sorting, columnFilters, globalFilter },
+    state: { sorting, columnFilters },
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
-    onGlobalFilterChange: setGlobalFilter,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
@@ -115,12 +144,15 @@ function OrdersTable() {
   });
 
   const handleExport = () => {
-    toast.info('Export feature coming soon!');
+    toast.info("Export feature coming soon!");
   };
 
-  const handleStatusUpdate = async (orderId: string, newStatus: OrderStatus) => {
+  const handleStatusUpdate = async (
+    orderId: string,
+    newStatus: OrderStatus,
+  ) => {
     await updateOrderStatus(orderId, newStatus);
-    toast.success('Order status updated');
+    toast.success("Order status updated");
   };
 
   return (
@@ -133,8 +165,8 @@ function OrdersTable() {
             onClick={() => setStatusFilter(tab)}
             className={`px-4 py-2 text-xs font-semibold uppercase tracking-wider rounded-sm transition-colors ${
               tab === statusFilter
-                ? 'bg-brand-dark text-white'
-                : 'text-brand-gray hover:bg-brand-light-gray'
+                ? "bg-brand-dark text-white"
+                : "text-brand-gray hover:bg-brand-light-gray"
             }`}
           >
             {tab}
@@ -199,9 +231,9 @@ function OrdersTable() {
                       header.column.columnDef.header,
                       header.getContext(),
                     )}
-                    {{ asc: ' ↑', desc: ' ↓' }[
+                    {{ asc: " ↑", desc: " ↓" }[
                       header.column.getIsSorted() as string
-                    ] ?? ''}
+                    ] ?? ""}
                   </th>
                 ))}
               </tr>
@@ -210,29 +242,38 @@ function OrdersTable() {
           <tbody>
             {ordersLoading ? (
               <tr>
-                <td colSpan={columns.length} className="py-8 text-center text-sm text-brand-gray">
+                <td
+                  colSpan={columns.length}
+                  className="py-8 text-center text-sm text-brand-gray"
+                >
                   Loading orders...
                 </td>
               </tr>
             ) : table.getRowModel().rows.length === 0 ? (
               <tr>
-                <td colSpan={columns.length} className="py-8 text-center text-sm text-brand-gray">
+                <td
+                  colSpan={columns.length}
+                  className="py-8 text-center text-sm text-brand-gray"
+                >
                   No orders found.
                 </td>
               </tr>
             ) : (
               table.getRowModel().rows.map((row) => (
-              <tr
-                key={row.id}
-                className="border-b border-brand-border hover:bg-brand-light-gray/50 cursor-pointer"
-                onClick={() => setSelectedOrder(row.original)}
-              >
-                {row.getVisibleCells().map((cell) => (
-                  <td key={cell.id} className="py-3 px-4">
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </td>
-                ))}
-              </tr>
+                <tr
+                  key={row.id}
+                  className="border-b border-brand-border hover:bg-brand-light-gray/50 cursor-pointer"
+                  onClick={() => setSelectedOrder(row.original)}
+                >
+                  {row.getVisibleCells().map((cell) => (
+                    <td key={cell.id} className="py-3 px-4">
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext(),
+                      )}
+                    </td>
+                  ))}
+                </tr>
               ))
             )}
           </tbody>
@@ -242,7 +283,8 @@ function OrdersTable() {
       {/* Pagination */}
       <div className="flex items-center justify-between mt-4">
         <p className="text-xs text-brand-gray">
-          Showing {table.getRowModel().rows.length} of {filteredOrders.length} orders
+          Showing {table.getRowModel().rows.length} of {filteredOrders.length}{" "}
+          orders
         </p>
         <div className="flex gap-2">
           <button
@@ -290,6 +332,32 @@ interface OrderDetailModalProps {
 
 function OrderDetailModal({ order, onStatusUpdate }: OrderDetailModalProps) {
   const [newStatus, setNewStatus] = useState(order.status);
+  const [orderData, setOrderData] = useState<Order | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  // Fetch full order details including items when modal opens
+  useEffect(() => {
+    let cancelled = false;
+    fetch(`/api/orders/${order.id}`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (!cancelled) {
+          setOrderData(data);
+          setLoading(false);
+        }
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setOrderData(order);
+          setLoading(false);
+        }
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [order.id]);
+
+  const displayOrder = orderData || order;
 
   return (
     <div className="space-y-4">
@@ -298,9 +366,13 @@ function OrderDetailModal({ order, onStatusUpdate }: OrderDetailModalProps) {
         <h4 className="text-xs font-semibold text-brand-dark uppercase tracking-wider mb-2">
           Customer Information
         </h4>
-        <p className="text-sm text-brand-dark font-medium">{order.customerName}</p>
-        <p className="text-xs text-brand-gray">{order.customerEmail}</p>
-        <p className="text-xs text-brand-gray mt-1">{order.shippingAddress}</p>
+        <p className="text-sm text-brand-dark font-medium">
+          {displayOrder.customerName}
+        </p>
+        <p className="text-xs text-brand-gray">{displayOrder.customerEmail}</p>
+        <p className="text-xs text-brand-gray mt-1">
+          {displayOrder.shippingAddress}
+        </p>
       </div>
 
       {/* Items */}
@@ -308,52 +380,73 @@ function OrderDetailModal({ order, onStatusUpdate }: OrderDetailModalProps) {
         <h4 className="text-xs font-semibold text-brand-dark uppercase tracking-wider mb-2">
           Ordered Items
         </h4>
-        <div className="space-y-2">
-          {order.items.map((item, i) => (
-            <div key={i} className="flex items-center gap-3 py-2 border-b border-brand-border">
-              <div className="w-10 h-10 bg-brand-light-gray rounded-sm overflow-hidden flex-shrink-0">
-                <Image
-                  src={item.image}
-                  alt={item.name}
-                  width={40}
-                  height={40}
-                  className="w-full h-full object-contain"
-                  sizes="40px"
-                  quality={80}
-                />
+        {loading ? (
+          <p className="text-xs text-brand-gray py-4">Loading items...</p>
+        ) : displayOrder.items && displayOrder.items.length > 0 ? (
+          <div className="space-y-2">
+            {displayOrder.items.map((item, i) => (
+              <div
+                key={i}
+                className="flex items-center gap-3 py-2 border-b border-brand-border"
+              >
+                <div className="w-10 h-10 bg-brand-light-gray rounded-sm overflow-hidden flex-shrink-0">
+                  <Image
+                    src={item.image}
+                    alt={item.name}
+                    width={40}
+                    height={40}
+                    className="w-full h-full object-contain"
+                    sizes="40px"
+                    quality={80}
+                  />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm text-brand-dark truncate">
+                    {item.name}
+                  </p>
+                  <p className="text-xs text-brand-gray">
+                    Size: {item.size} · Qty: {item.quantity}
+                  </p>
+                </div>
+                <p className="text-sm font-semibold text-brand-dark">
+                  {formatPKR(item.price * item.quantity)}
+                </p>
               </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm text-brand-dark truncate">{item.name}</p>
-                <p className="text-xs text-brand-gray">Qty: {item.quantity}</p>
-              </div>
-              <p className="text-sm font-semibold text-brand-dark">
-                {formatPKR(item.price * item.quantity)}
-              </p>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        ) : (
+          <p className="text-xs text-brand-gray py-4">
+            No items found for this order.
+          </p>
+        )}
       </div>
 
       {/* Total */}
       <div className="flex justify-between items-center py-3 border-t border-brand-border">
         <span className="text-sm font-semibold text-brand-dark">Total</span>
-        <span className="text-lg font-bold text-brand-dark">{formatPKR(order.total)}</span>
+        <span className="text-lg font-bold text-brand-dark">
+          {formatPKR(order.total)}
+        </span>
       </div>
 
       {/* Status Update */}
       <div className="flex items-center gap-3">
-        <label className="text-xs font-medium text-brand-dark">Update Status:</label>
+        <label className="text-xs font-medium text-brand-dark">
+          Update Status:
+        </label>
         <div className="relative">
           <select
             value={newStatus}
             onChange={(e) => setNewStatus(e.target.value as OrderStatus)}
             className="border border-brand-border pl-3 pr-8 py-2 text-sm outline-none focus:border-brand-dark appearance-none bg-white"
           >
-            {statusTabs.filter((s) => s !== 'All').map((status) => (
-              <option key={status} value={status}>
-                {status}
-              </option>
-            ))}
+            {statusTabs
+              .filter((s) => s !== "All")
+              .map((status) => (
+                <option key={status} value={status}>
+                  {status}
+                </option>
+              ))}
           </select>
           <ChevronDown className="w-4 h-4 text-brand-gray absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none" />
         </div>
