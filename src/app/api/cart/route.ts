@@ -1,10 +1,10 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import { NextRequest, NextResponse } from "next/server";
+import { createClient } from "@/lib/supabase/server";
 
 /**
  * POST /api/cart
  * Upserts cart items for a given customer email.
- * Expects: { email: string, items: [{ productId, quantity }] }
+ * Expects: { email: string, items: [{ productId, quantity, size }] }
  */
 export async function POST(request: NextRequest) {
   const supabase = createClient();
@@ -13,25 +13,28 @@ export async function POST(request: NextRequest) {
   const { email, items } = body;
 
   if (!email || !items || !Array.isArray(items)) {
-    return NextResponse.json({ error: 'Missing email or items array' }, { status: 400 });
+    return NextResponse.json(
+      { error: "Missing email or items array" },
+      { status: 400 },
+    );
   }
 
   // Upsert each cart item
   for (const item of items) {
-    const { error } = await supabase
-      .from('carts')
-      .upsert(
-        {
-          id: crypto.randomUUID(),
-          customerEmail: email,
-          productId: item.productId,
-          quantity: item.quantity,
-        },
-        { onConflict: 'customerEmail,productId' },
-      );
+    const { error } = await supabase.from("carts").upsert(
+      {
+        id: crypto.randomUUID(),
+        customerEmail: email,
+        productId: item.productId,
+        quantity: item.quantity,
+        size: item.size ?? null,
+        updatedAt: new Date().toISOString(),
+      },
+      { onConflict: "customerEmail,productId" },
+    );
 
     if (error) {
-      console.error('Cart upsert error:', error);
+      console.error("Cart upsert error:", error);
       return NextResponse.json({ error: error.message }, { status: 400 });
     }
   }
@@ -45,16 +48,19 @@ export async function POST(request: NextRequest) {
  */
 export async function GET(request: NextRequest) {
   const supabase = createClient();
-  const email = request.nextUrl.searchParams.get('email');
+  const email = request.nextUrl.searchParams.get("email");
 
   if (!email) {
-    return NextResponse.json({ error: 'Missing email parameter' }, { status: 400 });
+    return NextResponse.json(
+      { error: "Missing email parameter" },
+      { status: 400 },
+    );
   }
 
   const { data, error } = await supabase
-    .from('carts')
-    .select('*')
-    .eq('customerEmail', email);
+    .from("carts")
+    .select("*")
+    .eq("customerEmail", email);
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
@@ -64,6 +70,7 @@ export async function GET(request: NextRequest) {
     items: data.map((item) => ({
       productId: item.productId,
       quantity: item.quantity,
+      size: item.size,
     })),
   });
 }

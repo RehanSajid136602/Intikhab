@@ -1,15 +1,62 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
-import { verifyAdmin } from '@/lib/supabase/auth';
+import { NextRequest, NextResponse } from "next/server";
+import { createClient } from "@/lib/supabase/server";
+import { verifyAdmin } from "@/lib/supabase/auth";
+import { PRODUCT_TYPE_CONFIG } from "@/lib/sizeSystems";
+import type { ProductType } from "@/types/product";
+
+/**
+ * GET /api/products/[id]
+ * Public: returns a product by ID.
+ */
+export async function GET(
+  request: NextRequest,
+  { params }: { params: { id: string } },
+) {
+  const supabase = createClient();
+  const id = params.id;
+
+  const { data, error } = await supabase
+    .from("products")
+    .select("*")
+    .eq("id", id)
+    .single();
+
+  if (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+
+  if (!data) {
+    return NextResponse.json({ error: "Product not found" }, { status: 404 });
+  }
+
+  return NextResponse.json(transformProduct(data));
+}
+
+/**
+ * Validates that subcategory is valid for the given product type.
+ */
+function validateSubcategory(
+  productType: ProductType,
+  subcategory?: string,
+): boolean {
+  if (!subcategory) return true;
+  const validSubcategories = PRODUCT_TYPE_CONFIG[
+    productType as keyof typeof PRODUCT_TYPE_CONFIG
+  ].subcategories as readonly string[];
+  return validSubcategories.includes(subcategory);
+}
 
 /**
  * PUT /api/products/[id]
  * Admin only: updates a product by ID.
  */
-export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(
+  request: NextRequest,
+  { params }: { params: { id: string } },
+) {
   const { authenticated } = await verifyAdmin(request);
   if (!authenticated) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   const supabase = createClient();
@@ -17,16 +64,51 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
   const body = await request.json();
   const id = params.id;
 
-  console.log('PUT product update:', id, JSON.stringify(body));
+  console.log("PUT product update:", id, JSON.stringify(body));
+
+  // Validate product type if provided
+  if (body.productType !== undefined) {
+    const validProductTypes: ProductType[] = [
+      "shoes",
+      "bags",
+      "accessories",
+      "clothing",
+    ];
+    if (!validProductTypes.includes(body.productType)) {
+      return NextResponse.json(
+        {
+          error: `Invalid productType: ${body.productType}. Must be one of: ${validProductTypes.join(", ")}`,
+        },
+        { status: 400 },
+      );
+    }
+  }
+
+  // Validate subcategory if provided
+  if (body.subcategory !== undefined && body.productType !== undefined) {
+    if (!validateSubcategory(body.productType, body.subcategory)) {
+      const validSubcategories =
+        PRODUCT_TYPE_CONFIG[
+          body.productType as keyof typeof PRODUCT_TYPE_CONFIG
+        ].subcategories;
+      return NextResponse.json(
+        {
+          error: `Invalid subcategory "${body.subcategory}" for productType "${body.productType}". Must be one of: ${validSubcategories.join(", ")}`,
+        },
+        { status: 400 },
+      );
+    }
+  }
 
   const updateData: Record<string, unknown> = {};
   if (body.name !== undefined) updateData.name = body.name;
-  // Skip slug updates to avoid unique constraint violations
-  // if (body.slug !== undefined) updateData.slug = body.slug;
   if (body.brand !== undefined) updateData.brand = body.brand;
+  if (body.productType !== undefined) updateData.productType = body.productType;
   if (body.category !== undefined) updateData.category = body.category;
+  if (body.subcategory !== undefined) updateData.subcategory = body.subcategory;
   if (body.price !== undefined) updateData.price = body.price;
-  if (body.originalPrice !== undefined) updateData.originalPrice = body.originalPrice;
+  if (body.originalPrice !== undefined)
+    updateData.originalPrice = body.originalPrice;
   if (body.images !== undefined) updateData.images = body.images;
   if (body.badge !== undefined) updateData.badge = body.badge;
   if (body.inStock !== undefined) updateData["inStock"] = body.inStock;
@@ -35,17 +117,18 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
   if (body.description !== undefined) updateData.description = body.description;
   if (body.sku !== undefined) updateData.sku = body.sku;
   if (body.status !== undefined) updateData.status = body.status;
-  if (body.sizes !== undefined) updateData.sizes = body.sizes;
+  if (body.sizeStock !== undefined) updateData["sizeStock"] = body.sizeStock;
+  if (body.sizeSystem !== undefined) updateData.sizeSystem = body.sizeSystem;
 
   const { data, error } = await supabase
-    .from('products')
+    .from("products")
     .update(updateData)
-    .eq('id', id)
+    .eq("id", id)
     .select()
     .single();
 
   if (error) {
-    console.error('Product update error:', error);
+    console.error("Product update error:", error);
     return NextResponse.json({ error: error.message }, { status: 400 });
   }
 
@@ -56,18 +139,21 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
  * DELETE /api/products/[id]
  * Admin only: soft-deletes a product by setting status=draft.
  */
-export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: { id: string } },
+) {
   const { authenticated } = await verifyAdmin(request);
   if (!authenticated) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   const supabase = createClient();
 
   const { error } = await supabase
-    .from('products')
-    .update({ status: 'draft' })
-    .eq('id', params.id);
+    .from("products")
+    .update({ status: "draft" })
+    .eq("id", params.id);
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 400 });
@@ -82,17 +168,33 @@ function transformProduct(row: Record<string, unknown>) {
     slug: row.slug as string,
     name: row.name as string,
     brand: row.brand as string,
-    category: row.category as string,
+    productType: row.productType as
+      | "shoes"
+      | "bags"
+      | "accessories"
+      | "clothing",
+    category: row.category as "men" | "women" | "kids" | "unisex",
+    subcategory: row.subcategory as string | undefined,
     price: row.price as number,
     originalPrice: row.originalPrice as number | undefined,
     images: row.images as string[],
-    badge: row.badge as 'SALE' | 'NEW' | null,
+    badge: row.badge as "SALE" | "NEW" | null,
     inStock: row["inStock"] as boolean,
     stock: row.stock as number,
     installment: row.installment as number,
     description: row.description as string,
     sku: row.sku as string,
-    status: row.status as 'active' | 'draft',
-    sizes: row.sizes as number[],
+    status: row.status as "active" | "draft",
+    sizeStock:
+      (row["sizeStock"] as { size: string; stock: number; label?: string }[]) ||
+      [],
+    sizeSystem: row.sizeSystem as
+      | "eu"
+      | "uk"
+      | "us"
+      | "bag"
+      | "general"
+      | "numeric",
+    createdAt: row["createdAt"] as string,
   };
 }

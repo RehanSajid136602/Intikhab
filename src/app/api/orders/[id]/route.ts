@@ -1,6 +1,6 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
-import { verifyAdmin } from '@/lib/supabase/auth';
+import { NextRequest, NextResponse } from "next/server";
+import { createClient } from "@/lib/supabase/server";
+import { verifyAdmin } from "@/lib/supabase/auth";
 
 /**
  * GET /api/orders/[id]
@@ -15,20 +15,20 @@ export async function GET(
 
   // Fetch order
   const { data: order, error } = await supabase
-    .from('orders')
-    .select('*')
-    .eq('id', orderId)
+    .from("orders")
+    .select("*")
+    .eq("id", orderId)
     .single();
 
   if (error || !order) {
-    return NextResponse.json({ error: 'Order not found' }, { status: 404 });
+    return NextResponse.json({ error: "Order not found" }, { status: 404 });
   }
 
   // Fetch order items
   const { data: items } = await supabase
-    .from('order_items')
-    .select('*')
-    .eq('orderId', orderId);
+    .from("order_items")
+    .select("*")
+    .eq("orderId", orderId);
 
   const formattedOrder = {
     id: order.id,
@@ -43,10 +43,11 @@ export async function GET(
       image: item.image,
       quantity: item.quantity,
       price: item.price,
+      size: item.size,
     })),
     total: order.total,
     status: order.status,
-    date: new Date(order.createdAt).toISOString().split('T')[0],
+    date: new Date(order.createdAt).toISOString().split("T")[0],
   };
 
   return NextResponse.json(formattedOrder);
@@ -62,7 +63,7 @@ export async function PUT(
 ) {
   const { authenticated } = await verifyAdmin(request);
   if (!authenticated) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   const supabase = createClient();
@@ -72,9 +73,9 @@ export async function PUT(
   if (body.status !== undefined) updateData.status = body.status;
 
   const { data, error } = await supabase
-    .from('orders')
+    .from("orders")
     .update(updateData)
-    .eq('id', params.id)
+    .eq("id", params.id)
     .select()
     .single();
 
@@ -89,6 +90,6 @@ export async function PUT(
     shippingAddress: data.shippingAddress,
     total: data.total,
     status: data.status,
-    date: new Date(data.createdAt).toISOString().split('T')[0],
+    date: new Date(data.createdAt).toISOString().split("T")[0],
   });
 }
