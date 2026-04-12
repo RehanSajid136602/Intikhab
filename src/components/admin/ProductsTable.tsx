@@ -15,6 +15,7 @@ import {
 } from "@tanstack/react-table";
 import { Search, Plus, Trash2, Edit, ChevronDown } from "lucide-react";
 import { toast } from "sonner";
+import { Modal } from "@/components/ui/Modal";
 import { useAdminStore } from "@/stores/adminStore";
 import { formatPKR } from "@/lib/utils";
 import type { Product } from "@/types/product";
@@ -41,6 +42,9 @@ function ProductsTable({ onAddProduct, onEditProduct }: ProductsTableProps) {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [globalFilter, setGlobalFilter] = useState("");
   const [rowSelection, setRowSelection] = useState({});
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [productToDelete, setProductToDelete] = useState<Product | null>(null);
+  const [isBulkDelete, setIsBulkDelete] = useState(false);
 
   // Fetch products on mount
   useEffect(() => {
@@ -201,11 +205,10 @@ function ProductsTable({ onAddProduct, onEditProduct }: ProductsTableProps) {
               <Edit className="w-4 h-4" />
             </button>
             <button
-              onClick={async () => {
-                if (confirm(`Delete "${product.name}"?`)) {
-                  await deleteProduct(product.id);
-                  toast.success("Product deleted");
-                }
+              onClick={() => {
+                setIsBulkDelete(false);
+                setProductToDelete(product);
+                setDeleteModalOpen(true);
               }}
               className="p-1 text-brand-gray hover:text-brand-red transition-colors"
               aria-label="Delete product"
@@ -234,18 +237,29 @@ function ProductsTable({ onAddProduct, onEditProduct }: ProductsTableProps) {
 
   const selectedCount = table.getFilteredSelectedRowModel().rows.length;
 
-  const handleBulkDelete = async () => {
+  const handleBulkDelete = () => {
     if (selectedCount === 0) return;
-    if (!confirm(`Delete ${selectedCount} selected products?`)) return;
+    setIsBulkDelete(true);
+    setProductToDelete(null);
+    setDeleteModalOpen(true);
+  };
 
-    const selectedIds = table
-      .getFilteredSelectedRowModel()
-      .rows.map((r) => r.original.id);
-    for (const id of selectedIds) {
-      await deleteProduct(id);
+  const confirmDelete = async () => {
+    if (isBulkDelete) {
+      const selectedIds = table
+        .getFilteredSelectedRowModel()
+        .rows.map((r) => r.original.id);
+      for (const id of selectedIds) {
+        await deleteProduct(id);
+      }
+      setRowSelection({});
+      toast.success(`${selectedCount} products deleted`);
+    } else if (productToDelete) {
+      await deleteProduct(productToDelete.id);
+      toast.success("Product deleted");
     }
-    setRowSelection({});
-    toast.success(`${selectedCount} products deleted`);
+    setDeleteModalOpen(false);
+    setProductToDelete(null);
   };
 
   return (
@@ -414,6 +428,36 @@ function ProductsTable({ onAddProduct, onEditProduct }: ProductsTableProps) {
           </button>
         </div>
       </div>
+
+      {/* Delete Confirmation Modal */}
+      <Modal
+        isOpen={deleteModalOpen}
+        onClose={() => setDeleteModalOpen(false)}
+        title="Confirm Deletion"
+        size="sm"
+      >
+        <div className="flex flex-col gap-6">
+          <p className="text-sm text-brand-dark">
+            {isBulkDelete
+              ? `Are you sure you want to delete ${selectedCount} selected products? This action cannot be undone.`
+              : `Are you sure you want to delete "${productToDelete?.name}"? This action cannot be undone.`}
+          </p>
+          <div className="flex justify-end gap-3">
+            <button
+              onClick={() => setDeleteModalOpen(false)}
+              className="px-4 py-2 text-sm font-semibold text-brand-dark border border-brand-border hover:bg-brand-light-gray transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={confirmDelete}
+              className="px-4 py-2 text-sm font-semibold text-white bg-brand-red hover:bg-red-600 transition-colors"
+            >
+              Delete
+            </button>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 }

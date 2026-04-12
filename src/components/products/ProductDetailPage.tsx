@@ -29,8 +29,6 @@ export function ProductDetailPage({
   const { addItem } = useCartStore();
   const router = useRouter();
   const [activeImage, setActiveImage] = useState(0);
-  const [selectedSize, setSelectedSize] = useState<string | null>(null);
-  const params = useParams();
 
   const hasSizeData = product.sizeStock && product.sizeStock.length > 0;
   const anySizeInStock = hasSizeData
@@ -50,6 +48,14 @@ export function ProductDetailPage({
     : product.inStock
       ? [{ size: "one-size", stock: product.stock }]
       : [];
+
+  const [selectedSize, setSelectedSize] = useState<string | null>(
+    displaySizes.length === 1 && displaySizes[0].stock > 0 
+      ? displaySizes[0].size 
+      : null
+  );
+
+  const params = useParams();
 
   const handleAddToCart = () => {
     if (!selectedSize) {
@@ -190,11 +196,11 @@ export function ProductDetailPage({
               {product.description}
             </p>
 
-            {/* Sizes - Show selector if multiple sizes exist, or skip for one-size products */}
-            {displaySizes.length > 1 && (
+            {/* Sizes - Show selector if sizes exist, skip for generic one-size products */}
+            {displaySizes.length > 0 && !(displaySizes.length === 1 && displaySizes[0].size === "one-size") && (
               <div>
                 <h3 className="text-sm font-semibold text-brand-dark mb-2">
-                  Select Size
+                  {displaySizes.length === 1 ? "Size" : "Select Size"}
                 </h3>
                 <div className="flex flex-wrap gap-2">
                   {displaySizes.map((ss: SizeStock) => {

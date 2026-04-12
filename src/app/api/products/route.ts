@@ -126,8 +126,40 @@ export async function POST(request: NextRequest) {
     );
   }
 
+  const generatedSlug = body.slug || body.name?.toLowerCase().replace(/\s+/g, "-");
+
+  // Check for unique SKU and SLUG overlaps before insertion
+  if (body.sku || generatedSlug) {
+    const { data: existingProduct, error: checkError } = await supabase
+      .from("products")
+      .select("sku, slug")
+      .or(`sku.eq.${body.sku},slug.eq.${generatedSlug}`)
+      .limit(1)
+      .maybeSingle();
+
+    if (checkError) {
+      return NextResponse.json({ error: "Failed to validate uniqueness: " + checkError.message }, { status: 500 });
+    }
+
+    if (existingProduct) {
+      if (existingProduct.sku === body.sku) {
+        return NextResponse.json(
+          { error: `A product with the SKU "${body.sku}" already exists. Please use a unique SKU.` },
+          { status: 400 }
+        );
+      }
+      if (existingProduct.slug === generatedSlug) {
+        return NextResponse.json(
+          { error: `A product with a similar name already exists. The generated slug "${generatedSlug}" must be unique.` },
+          { status: 400 }
+        );
+      }
+    }
+  }
+
   const productData = {
-    slug: body.slug || body.name?.toLowerCase().replace(/\s+/g, "-"),
+    id: crypto.randomUUID(),
+    slug: generatedSlug,
     name: body.name,
     brand: body.brand || "Intikhab",
     productType,
@@ -148,6 +180,7 @@ export async function POST(request: NextRequest) {
     description: body.description ?? "",
     sku: body.sku,
     status: body.status ?? "active",
+    updatedAt: new Date().toISOString(),
   };
 
   const { data, error } = await supabase
@@ -157,7 +190,11 @@ export async function POST(request: NextRequest) {
     .single();
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 400 });
+    console.error("Supabase Product Insertion Error:", error);
+    return NextResponse.json(
+      { error: error.message, details: error.details, hint: error.hint },
+      { status: 400 },
+    );
   }
 
   // Revalidate homepage and all category pages so new products appear immediately

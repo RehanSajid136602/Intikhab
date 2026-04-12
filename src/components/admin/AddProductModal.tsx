@@ -28,7 +28,10 @@ const productSchema = z
     category: z.enum(["men", "women", "kids", "unisex"]).default("men"),
     subcategory: z.string().optional(),
     price: z.number().min(100, "Price must be at least PKR 100"),
-    originalPrice: z.number().optional(),
+    originalPrice: z.preprocess(
+      (val) => (val === "" || isNaN(Number(val)) ? undefined : Number(val)),
+      z.number().optional(),
+    ),
     // Shoe size fields (35-46)
     size35: z.number().min(0, "Stock cannot be negative"),
     size36: z.number().min(0, "Stock cannot be negative"),
@@ -251,7 +254,8 @@ function AddProductModal({
       });
 
       if (!res.ok) {
-        throw new Error("Failed to upload image");
+        const errorData = await res.json();
+        throw new Error(errorData.error || "Failed to upload image");
       }
 
       const data = await res.json();
@@ -305,9 +309,15 @@ function AddProductModal({
         category: data.category,
         subcategory: data.subcategory || null,
         price: data.price,
-        originalPrice: data.originalPrice,
+        originalPrice:
+          data.originalPrice && !isNaN(Number(data.originalPrice))
+            ? Number(data.originalPrice)
+            : null,
         images: imageUrls,
-        badge: data.originalPrice ? ("SALE" as const) : null,
+        badge:
+          data.originalPrice && !isNaN(Number(data.originalPrice))
+            ? ("SALE" as const)
+            : null,
         inStock: totalStock > 0,
         stock: totalStock,
         sizeStock,
