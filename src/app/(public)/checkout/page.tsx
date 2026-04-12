@@ -692,7 +692,7 @@ export default function CheckoutPage() {
                       </p>
                       <p className="text-xs text-brand-gray">
                         {item.productType && <span className="capitalize">{item.productType}</span>}
-                        {" · Size: {item.size} · Qty: {item.quantity}"}
+                        {` · Size: ${item.size} · Qty: ${item.quantity}`}
                       </p>
                       <p className="text-sm font-semibold text-brand-dark">
                         {formatPKR(item.price * item.quantity)}

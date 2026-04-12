@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import {
   Search,
   User,
@@ -26,6 +27,7 @@ function Navbar() {
   const { totalItems } = useCartStore();
   const { items: wishlistItems } = useWishlistStore();
   const { toggleMobileMenu, toggleSearch, searchOpen } = useUIStore();
+  const router = useRouter();
 
   return (
     <nav className="sticky top-0 z-50 bg-white shadow-sm transition-shadow duration-300">
@@ -55,6 +57,13 @@ function Navbar() {
               <div key={item.label} className="nav-item relative">
                 {item.dropdown ? (
                   <button
+                    onClick={() => router.push(item.href)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        router.push(item.href);
+                      }
+                    }}
                     className={cn(
                       'text-brand-dark hover:text-brand-red transition-colors flex items-center gap-1 cursor-pointer',
                       item.isSale && 'text-brand-red',
