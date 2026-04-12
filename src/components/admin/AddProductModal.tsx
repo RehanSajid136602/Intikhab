@@ -53,6 +53,8 @@ const productSchema = z
   })
   .refine(
     (data) => {
+      // Only require stock validation for active products
+      if (data.status !== "active") return true;
       // For shoes, at least one size must have quantity > 0
       if (data.productType === "shoes") {
         const sizes = [35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46];
@@ -66,7 +68,7 @@ const productSchema = z
       );
     },
     {
-      message: "Please enter stock for at least one shoe size",
+      message: "Please enter stock for at least one shoe size (or save as draft)",
       path: ["size35"],
     },
   );
