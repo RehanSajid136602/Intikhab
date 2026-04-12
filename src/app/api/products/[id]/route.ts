@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { verifyAdmin } from "@/lib/supabase/auth";
 import { PRODUCT_TYPE_CONFIG } from "@/lib/sizeSystems";
@@ -132,6 +133,8 @@ export async function PUT(
     return NextResponse.json({ error: error.message }, { status: 400 });
   }
 
+  revalidateProductPaths();
+
   return NextResponse.json(transformProduct(data));
 }
 
@@ -159,7 +162,32 @@ export async function DELETE(
     return NextResponse.json({ error: error.message }, { status: 400 });
   }
 
+  revalidateProductPaths();
+
   return NextResponse.json({ success: true });
+}
+
+function revalidateProductPaths() {
+  revalidatePath("/");
+  revalidatePath("/men");
+  revalidatePath("/women");
+  revalidatePath("/kids");
+  revalidatePath("/shoes");
+  revalidatePath("/bags");
+  revalidatePath("/accessories");
+  revalidatePath("/clothing");
+  revalidatePath("/shoes/men");
+  revalidatePath("/shoes/women");
+  revalidatePath("/shoes/kids");
+  revalidatePath("/bags/men");
+  revalidatePath("/bags/women");
+  revalidatePath("/bags/kids");
+  revalidatePath("/accessories/men");
+  revalidatePath("/accessories/women");
+  revalidatePath("/accessories/kids");
+  revalidatePath("/clothing/men");
+  revalidatePath("/clothing/women");
+  revalidatePath("/clothing/kids");
 }
 
 function transformProduct(row: Record<string, unknown>) {

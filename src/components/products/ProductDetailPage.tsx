@@ -32,9 +32,24 @@ export function ProductDetailPage({
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
   const params = useParams();
 
-  const sizeStockMap: Map<string, number> = new Map(
-    (product.sizeStock || []).map((s: SizeStock) => [s.size, s.stock]),
-  );
+  const hasSizeData = product.sizeStock && product.sizeStock.length > 0;
+  const anySizeInStock = hasSizeData
+    ? product.sizeStock.some((ss: SizeStock) => ss.stock > 0)
+    : product.inStock;
+  const productInStock = anySizeInStock;
+
+  const sizeStockMap: Map<string, number> = hasSizeData
+    ? new Map(
+        (product.sizeStock || []).map((s: SizeStock) => [s.size, s.stock]),
+      )
+    : new Map(product.inStock ? [["one-size", product.stock]] : []);
+
+  // If no sizeStock data, default to "one-size" for legacy/one-size products
+  const displaySizes = hasSizeData
+    ? product.sizeStock
+    : product.inStock
+      ? [{ size: "one-size", stock: product.stock }]
+      : [];
 
   const handleAddToCart = () => {
     if (!selectedSize) {
@@ -175,14 +190,14 @@ export function ProductDetailPage({
               {product.description}
             </p>
 
-            {/* Sizes */}
-            {product.sizeStock && product.sizeStock.length > 0 && (
+            {/* Sizes - Show selector if multiple sizes exist, or skip for one-size products */}
+            {displaySizes.length > 1 && (
               <div>
                 <h3 className="text-sm font-semibold text-brand-dark mb-2">
                   Select Size
                 </h3>
                 <div className="flex flex-wrap gap-2">
-                  {product.sizeStock.map((ss: SizeStock) => {
+                  {displaySizes.map((ss: SizeStock) => {
                     const hasStock = ss.stock > 0;
                     const isSelected = selectedSize === ss.size;
                     return (
@@ -197,9 +212,7 @@ export function ProductDetailPage({
                               ? "border-brand-dark bg-brand-dark text-white font-semibold"
                               : "border-brand-border text-brand-dark hover:border-brand-dark cursor-pointer"
                         }`}
-                        title={
-                          hasStock ? `${ss.stock} in stock` : "Out of stock"
-                        }
+                        title={hasStock ? `${ss.stock} in stock` : "Out of stock"}
                       >
                         {ss.size}
                       </button>
@@ -211,12 +224,9 @@ export function ProductDetailPage({
 
             {/* Stock Status */}
             <p
-              className={`text-sm font-medium ${product.inStock && product.sizeStock.some((ss: SizeStock) => ss.stock > 0) ? "text-brand-green" : "text-brand-red"}`}
+              className={`text-sm font-medium ${productInStock ? "text-brand-green" : "text-brand-red"}`}
             >
-              {product.inStock &&
-              product.sizeStock.some((ss: SizeStock) => ss.stock > 0)
-                ? "✓ In Stock"
-                : "✗ Out of Stock"}
+              {productInStock ? "✓ In Stock" : "✗ Out of Stock"}
               {selectedSize &&
                 sizeStockMap.has(selectedSize) &&
                 sizeStockMap.get(selectedSize)! > 0 &&
@@ -232,7 +242,7 @@ export function ProductDetailPage({
             <div className="flex gap-4 pt-4">
               <button
                 onClick={handleAddToCart}
-                disabled={!product.inStock}
+                disabled={!productInStock}
                 className="flex-1 flex items-center justify-center gap-2 bg-brand-dark text-white py-4 font-semibold uppercase tracking-wider rounded-sm hover:bg-black transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <ShoppingCart className="w-5 h-5" />
@@ -240,7 +250,7 @@ export function ProductDetailPage({
               </button>
               <button
                 onClick={handleBuyNow}
-                disabled={!product.inStock}
+                disabled={!productInStock}
                 className="flex-1 bg-brand-red text-white py-4 font-semibold uppercase tracking-wider rounded-sm hover:bg-red-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Buy Now

@@ -160,11 +160,27 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: error.message }, { status: 400 });
   }
 
-  // Revalidate homepage and category pages so new products appear immediately
+  // Revalidate homepage and all category pages so new products appear immediately
   revalidatePath("/");
   revalidatePath("/men");
   revalidatePath("/women");
   revalidatePath("/kids");
+  revalidatePath("/shoes");
+  revalidatePath("/bags");
+  revalidatePath("/accessories");
+  revalidatePath("/clothing");
+  revalidatePath("/shoes/men");
+  revalidatePath("/shoes/women");
+  revalidatePath("/shoes/kids");
+  revalidatePath("/bags/men");
+  revalidatePath("/bags/women");
+  revalidatePath("/bags/kids");
+  revalidatePath("/accessories/men");
+  revalidatePath("/accessories/women");
+  revalidatePath("/accessories/kids");
+  revalidatePath("/clothing/men");
+  revalidatePath("/clothing/women");
+  revalidatePath("/clothing/kids");
 
   return NextResponse.json(transformProduct(data), { status: 201 });
 }
