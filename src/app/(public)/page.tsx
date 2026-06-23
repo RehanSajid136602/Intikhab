@@ -1,8 +1,16 @@
+import type { Metadata } from "next";
+import { getMetadata, SITE_URL } from "@/lib/seo";
 import dynamic from "next/dynamic";
 import { HeroSlider } from "@/components/home/HeroSlider";
 import { NewArrivals } from "@/components/home/NewArrivals";
 import { createClient } from "@/lib/supabase/server";
 import type { Product } from "@/types/product";
+
+export const metadata: Metadata = getMetadata({
+  title: "Intikhab — Premium Shoes, Sneakers & Footwear Online",
+  description: "Discover premium sneakers, formal shoes, casual shoes, loafers, boots, and everyday footwear at Intikhab.",
+  path: "",
+});
 
 const ShopByCategory = dynamic(
   () =>
@@ -59,8 +67,43 @@ export default async function HomePage() {
 
   const products: Product[] = (data || []).map(transformProduct);
 
+  const websiteSchema = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "Intikhab",
+    "url": SITE_URL,
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": {
+        "@type": "EntryPoint",
+        "urlTemplate": `${SITE_URL}/products?search={search_term_string}`
+      },
+      "query-input": "required name=search_term_string"
+    }
+  };
+
+  const organizationSchema = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "Intikhab",
+    "url": SITE_URL,
+    "logo": `${SITE_URL}/favicon.ico`,
+    "sameAs": [
+      "https://www.facebook.com/share/1AjG4bGKpc/",
+      "https://www.instagram.com/intikhab_pakistan?igsh=aW5yaWJldTc0d2F2"
+    ]
+  };
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
+      />
       <HeroSlider />
 
       {/* New Arrivals Section - Industry standard: prominently displays latest products */}

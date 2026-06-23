@@ -16,6 +16,7 @@ import {
 import { toast } from "sonner";
 import type { Product, SizeStock } from "@/types/product";
 import { ProductCard } from "@/components/products/ProductCard";
+import { Breadcrumbs } from "@/components/Breadcrumbs";
 
 interface ProductDetailPageProps {
   product: Product;
@@ -78,13 +79,15 @@ export function ProductDetailPage({
     <div className="min-h-screen bg-white">
       <div className="container mx-auto max-w-7xl px-4 py-8">
         {/* Breadcrumb */}
-        <button
-          onClick={() => router.back()}
-          className="flex items-center gap-2 text-brand-gray hover:text-brand-dark transition-colors mb-8"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          <span className="text-sm">Back</span>
-        </button>
+        <Breadcrumbs
+          items={[
+            { label: "Home", href: "/" },
+            { label: product.productType.charAt(0).toUpperCase() + product.productType.slice(1), href: `/${product.productType}` },
+            { label: product.category.charAt(0).toUpperCase() + product.category.slice(1), href: `/${product.productType}/${product.category}` },
+            { label: product.name }
+          ]}
+          className="mb-6"
+        />
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-16">
           {/* LEFT - Image Gallery */}
@@ -93,7 +96,7 @@ export function ProductDetailPage({
             <div className="relative aspect-square bg-brand-light-gray rounded-sm overflow-hidden mb-4 group">
               <Image
                 src={product.images[activeImage]}
-                alt={product.name}
+                alt={`${product.brand} ${product.name} - ${product.category}'s ${product.productType}`}
                 fill
                 className="object-contain p-8"
                 sizes="(max-width: 768px) 100vw, 50vw"
@@ -177,7 +180,10 @@ export function ProductDetailPage({
               {product.name}
             </h1>
 
-            <p className="text-sm text-brand-gray">SKU: {product.sku}</p>
+             <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-brand-gray">
+              <p>SKU: <span className="text-brand-dark font-medium">{product.sku}</span></p>
+              <p>Category: <Link href={`/${product.productType}/${product.category}`} className="text-brand-red font-medium hover:underline capitalize">{product.category}'s {product.productType}</Link></p>
+            </div>
 
             {/* Price */}
             <div className="flex items-baseline gap-3">

@@ -5,6 +5,8 @@ import type { Product } from "@/types/product";
 import { notFound } from "next/navigation";
 import { PRODUCT_TYPE_CONFIG } from "@/lib/sizeSystems";
 
+import { getMetadata } from "@/lib/seo";
+
 interface PageProps {
   params: {
     productType: string;
@@ -25,17 +27,35 @@ const VALID_CATEGORIES = ["men", "women", "kids", "unisex"] as const;
 
 export async function generateMetadata({
   params,
+  searchParams,
 }: PageProps): Promise<Metadata> {
   const { productType, category } = params;
+  const { subcategory } = searchParams;
 
   const productTypeLabel =
     productType.charAt(0).toUpperCase() + productType.slice(1);
   const categoryLabel = category.charAt(0).toUpperCase() + category.slice(1);
+  const subcategoryLabel = subcategory
+    ? subcategory.charAt(0).toUpperCase() + subcategory.slice(1)
+    : "";
 
-  return {
-    title: `${categoryLabel}'s ${productTypeLabel} | Intikhab`,
-    description: `Shop ${categoryLabel}'s ${productTypeLabel}. Premium quality, nationwide delivery. Cash on delivery available.`,
-  };
+  const title = subcategory
+    ? `${categoryLabel}'s ${subcategoryLabel} ${productTypeLabel} | Intikhab`
+    : `${categoryLabel}'s ${productTypeLabel} | Intikhab`;
+
+  const description = subcategory
+    ? `Discover our exclusive range of ${categoryLabel}'s ${subcategoryLabel} ${productTypeLabel}. Premium quality, nationwide delivery. Cash on delivery available.`
+    : `Discover our exclusive range of ${categoryLabel}'s ${productTypeLabel}. Premium quality, nationwide delivery. Cash on delivery available.`;
+
+  const path = subcategory
+    ? `/${productType}/${category}?subcategory=${subcategory}`
+    : `/${productType}/${category}`;
+
+  return getMetadata({
+    title,
+    description,
+    path,
+  });
 }
 
 export default async function ProductCategoryPage({

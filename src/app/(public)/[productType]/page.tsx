@@ -19,6 +19,8 @@ const VALID_PRODUCT_TYPES = [
 ] as const;
 const CATEGORIES = ["men", "women", "kids", "unisex"] as const;
 
+import { getMetadata } from "@/lib/seo";
+
 export async function generateMetadata({
   params,
 }: PageProps): Promise<Metadata> {
@@ -26,10 +28,11 @@ export async function generateMetadata({
   const productTypeLabel =
     productType.charAt(0).toUpperCase() + productType.slice(1);
 
-  return {
+  return getMetadata({
     title: `${productTypeLabel} | Intikhab`,
     description: `Shop our collection of ${productTypeLabel}. Premium quality, nationwide delivery. Cash on delivery available.`,
-  };
+    path: `/${productType}`,
+  });
 }
 
 export default async function ProductTypePage({ params }: PageProps) {

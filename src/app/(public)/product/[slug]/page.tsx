@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { ProductDetailPage } from "@/components/products/ProductDetailPage";
 import type { Product } from "@/types/product";
+import { getMetadata, SITE_URL } from "@/lib/seo";
 
 export const dynamic = "force-dynamic";
 export const fetchCache = "force-no-store";
@@ -18,7 +19,7 @@ export async function generateMetadata({
 
   const { data } = await supabase
     .from("products")
-    .select("name, description")
+    .select("name, description, category, images")
     .eq("slug", params.slug)
     .eq("status", "active")
     .single();
@@ -27,10 +28,20 @@ export async function generateMetadata({
     return { title: "Product Not Found | Intikhab" };
   }
 
-  return {
-    title: `${data.name} | Intikhab`,
-    description: data.description,
-  };
+  const categoryLabel = data.category
+    ? (data.category as string).charAt(0).toUpperCase() + (data.category as string).slice(1)
+    : "Footwear";
+
+  const title = `${data.name} — ${categoryLabel} | Intikhab`;
+  const description = `Buy ${data.name} from Intikhab. Premium ${data.category || "footwear"} designed for comfort, style, and everyday wear.`;
+  const ogImage = data.images && (data.images as string[])[0] ? (data.images as string[])[0] : undefined;
+
+  return getMetadata({
+    title,
+    description,
+    path: `/product/${params.slug}`,
+    ogImage,
+  });
 }
 
 export default async function ProductPage({ params }: ProductPageProps) {
@@ -60,8 +71,41 @@ export default async function ProductPage({ params }: ProductPageProps) {
   const product: Product = transformProduct(productRow);
   const relatedProducts: Product[] = (relatedRows || []).map(transformProduct);
 
+  // Generate dynamic JSON-LD Product Schema
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    "name": product.name,
+    "image": product.images.map((img) =>
+      img.startsWith("http") ? img : `${SITE_URL}${img}`
+    ),
+    "description": product.description,
+    "brand": {
+      "@type": "Brand",
+      "name": "Intikhab",
+    },
+    "category": product.category,
+    "sku": product.sku || product.id,
+    "offers": {
+      "@type": "Offer",
+      "url": `${SITE_URL}/product/${product.slug}`,
+      "priceCurrency": "PKR",
+      "price": product.price,
+      "availability": product.inStock
+        ? "https://schema.org/InStock"
+        : "https://schema.org/OutOfStock",
+      "itemCondition": "https://schema.org/NewCondition",
+    },
+  };
+
   return (
-    <ProductDetailPage product={product} relatedProducts={relatedProducts} />
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <ProductDetailPage product={product} relatedProducts={relatedProducts} />
+    </>
   );
 }
 
