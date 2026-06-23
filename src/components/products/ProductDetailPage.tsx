@@ -18,6 +18,15 @@ import type { Product, SizeStock } from "@/types/product";
 import { ProductCard } from "@/components/products/ProductCard";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 
+const FALLBACK_IMAGE = "/images/intikhab/intikhab-hero-premium-sneakers.webp";
+
+const getValidImage = (src: string | undefined | null): string => {
+  if (!src || typeof src !== "string" || src.trim() === "") {
+    return FALLBACK_IMAGE;
+  }
+  return src;
+};
+
 interface ProductDetailPageProps {
   product: Product;
   relatedProducts: Product[];
@@ -95,7 +104,7 @@ export function ProductDetailPage({
             {/* Main Image */}
             <div className="relative aspect-square bg-brand-light-gray rounded-sm overflow-hidden mb-4 group">
               <Image
-                src={product.images[activeImage]}
+                src={getValidImage(product.images?.[activeImage])}
                 alt={`${product.brand} ${product.name} - ${product.category}'s ${product.productType}`}
                 fill
                 className="object-contain p-8"
@@ -104,11 +113,11 @@ export function ProductDetailPage({
               />
 
               {/* Left Arrow */}
-              {product.images.length > 1 && (
+              {(product.images?.length ?? 0) > 1 && (
                 <button
                   onClick={() =>
                     setActiveImage((prev) =>
-                      prev > 0 ? prev - 1 : product.images.length - 1,
+                      prev > 0 ? prev - 1 : (product.images?.length ?? 0) - 1,
                     )
                   }
                   className="absolute left-2 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/90 hover:bg-white rounded-full flex items-center justify-center shadow-md transition-all opacity-0 group-hover:opacity-100"
@@ -119,11 +128,11 @@ export function ProductDetailPage({
               )}
 
               {/* Right Arrow */}
-              {product.images.length > 1 && (
+              {(product.images?.length ?? 0) > 1 && (
                 <button
                   onClick={() =>
                     setActiveImage((prev) =>
-                      prev < product.images.length - 1 ? prev + 1 : 0,
+                      prev < (product.images?.length ?? 0) - 1 ? prev + 1 : 0,
                     )
                   }
                   className="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/90 hover:bg-white rounded-full flex items-center justify-center shadow-md transition-all opacity-0 group-hover:opacity-100"
@@ -134,17 +143,17 @@ export function ProductDetailPage({
               )}
 
               {/* Image Counter */}
-              {product.images.length > 1 && (
+              {(product.images?.length ?? 0) > 1 && (
                 <div className="absolute bottom-3 right-3 bg-black/60 text-white text-xs px-2 py-1 rounded-sm">
-                  {activeImage + 1} / {product.images.length}
+                  {activeImage + 1} / {(product.images?.length ?? 0)}
                 </div>
               )}
             </div>
 
             {/* Thumbnails */}
-            {product.images.length > 1 && (
+            {(product.images?.length ?? 0) > 1 && (
               <div className="flex gap-3">
-                {product.images.map((img, i) => (
+                {(product.images || []).map((img, i) => (
                   <button
                     key={i}
                     onClick={() => setActiveImage(i)}
@@ -155,7 +164,7 @@ export function ProductDetailPage({
                     }`}
                   >
                     <Image
-                      src={img}
+                      src={getValidImage(img)}
                       alt={`${product.name} ${i + 1}`}
                       fill
                       className="object-contain p-1"

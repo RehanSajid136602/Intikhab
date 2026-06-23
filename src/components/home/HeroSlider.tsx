@@ -24,7 +24,7 @@ const slides = [
     alignment: 'left' as const,
   },
   {
-    image: '/intikhab-walking-park-trees-blue.jpeg',
+    image: '/intikhab-sneakers-balcony-sunset-blue.jpeg',
     alt: 'Hero 2',
     label: 'SUMMER READY',
     title: (

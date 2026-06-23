@@ -8,7 +8,7 @@ import { SectionTitle } from '@/components/ui/SectionTitle';
 
 const collections = [
   { label: 'GIRL B', image: '/intikhab-man-relaxed-chair-blue.jpeg', badge: 'CLASSIC', badgeBg: 'bg-white/90 text-brand-dark', href: '/coming-soon' },
-  { label: "Summer '25", image: '/intikhab-walking-park-trees-blue.jpeg', badge: 'TOP SELLER', badgeBg: 'bg-brand-red text-white', href: '/coming-soon' },
+  { label: "Summer '25", image: '/intikhab-sneakers-balcony-sunset-blue.jpeg', badge: 'TOP SELLER', badgeBg: 'bg-brand-red text-white', href: '/coming-soon' },
   { label: 'KIDS', image: '/intikhab-man-sitting-bench-white.jpeg', href: '/coming-soon' },
   { label: 'NAYZA', image: '/intikhab-sneakers-woven-mat-black.jpeg', href: '/coming-soon' },
 ];

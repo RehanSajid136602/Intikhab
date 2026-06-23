@@ -19,6 +19,15 @@ import { formatPKR } from "@/lib/utils";
 import { BRAND } from "@/lib/constants";
 import type { Product } from "@/types/product";
 
+const FALLBACK_IMAGE = "/images/intikhab/intikhab-hero-premium-sneakers.webp";
+
+const getValidImage = (src: string | undefined | null): string => {
+  if (!src || typeof src !== "string" || src.trim() === "") {
+    return FALLBACK_IMAGE;
+  }
+  return src;
+};
+
 interface ProductDetailClientProps {
   product: Product;
   relatedProducts: Product[];
@@ -59,7 +68,7 @@ export default function ProductDetailClient({
     "@context": "https://schema.org",
     "@type": "Product",
     name: product.name,
-    image: product.images[0],
+    image: getValidImage(product.images?.[0]),
     description: product.description,
     offers: {
       "@type": "Offer",
@@ -120,7 +129,7 @@ export default function ProductDetailClient({
                     className="absolute inset-0"
                   >
                     <Image
-                      src={product.images[selectedImageIndex]}
+                      src={getValidImage(product.images?.[selectedImageIndex])}
                       alt={`${product.name} - Image ${selectedImageIndex + 1}`}
                       fill
                       className={`object-contain p-8 transition-transform duration-300 ${
@@ -134,12 +143,12 @@ export default function ProductDetailClient({
                 </AnimatePresence>
 
                 {/* Navigation Arrows */}
-                {product.images.length > 1 && (
+                {(product.images?.length ?? 0) > 1 && (
                   <>
                     <button
                       onClick={() =>
                         setSelectedImageIndex((prev) =>
-                          prev > 0 ? prev - 1 : product.images.length - 1,
+                          prev > 0 ? prev - 1 : (product.images?.length ?? 0) - 1,
                         )
                       }
                       className="absolute left-2 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/90 rounded-full flex items-center justify-center shadow-md hover:bg-white transition-colors z-10"
@@ -150,7 +159,7 @@ export default function ProductDetailClient({
                     <button
                       onClick={() =>
                         setSelectedImageIndex((prev) =>
-                          prev < product.images.length - 1 ? prev + 1 : 0,
+                          prev < (product.images?.length ?? 0) - 1 ? prev + 1 : 0,
                         )
                       }
                       className="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/90 rounded-full flex items-center justify-center shadow-md hover:bg-white transition-colors z-10"
@@ -163,9 +172,9 @@ export default function ProductDetailClient({
               </div>
 
               {/* Thumbnail Strip */}
-              {product.images.length > 1 && (
+              {(product.images?.length ?? 0) > 1 && (
                 <div className="flex gap-3 overflow-x-auto pb-2">
-                  {product.images.map((image, index) => (
+                  {(product.images || []).map((image, index) => (
                     <button
                       key={index}
                       onClick={() => setSelectedImageIndex(index)}
@@ -177,7 +186,7 @@ export default function ProductDetailClient({
                       aria-label={`View image ${index + 1}`}
                     >
                       <Image
-                        src={image}
+                        src={getValidImage(image)}
                         alt={`Thumbnail ${index + 1}`}
                         fill
                         className="object-contain p-2"

@@ -4,6 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "clean": "rm -rf .next node_modules/.cache",
+    "dev:clean": "rm -rf .next node_modules/.cache && next dev",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
@@ -44,6 +46,7 @@
     "postcss": "^8.4.47",
     "tailwindcss": "^3.4.14",
     "tsx": "^4.21.0",
-    "typescript": "^5.6.3"
+    "typescript": "^5.6.3",
+    "vercel": "^54.15.0"
   }
 }

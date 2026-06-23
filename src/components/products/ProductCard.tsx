@@ -28,13 +28,24 @@ function ProductCard({ product, showImageCarousel }: ProductCardProps) {
   const isInWishlist = useWishlistStore((state) =>
     state.isInWishlist(product.id),
   );
+  const FALLBACK_IMAGE = "/images/intikhab/intikhab-hero-premium-sneakers.webp";
+
+  const getValidImage = (src: string | undefined | null): string => {
+    if (!src || typeof src !== "string" || src.trim() === "") {
+      return FALLBACK_IMAGE;
+    }
+    return src;
+  };
+
   const { currentImageIndex, setIsPaused } = useProductImageCarousel(
-    showImageCarousel ? product.images.length : 1,
+    showImageCarousel ? (product.images?.length ?? 0) : 1,
   );
 
-  const currentImage = showImageCarousel
-    ? product.images[currentImageIndex]
-    : product.images[0];
+  const rawImage = showImageCarousel
+    ? product.images?.[currentImageIndex]
+    : product.images?.[0];
+
+  const currentImage = getValidImage(rawImage);
 
   const handleWishlistClick = (e: React.MouseEvent) => {
     e.stopPropagation();

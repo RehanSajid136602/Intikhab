@@ -1,65 +1,94 @@
 import { createServerClient } from '@supabase/ssr';
 import { type NextRequest, NextResponse } from 'next/server';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
 export async function middleware(request: NextRequest) {
-  let supabaseResponse = NextResponse.next({
-    request: {
-      headers: request.headers,
-    },
-  });
+  try {
+    const { pathname } = request.nextUrl;
 
-  const supabase = createServerClient(supabaseUrl!, supabaseAnonKey!, {
-    cookies: {
-      getAll() {
-        return request.cookies.getAll();
+    // Fast static assets exclusion check inside middleware logic
+    if (
+      pathname.startsWith('/_next') ||
+      pathname === '/favicon.ico' ||
+      pathname === '/robots.txt' ||
+      pathname === '/sitemap.xml' ||
+      /\.(svg|png|jpg|jpeg|gif|webp|avif|ico)$/i.test(pathname)
+    ) {
+      return NextResponse.next();
+    }
+
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+    if (!supabaseUrl || !supabaseAnonKey) {
+      return NextResponse.next();
+    }
+
+    let supabaseResponse = NextResponse.next({
+      request: {
+        headers: request.headers,
       },
-      setAll(cookiesToSet) {
-        cookiesToSet.forEach(({ name, value, options }) => {
-          request.cookies.set(name, value);
-          supabaseResponse.cookies.set(name, value, options);
+    });
+
+    const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
+      cookies: {
+        getAll() {
+          return request.cookies.getAll();
+        },
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value, options }) => {
+            request.cookies.set(name, value);
+            supabaseResponse.cookies.set(name, value, options);
+          });
+        },
+      },
+    });
+
+    // Refresh session without blocking the request
+    await supabase.auth.getSession();
+
+    // Admin route protection
+    if (pathname.startsWith('/admin')) {
+      const isLoginPage = pathname === '/admin/login';
+
+      if (isLoginPage) {
+        return supabaseResponse;
+      }
+
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
+      if (!session) {
+        // Redirect to login if not authenticated
+        const loginUrl = new URL('/admin/login', request.url);
+        // Create redirect response
+        const redirectResponse = NextResponse.redirect(loginUrl);
+        // Copy cookies to ensure auth state sync if needed
+        supabaseResponse.cookies.getAll().forEach((cookie) => {
+          redirectResponse.cookies.set(cookie.name, cookie.value, {
+            path: cookie.path,
+            domain: cookie.domain,
+            secure: cookie.secure,
+            sameSite: cookie.sameSite,
+            expires: cookie.expires,
+            maxAge: cookie.maxAge,
+            httpOnly: cookie.httpOnly,
+          });
         });
-      },
-    },
-  });
-
-  // Refresh session without blocking the request
-  await supabase.auth.getSession();
-
-  // Admin route protection
-  if (request.nextUrl.pathname.startsWith('/admin')) {
-    const isLoginPage = request.nextUrl.pathname === '/admin/login';
-
-    // Skip session check for login page
-    if (isLoginPage) {
-      return supabaseResponse;
+        return redirectResponse;
+      }
     }
 
-    const {
-      data: { session },
-    } = await supabase.auth.getSession();
-
-    if (!session) {
-      // Redirect to login if not authenticated
-      const loginUrl = new URL('/admin/login', request.url);
-      return NextResponse.redirect(loginUrl);
-    }
+    return supabaseResponse;
+  } catch (error) {
+    console.error('Middleware error:', error);
+    return NextResponse.next();
   }
-
-  return supabaseResponse;
 }
 
 export const config = {
   matcher: [
-    /*
-     * Match all request paths except for the ones starting with:
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     * - public folder
-     */
-    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+    "/((?!_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml|.*\\.(?:png|jpg|jpeg|gif|webp|avif|svg|ico)$).*)",
   ],
 };
+
