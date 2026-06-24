@@ -1,11 +1,15 @@
 import { NextResponse } from 'next/server';
-import { auth0 } from '@/lib/auth0';
+import { auth } from '@/lib/auth';
+import { headers } from 'next/headers';
 import { createClient } from '@/lib/supabase/server';
 import { notifyFeedback } from '@/lib/feedback-notify';
 
 export async function POST(request: Request) {
   try {
-    const session = await auth0.getSession();
+    const session = await auth.api.getSession({
+      headers: headers(),
+    }).catch(() => null);
+
     if (!session?.user?.email) {
       return NextResponse.json(
         { error: 'You must be logged in to submit feedback.' },

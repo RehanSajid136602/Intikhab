@@ -49,30 +49,18 @@ export async function checkAdminAccess(email?: string | null): Promise<boolean> 
   return isAllowedAdminEmail(normalizedEmail);
 }
 
+import { auth } from "@/lib/auth";
+
 export async function verifyAdmin(request: NextRequest) {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  const session = await auth.api.getSession({
+    headers: request.headers,
+  }).catch(() => null);
 
-  const supabase = createServerClient(supabaseUrl!, supabaseAnonKey!, {
-    cookies: {
-      getAll() {
-        return request.cookies.getAll();
-      },
-      setAll() {
-        // Can't set cookies in API routes, but middleware handles it
-      },
-    },
-  });
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user || !(await checkAdminAccess(user.email))) {
+  if (!session || !(await checkAdminAccess(session.user.email))) {
     return { authenticated: false, user: null };
   }
 
-  return { authenticated: true, user };
+  return { authenticated: true, user: session.user };
 }
 
 export function unauthorizedResponse() {

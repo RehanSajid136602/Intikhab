@@ -1,4 +1,5 @@
-import { auth0 } from "@/lib/auth0";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
@@ -24,10 +25,12 @@ interface Order {
 }
 
 export default async function OrdersPage() {
-  const session = await auth0.getSession();
+  const session = await auth.api.getSession({
+    headers: headers(),
+  }).catch(() => null);
 
   if (!session) {
-    redirect("/auth/login");
+    redirect("/login");
   }
 
   const { user } = session;

@@ -1,11 +1,14 @@
-import { auth0 } from "@/lib/auth0";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { AddressesClient } from "./AddressesClient";
 
 export default async function AddressesPage() {
-  const session = await auth0.getSession();
-  if (!session) redirect("/auth/login");
+  const session = await auth.api.getSession({
+    headers: headers(),
+  }).catch(() => null);
+  if (!session) redirect("/login");
 
   return (
     <div className="min-h-screen bg-[#fafafa]">

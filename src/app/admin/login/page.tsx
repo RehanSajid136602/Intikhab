@@ -1,12 +1,12 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { createClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import Image from 'next/image';
 import { Shield, LogOut } from 'lucide-react';
 import { verifyAdminAccessAction } from '@/app/admin/actions';
+import { signIn, signOut, useSession } from '@/lib/auth-client';
 
 export default function AdminLoginPage() {
   const router = useRouter();
@@ -17,18 +17,20 @@ export default function AdminLoginPage() {
   const [isUnauthorized, setIsUnauthorized] = useState(false);
   const [userEmail, setUserEmail] = useState<string | null>(null);
 
+  const { data: session, isPending } = useSession();
+
   useEffect(() => {
     const initAuthCheck = async () => {
+      if (isPending) return;
+
       try {
-        const supabase = createClient();
-        const { data: { user } } = await supabase.auth.getUser();
-        if (user && user.email) {
-          const allowed = await verifyAdminAccessAction(user.email);
+        if (session && session.user && session.user.email) {
+          const allowed = await verifyAdminAccessAction(session.user.email);
           if (allowed) {
             router.push('/admin');
             return;
           } else {
-            setUserEmail(user.email);
+            setUserEmail(session.user.email);
             setIsUnauthorized(true);
           }
         }
@@ -39,27 +41,29 @@ export default function AdminLoginPage() {
       }
     };
     initAuthCheck();
-  }, [router]);
+  }, [session, isPending, router]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
     try {
-      const supabase = createClient();
-
-      const { error, data } = await supabase.auth.signInWithPassword({
+      const response = await signIn.email({
         email,
         password,
+      }, {
+        onSuccess: async () => {
+          // Override automatic redirect to perform admin authorization check manually
+        }
       });
 
-      if (error) {
-        toast.error(error.message);
+      if (response?.error) {
+        toast.error(response.error.message || 'Authentication failed.');
         setIsLoading(false);
         return;
       }
 
-      const activeUser = data?.user;
+      const activeUser = response?.data?.user;
       if (activeUser && activeUser.email) {
         const allowed = await verifyAdminAccessAction(activeUser.email);
         if (allowed) {
@@ -83,8 +87,7 @@ export default function AdminLoginPage() {
   const handleSignOut = async () => {
     setIsChecking(true);
     try {
-      const supabase = createClient();
-      await supabase.auth.signOut();
+      await signOut();
       setUserEmail(null);
       setIsUnauthorized(false);
       setEmail('');

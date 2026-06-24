@@ -7,21 +7,18 @@ import { createServerClient } from '@supabase/ssr';
 import { redirect } from 'next/navigation';
 import { checkAdminAccess } from '@/lib/supabase/auth';
 
+import { headers } from 'next/headers';
+import { auth } from '@/lib/auth';
+
 async function requireAdmin() {
-  const cookieStore = cookies();
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
-  const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
-    cookies: {
-      getAll() { return cookieStore.getAll(); },
-      setAll() { },
-    },
-  });
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user || !(await checkAdminAccess(user.email))) {
+  const session = await auth.api.getSession({
+    headers: headers(),
+  }).catch(() => null);
+
+  if (!session || !(await checkAdminAccess(session.user.email))) {
     redirect('/admin/login');
   }
-  return user;
+  return session.user;
 }
 
 export async function verifyAdminAccessAction(email: string): Promise<boolean> {

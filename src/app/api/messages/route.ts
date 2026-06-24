@@ -22,6 +22,7 @@ export async function POST(request: Request) {
     body: String(message).trim(),
     type: type || "general",
     status: "unread",
+    updatedAt: new Date().toISOString(),
   });
 
   if (error) {

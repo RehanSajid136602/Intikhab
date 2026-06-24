@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { createHash } from "crypto";
 import { createClient } from "@/lib/supabase/server";
 import { verifyAdmin } from "@/lib/supabase/auth";
-import { auth0 } from "@/lib/auth0";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
 
 /**
  * GET /api/orders/[id]
@@ -28,7 +29,9 @@ export async function GET(
   }
 
   const { authenticated: isAdmin } = await verifyAdmin(request);
-  const session = await auth0.getSession().catch(() => null);
+  const session = await auth.api.getSession({
+    headers: headers(),
+  }).catch(() => null);
   const isOwner =
     Boolean(session?.user?.email) &&
     session?.user?.email?.toLowerCase() ===

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth0 } from "@/lib/auth0";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
 
 export async function GET(
@@ -42,7 +43,9 @@ export async function POST(
     return NextResponse.json({ error: "Rating and review are required" }, { status: 400 });
   }
 
-  const session = await auth0.getSession().catch(() => null);
+  const session = await auth.api.getSession({
+    headers: headers(),
+  }).catch(() => null);
   const customerEmail = session?.user?.email || null;
   const guestName = customerEmail ? null : String(body.guestName || "").trim();
   const guestEmail = customerEmail ? null : String(body.guestEmail || "").trim();

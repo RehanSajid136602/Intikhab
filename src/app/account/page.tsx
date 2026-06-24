@@ -1,4 +1,5 @@
-import { auth0 } from "@/lib/auth0";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { User, LogOut, Package, MapPin } from "lucide-react";
 import Link from "next/link";
@@ -6,10 +7,12 @@ import { ProfileForm } from "./ProfileForm";
 import { createClient } from "@/lib/supabase/server";
 
 export default async function AccountPage() {
-  const session = await auth0.getSession();
+  const session = await auth.api.getSession({
+    headers: headers(),
+  }).catch(() => null);
 
   if (!session) {
-    redirect("/auth/login");
+    redirect("/login");
   }
 
   const { user } = session;
@@ -66,10 +69,10 @@ export default async function AccountPage() {
           </aside>
 
           <main className="lg:col-span-3 space-y-6">
-            {user.picture && (
+            {user.image && (
               <div className="flex items-center gap-4 bg-white border border-zinc-200 rounded-xl p-5">
                 <img
-                  src={user.picture}
+                  src={user.image}
                   alt=""
                   className="w-16 h-16 rounded-full"
                 />
@@ -80,7 +83,7 @@ export default async function AccountPage() {
               </div>
             )}
 
-            {!user.picture && (
+            {!user.image && (
               <div className="bg-white border border-zinc-200 rounded-xl p-5">
                 <dl className="space-y-3 text-sm">
                   <div className="flex justify-between py-2 border-b border-zinc-100">
@@ -108,3 +111,4 @@ export default async function AccountPage() {
     </div>
   );
 }
+

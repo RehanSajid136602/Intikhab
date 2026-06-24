@@ -83,7 +83,7 @@ export default function CheckoutPage() {
   const [loggedInEmail, setLoggedInEmail] = useState<string | null>(null);
   const [savedAddresses, setSavedAddresses] = useState<SavedAddress[]>([]);
 
-  // Pre-fill from saved profile (Auth0 email + customers table)
+  // Pre-fill from saved profile (Better Auth email + customers table)
   useEffect(() => {
     async function fetchUser() {
       try {

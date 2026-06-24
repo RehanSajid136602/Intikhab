@@ -19,6 +19,7 @@ import { mainNavItems } from '@/data/navigation';
 import { BRAND } from '@/lib/constants';
 import { SearchBar } from './SearchBar';
 import { cn } from '@/lib/utils';
+import { signOut } from '@/lib/auth-client';
 
 interface NavbarProps {
   isAuthenticated?: boolean;
@@ -31,6 +32,21 @@ function Navbar({ isAuthenticated = false, userEmail }: NavbarProps) {
   const { toggleMobileMenu, toggleSearch, searchOpen } = useUIStore();
   const router = useRouter();
   const [dropdownOpen, setDropdownOpen] = useState(false);
+
+  const handleSignOut = async () => {
+    try {
+      await signOut({
+        fetchOptions: {
+          onSuccess: () => {
+            router.push('/');
+            router.refresh();
+          },
+        },
+      });
+    } catch (err) {
+      console.error('Error signing out:', err);
+    }
+  };
 
   return (
     <nav className="sticky top-0 z-50 border-b border-brand-border bg-brand-surface/95 backdrop-blur transition-shadow duration-300">
@@ -151,13 +167,13 @@ function Navbar({ isAuthenticated = false, userEmail }: NavbarProps) {
                         My Account
                       </Link>
                       <div className="border-t border-brand-border mt-1 pt-1">
-                        <a
-                          href="/auth/logout"
-                          className="flex items-center gap-2 px-4 py-2 text-sm text-red-500 hover:bg-red-50 transition-colors"
+                        <button
+                          onClick={handleSignOut}
+                          className="flex w-full items-center gap-2 px-4 py-2 text-sm text-red-500 hover:bg-red-50 transition-colors text-left font-normal"
                         >
                           <LogOut className="w-3.5 h-3.5" />
                           Sign Out
-                        </a>
+                        </button>
                       </div>
                     </div>
                   </>
@@ -165,18 +181,18 @@ function Navbar({ isAuthenticated = false, userEmail }: NavbarProps) {
               </div>
             ) : (
               <div className="flex items-center gap-2">
-                <a
-                  href="/auth/login"
+                <Link
+                  href="/login"
                   className="hidden text-xs font-semibold uppercase tracking-wider text-brand-dark hover:text-brand-red transition-colors px-3 py-1.5 sm:inline-flex"
                 >
                   Login
-                </a>
-                <a
-                  href="/auth/login?screen_hint=signup"
+                </Link>
+                <Link
+                  href="/signup"
                   className="hidden rounded-control bg-brand-dark px-4 py-2 text-xs font-semibold uppercase tracking-wider text-white transition-colors hover:bg-black sm:inline-flex"
                 >
                   Sign Up
-                </a>
+                </Link>
               </div>
             )}
 

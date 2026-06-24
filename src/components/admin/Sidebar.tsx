@@ -40,9 +40,8 @@ function Sidebar({ userEmail }: { userEmail?: string }) {
   const pathname = usePathname();
 
   const handleLogout = async () => {
-    const { createClient } = await import('@/lib/supabase/client');
-    const supabase = createClient();
-    await supabase.auth.signOut();
+    const { signOut } = await import('@/lib/auth-client');
+    await signOut();
     window.location.href = '/admin/login';
   };
 

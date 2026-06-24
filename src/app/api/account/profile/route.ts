@@ -1,10 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth0 } from "@/lib/auth0";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
 
 export async function GET() {
   try {
-    const session = await auth0.getSession();
+    const session = await auth.api.getSession({
+      headers: headers(),
+    }).catch(() => null);
     if (!session?.user?.email) {
       return NextResponse.json({ profile: null });
     }
@@ -28,7 +31,9 @@ export async function GET() {
 
 export async function PUT(request: NextRequest) {
   try {
-    const session = await auth0.getSession();
+    const session = await auth.api.getSession({
+      headers: headers(),
+    }).catch(() => null);
     if (!session?.user?.email) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }

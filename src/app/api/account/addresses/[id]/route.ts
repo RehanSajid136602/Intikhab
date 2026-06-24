@@ -1,9 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth0 } from "@/lib/auth0";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
 
 async function requireEmail() {
-  const session = await auth0.getSession();
+  const session = await auth.api.getSession({
+    headers: headers(),
+  }).catch(() => null);
   return session?.user?.email || null;
 }
 

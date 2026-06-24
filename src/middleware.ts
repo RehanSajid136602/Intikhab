@@ -1,7 +1,6 @@
-import { auth0 } from "@/lib/auth0";
 import { createServerClient } from '@supabase/ssr';
 import { type NextRequest, NextResponse } from 'next/server';
-import { isAllowedAdminEmail } from '@/lib/supabase/auth';
+import { isAllowedAdminEmail } from '@/lib/auth/admin-emails';
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -16,7 +15,7 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // Admin routes: use Supabase Auth (email/password login)
+  // Admin routes: protect with Better Auth + Admin verification
   if (pathname.startsWith('/admin')) {
     const isLoginPage = pathname === '/admin/login';
 
@@ -24,69 +23,63 @@ export async function middleware(request: NextRequest) {
       return NextResponse.next();
     }
 
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+    // Read the session cookie name used by Better Auth (standard is better-auth.session_token)
+    const sessionToken = request.cookies.get('better-auth.session_token')?.value;
 
-    if (!supabaseUrl || !supabaseAnonKey) {
-      return NextResponse.next();
+    if (!sessionToken) {
+      return NextResponse.redirect(new URL('/admin/login', request.url));
     }
 
-    let supabaseResponse = NextResponse.next({
-      request: { headers: request.headers },
-    });
-
-    const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
-      cookies: {
-        getAll() { return request.cookies.getAll(); },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value, options }) => {
-            request.cookies.set(name, value);
-            supabaseResponse.cookies.set(name, value, options);
-          });
-        },
+    // Call Better Auth session API endpoint internally
+    const getSessionUrl = new URL('/api/auth/get-session', request.url);
+    const sessionRes = await fetch(getSessionUrl, {
+      headers: {
+        cookie: request.headers.get('cookie') || '',
       },
-    });
+    }).catch(() => null);
 
-    const { data: { user } } = await supabase.auth.getUser();
+    if (!sessionRes || !sessionRes.ok) {
+      return NextResponse.redirect(new URL('/admin/login', request.url));
+    }
 
-    let isAllowed = false;
-    if (user && user.email) {
-      const normalizedEmail = user.email.trim().toLowerCase();
-      const { data: adminData } = await supabase
-        .from('admin_users')
-        .select('active')
-        .eq('email', normalizedEmail)
-        .single();
+    const session = await sessionRes.json().catch(() => null);
+    if (!session?.user?.email) {
+      return NextResponse.redirect(new URL('/admin/login', request.url));
+    }
 
-      if (adminData && adminData.active) {
-        isAllowed = true;
-      } else {
-        isAllowed = isAllowedAdminEmail(normalizedEmail);
+    const email = session.user.email.trim().toLowerCase();
+    let isAllowed = isAllowedAdminEmail(email);
+
+    if (!isAllowed) {
+      // Check database via Supabase client (Edge-safe HTTP call)
+      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+      const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+      if (supabaseUrl && supabaseAnonKey) {
+        const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
+          cookies: {
+            getAll() { return request.cookies.getAll(); },
+            setAll() {},
+          },
+        });
+
+        const { data: adminData } = await supabase
+          .from('admin_users')
+          .select('active')
+          .eq('email', email)
+          .single();
+
+        if (adminData && adminData.active) {
+          isAllowed = true;
+        }
       }
     }
 
     if (!isAllowed) {
-      const loginUrl = new URL('/admin/login', request.url);
-      const redirectResponse = NextResponse.redirect(loginUrl);
-      supabaseResponse.cookies.getAll().forEach((cookie) => {
-        redirectResponse.cookies.set(cookie.name, cookie.value, {
-          path: cookie.path, domain: cookie.domain, secure: cookie.secure,
-          sameSite: cookie.sameSite, expires: cookie.expires,
-          maxAge: cookie.maxAge, httpOnly: cookie.httpOnly,
-        });
-      });
-      return redirectResponse;
+      return NextResponse.redirect(new URL('/admin/login', request.url));
     }
 
-    return supabaseResponse;
-  }
-
-  // All other routes (storefront): use Auth0
-  const auth0Response = await auth0.middleware(request);
-
-  // Auth0 middleware returns null for non-auth routes — pass through
-  if (auth0Response) {
-    return auth0Response;
+    return NextResponse.next();
   }
 
   return NextResponse.next();

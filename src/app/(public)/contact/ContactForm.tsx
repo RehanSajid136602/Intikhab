@@ -9,10 +9,11 @@ export function ContactForm() {
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    const form = event.currentTarget;
     setStatus("submitting");
     setError("");
 
-    const formData = new FormData(event.currentTarget);
+    const formData = new FormData(form);
     const payload = Object.fromEntries(formData.entries());
 
     const response = await fetch("/api/messages", {
@@ -28,7 +29,7 @@ export function ContactForm() {
       return;
     }
 
-    event.currentTarget.reset();
+    form.reset();
     setStatus("success");
   }
 
