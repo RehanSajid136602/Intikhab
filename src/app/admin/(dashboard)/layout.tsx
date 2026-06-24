@@ -3,12 +3,8 @@ import { redirect } from 'next/navigation';
 import { createServerClient } from '@supabase/ssr';
 import { Sidebar } from '@/components/admin/Sidebar';
 import { TopBar } from '@/components/admin/TopBar';
+import { checkAdminAccess } from '@/lib/supabase/auth';
 
-/**
- * Admin dashboard layout with sidebar and topbar.
- * Only applies to pages inside the (dashboard) route group.
- * /admin/login is NOT wrapped by this layout.
- */
 export default async function AdminLayout({
   children,
 }: {
@@ -24,22 +20,22 @@ export default async function AdminLayout({
         return cookieStore.getAll();
       },
       setAll() {
-        // Can't set cookies in server components, handled by middleware
+        // Cookies set via middleware; no-op in server components
       },
     },
   });
 
   const {
-    data: { session },
-  } = await supabase.auth.getSession();
+    data: { user },
+  } = await supabase.auth.getUser();
 
-  if (!session) {
+  if (!user || !(await checkAdminAccess(user.email))) {
     redirect('/admin/login');
   }
 
   return (
     <div className="min-h-screen bg-brand-light-gray">
-      <Sidebar userEmail={session.user.email} />
+      <Sidebar userEmail={user.email} />
       <div className="ml-[260px]">
         <TopBar pageTitle="Dashboard" />
         <main className="p-6">{children}</main>

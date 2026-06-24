@@ -6,12 +6,26 @@ import { motion, useInView } from 'framer-motion';
 import { useRef } from 'react';
 import { SectionTitle } from '@/components/ui/SectionTitle';
 
-const collections = [
-  { label: 'GIRL B', image: '/intikhab-man-relaxed-chair-blue.jpeg', badge: 'CLASSIC', badgeBg: 'bg-white/90 text-brand-dark', href: '/coming-soon' },
-  { label: "Summer '25", image: '/intikhab-sneakers-balcony-sunset-blue.jpeg', badge: 'TOP SELLER', badgeBg: 'bg-brand-red text-white', href: '/coming-soon' },
-  { label: 'KIDS', image: '/intikhab-man-sitting-bench-white.jpeg', href: '/coming-soon' },
-  { label: 'NAYZA', image: '/intikhab-sneakers-woven-mat-black.jpeg', href: '/coming-soon' },
-];
+import { homepageImages } from '@/data/homepageImages';
+
+const collections = homepageImages.shopCategories.map((item, index) => {
+  let badge = undefined;
+  let badgeBg = undefined;
+  if (index === 0) {
+    badge = 'CLASSIC';
+    badgeBg = 'bg-white/90 text-brand-dark';
+  } else if (index === 1) {
+    badge = 'TOP SELLER';
+    badgeBg = 'bg-brand-red text-white';
+  }
+  return {
+    label: item.label.toUpperCase(),
+    image: item.src,
+    badge,
+    badgeBg,
+    href: item.href,
+  };
+});
 
 /**
  * 4-cell collection mosaic with different layout than CategoryMosaic.
@@ -79,7 +93,7 @@ function CollectionCell({ collection, className }: CollectionCellProps) {
         alt={collection.label}
         fill
         className="object-cover transition-transform duration-500"
-        sizes="(max-width: 768px) 33vw, 20vw"
+        sizes="(max-width: 768px) 100vw, 33vw"
         quality={85}
       />
       <div className="overlay absolute inset-0 bg-black/15 opacity-0 transition-opacity duration-300" />

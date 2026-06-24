@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useCartStore } from "@/stores/cartStore";
@@ -43,12 +43,26 @@ const PROVINCE_MAP: Record<string, string> = {
   Other: "",
 };
 
+interface SavedAddress {
+  id: string;
+  full_name: string;
+  phone: string;
+  city: string;
+  province: string;
+  postal_code: string;
+  address_line: string;
+  is_default: boolean;
+}
+
 export default function CheckoutPage() {
   const router = useRouter();
   const { items, totalPrice, clearCart } = useCartStore();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [stockErrors, setStockErrors] = useState<string[]>([]);
   const [stockChecking, setStockChecking] = useState(true);
+  const [couponCode, setCouponCode] = useState("");
+  const [couponDiscount, setCouponDiscount] = useState(0);
+  const [couponMessage, setCouponMessage] = useState("");
 
   // Form state
   const [formData, setFormData] = useState({
@@ -58,6 +72,7 @@ export default function CheckoutPage() {
     streetAddress: "",
     city: "",
     province: "",
+    postalCode: "",
     orderNotes: "",
     paymentMethod: "cod",
     jazzCashAccount: "",
@@ -65,6 +80,36 @@ export default function CheckoutPage() {
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [loggedInEmail, setLoggedInEmail] = useState<string | null>(null);
+  const [savedAddresses, setSavedAddresses] = useState<SavedAddress[]>([]);
+
+  // Pre-fill from saved profile (Auth0 email + customers table)
+  useEffect(() => {
+    async function fetchUser() {
+      try {
+        const res = await fetch("/api/account/profile");
+        const data = await res.json();
+        if (data.authEmail) {
+          setLoggedInEmail(data.authEmail);
+          setFormData((prev) => ({
+            ...prev,
+            email: data.authEmail,
+            fullName: prev.fullName || data.profile?.fullName || data.authName || "",
+            phone: prev.phone || data.profile?.phone || "",
+            city: prev.city || data.profile?.city || "",
+          }));
+          const addressRes = await fetch("/api/account/addresses");
+          if (addressRes.ok) {
+            const addresses: SavedAddress[] = await addressRes.json();
+            setSavedAddresses(addresses);
+          }
+        }
+      } catch {
+        // Not logged in — guest checkout
+      }
+    }
+    fetchUser();
+  }, []);
 
   // Validate stock on mount
   React.useEffect(() => {
@@ -82,13 +127,12 @@ export default function CheckoutPage() {
             problems.push(`${item.name}: product not found`);
           } else {
             const sizeStock = product.sizeStock as
-              | { size: number; stock: number }[]
+              | { size: string | number; stock: number }[]
               | undefined;
-            const itemSize =
-              typeof item.size === "string"
-                ? parseInt(item.size, 10)
-                : item.size;
-            const sizeEntry = sizeStock?.find((ss) => ss.size === itemSize);
+            const itemSize = String(item.size);
+            const sizeEntry = sizeStock?.find(
+              (ss) => String(ss.size) === itemSize,
+            );
             if (!sizeEntry) {
               problems.push(
                 `${item.name} (size ${itemSize}): size not available`,
@@ -146,6 +190,20 @@ export default function CheckoutPage() {
     }));
   };
 
+  const applySavedAddress = (addressId: string) => {
+    const address = savedAddresses.find((item) => item.id === addressId);
+    if (!address) return;
+    setFormData((prev) => ({
+      ...prev,
+      fullName: address.full_name,
+      phone: address.phone,
+      city: address.city,
+      province: address.province,
+      postalCode: address.postal_code,
+      streetAddress: address.address_line,
+    }));
+  };
+
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
 
@@ -167,6 +225,10 @@ export default function CheckoutPage() {
 
     if (!formData.streetAddress.trim()) {
       newErrors.streetAddress = "Street address is required";
+    }
+
+    if (!formData.postalCode.trim()) {
+      newErrors.postalCode = "Postal code is required";
     }
 
     if (!formData.city) {
@@ -211,6 +273,7 @@ export default function CheckoutPage() {
           items: items.map((item) => ({
             productId: item.id,
             quantity: item.quantity,
+            size: item.size,
           })),
         }),
       });
@@ -224,22 +287,20 @@ export default function CheckoutPage() {
           customerEmail: formData.email,
           phone: formData.phone,
           shippingAddress: formData.streetAddress,
+          postalCode: formData.postalCode,
           province: formData.province,
           city: formData.city,
           paymentMethod: formData.paymentMethod,
           orderNotes: formData.orderNotes || null,
+          couponCode: couponCode.trim() || undefined,
           items: items.map((item) => ({
             productId: item.id,
             name: item.name,
             image: item.image,
             quantity: item.quantity,
             price: item.price,
-            size:
-              typeof item.size === "string"
-                ? parseInt(item.size, 10)
-                : item.size,
+            size: String(item.size),
           })),
-          total: totalPrice,
         }),
       });
 
@@ -278,7 +339,7 @@ export default function CheckoutPage() {
       whatsappMessage += `*Customer:* ${formData.fullName}\n`;
       whatsappMessage += `*Phone:* ${formData.phone}\n`;
       whatsappMessage += `*Email:* ${formData.email || "N/A"}\n`;
-      whatsappMessage += `*Address:* ${formData.streetAddress}, ${formData.city}, ${formData.province}\n`;
+      whatsappMessage += `*Address:* ${formData.streetAddress}, ${formData.city}, ${formData.province} ${formData.postalCode}\n`;
       whatsappMessage += `*Payment:* ${formData.paymentMethod.toUpperCase()}\n\n`;
       whatsappMessage += `*Order Items:*\n`;
       items.forEach((item, index) => {
@@ -289,7 +350,7 @@ export default function CheckoutPage() {
         whatsappMessage += `   Subtotal: ${formatPKR(item.price * item.quantity)}\n\n`;
       });
       whatsappMessage += `-------------------\n`;
-      whatsappMessage += `*Total: ${formatPKR(totalPrice)}*\n\n`;
+      whatsappMessage += `*Total: ${formatPKR(order.total)}*\n\n`;
       whatsappMessage += `Please confirm my order. Thank you!`;
 
       // Open WhatsApp
@@ -304,7 +365,9 @@ export default function CheckoutPage() {
       );
 
       toast.success("Order placed successfully!");
-      router.push(`/order-confirmation?orderId=${order.id}`);
+      router.push(
+        `/order-confirmation?orderId=${encodeURIComponent(order.id)}&token=${encodeURIComponent(order.accessToken)}`,
+      );
     } catch (error) {
       toast.error(
         error instanceof Error ? error.message : "Failed to place order",
@@ -313,9 +376,31 @@ export default function CheckoutPage() {
     }
   };
 
-  const handleRemoveItem = (id: string) => {
+  const handleApplyCoupon = async () => {
+    setCouponMessage("");
+    setCouponDiscount(0);
+    if (!couponCode.trim()) {
+      setCouponMessage("Enter a coupon code first.");
+      return;
+    }
+    const response = await fetch("/api/coupons/validate", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ code: couponCode, subtotal: totalPrice }),
+    });
+    const data = await response.json();
+    if (!response.ok) {
+      setCouponMessage(data.error || "Coupon could not be applied.");
+      return;
+    }
+    setCouponCode(data.code);
+    setCouponDiscount(data.discount);
+    setCouponMessage(`Coupon applied: ${formatPKR(data.discount)} off`);
+  };
+
+  const handleRemoveItem = (lineId: string) => {
     const { removeItem } = useCartStore.getState();
-    removeItem(id);
+    removeItem(lineId);
   };
 
   return (
@@ -391,14 +476,20 @@ export default function CheckoutPage() {
                       onChange={(e) =>
                         setFormData({ ...formData, email: e.target.value })
                       }
+                      readOnly={!!loggedInEmail}
                       className={`w-full px-4 py-2.5 border rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-brand-dark focus:border-brand-dark ${
                         errors.email ? "border-red-500" : "border-brand-border"
-                      }`}
+                      } ${loggedInEmail ? "bg-gray-100 cursor-not-allowed" : ""}`}
                       placeholder="your@email.com"
                     />
                     {errors.email && (
                       <p className="text-red-500 text-sm mt-1">
                         {errors.email}
+                      </p>
+                    )}
+                    {loggedInEmail && (
+                      <p className="text-green-600 text-xs mt-1">
+                        Logged in as {loggedInEmail}
                       </p>
                     )}
                   </div>
@@ -411,6 +502,26 @@ export default function CheckoutPage() {
                   Delivery Address
                 </h2>
                 <div className="space-y-4">
+                  {savedAddresses.length > 0 && (
+                    <div>
+                      <label className="block text-sm font-medium text-brand-dark mb-1">
+                        Use saved address
+                      </label>
+                      <select
+                        onChange={(event) => applySavedAddress(event.target.value)}
+                        defaultValue=""
+                        className="form-field"
+                      >
+                        <option value="">Select a saved address</option>
+                        {savedAddresses.map((address) => (
+                          <option key={address.id} value={address.id}>
+                            {address.full_name} - {address.city}
+                            {address.is_default ? " (default)" : ""}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  )}
                   <div>
                     <label className="block text-sm font-medium text-brand-dark mb-1">
                       Street Address <span className="text-red-500">*</span>
@@ -478,6 +589,33 @@ export default function CheckoutPage() {
                         placeholder="Auto-filled"
                       />
                     </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-brand-dark mb-1">
+                      Postal Code <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.postalCode}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          postalCode: e.target.value,
+                        })
+                      }
+                      className={`w-full px-4 py-2.5 border rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-brand-dark focus:border-brand-dark ${
+                        errors.postalCode
+                          ? "border-red-500"
+                          : "border-brand-border"
+                      }`}
+                      placeholder="e.g. 54000"
+                    />
+                    {errors.postalCode && (
+                      <p className="text-red-500 text-sm mt-1">
+                        {errors.postalCode}
+                      </p>
+                    )}
                   </div>
                 </div>
               </div>
@@ -675,7 +813,7 @@ export default function CheckoutPage() {
               {/* Items */}
               <div className="space-y-4 mb-4 max-h-64 overflow-y-auto">
                 {items.map((item) => (
-                  <div key={item.id} className="flex gap-3">
+                  <div key={item.lineId || `${item.id}:${item.size}`} className="flex gap-3">
                     <div className="relative w-16 h-16 bg-white rounded-lg overflow-hidden border border-brand-border">
                       <Image
                         src={item.image}
@@ -699,7 +837,9 @@ export default function CheckoutPage() {
                       </p>
                     </div>
                     <button
-                      onClick={() => handleRemoveItem(item.id)}
+                      onClick={() =>
+                        handleRemoveItem(item.lineId || `${item.id}:${item.size}`)
+                      }
                       className="text-brand-gray hover:text-red-500 transition-colors"
                     >
                       <Trash2 className="w-4 h-4" />
@@ -709,6 +849,36 @@ export default function CheckoutPage() {
               </div>
 
               <hr className="border-brand-border my-4" />
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-brand-dark">
+                  Coupon code
+                </label>
+                <div className="flex gap-2">
+                  <input
+                    value={couponCode}
+                    onChange={(event) => setCouponCode(event.target.value)}
+                    className="form-field py-2"
+                    placeholder="e.g. WELCOME10"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleApplyCoupon}
+                    className="secondary-cta px-4 py-2"
+                  >
+                    Apply
+                  </button>
+                </div>
+                {couponMessage && (
+                  <p
+                    className={`text-xs ${
+                      couponDiscount > 0 ? "text-brand-green" : "text-brand-red"
+                    }`}
+                  >
+                    {couponMessage}
+                  </p>
+                )}
+              </div>
 
               {/* Totals */}
               <div className="space-y-2">
@@ -721,14 +891,20 @@ export default function CheckoutPage() {
                 <div className="flex justify-between text-sm">
                   <span className="text-brand-gray">Shipping</span>
                   <span className="text-brand-gray">
-                    Calculated after order
+                    Confirmed before dispatch
                   </span>
                 </div>
+                {couponDiscount > 0 && (
+                  <div className="flex justify-between text-sm text-brand-green">
+                    <span>Coupon discount</span>
+                    <span>-{formatPKR(couponDiscount)}</span>
+                  </div>
+                )}
                 <hr className="border-brand-border my-2" />
                 <div className="flex justify-between text-lg font-bold">
                   <span className="text-brand-dark">Total</span>
                   <span className="text-brand-dark">
-                    {formatPKR(totalPrice)}
+                    {formatPKR(Math.max(0, totalPrice - couponDiscount))}
                   </span>
                 </div>
               </div>

@@ -1,9 +1,3 @@
-/**
- * Server-side Supabase client.
- * Uses the service role key for server components — bypasses RLS.
- * MUST only be used in server components, never in 'use client' files.
- */
-
 import { createClient as createSupabaseClient } from '@supabase/supabase-js';
 
 export function createClient() {

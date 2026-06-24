@@ -33,7 +33,7 @@ function CartSummary() {
       <ReturnPolicySnippet variant="mini" className="mb-3" />
       <button
         onClick={handleCheckout}
-        className="w-full bg-brand-red text-white text-xs font-bold uppercase tracking-widest py-3 hover:bg-red-600 transition-colors"
+        className="primary-cta w-full"
       >
         PROCEED TO CHECKOUT
       </button>

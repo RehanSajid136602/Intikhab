@@ -21,7 +21,8 @@ export const metadata: Metadata = {
   },
   description: DEFAULT_DESCRIPTION,
   icons: {
-    icon: '/favicon.ico',
+    icon: '/favicon.png',
+    apple: '/favicon.png',
   },
   keywords: DEFAULT_KEYWORDS,
   authors: [{ name: SITE_NAME }],

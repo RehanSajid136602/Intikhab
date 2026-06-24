@@ -10,6 +10,7 @@ import {
   ShoppingCart,
   Menu,
   ChevronDown,
+  LogOut,
 } from 'lucide-react';
 import { useCartStore } from '@/stores/cartStore';
 import { useWishlistStore } from '@/stores/wishlistStore';
@@ -19,21 +20,22 @@ import { BRAND } from '@/lib/constants';
 import { SearchBar } from './SearchBar';
 import { cn } from '@/lib/utils';
 
-/**
- * Sticky main navigation with mega dropdowns, search, account, wishlist, cart icons,
- * and mobile hamburger toggle.
- */
-function Navbar() {
+interface NavbarProps {
+  isAuthenticated?: boolean;
+  userEmail?: string;
+}
+
+function Navbar({ isAuthenticated = false, userEmail }: NavbarProps) {
   const { totalItems } = useCartStore();
   const { items: wishlistItems } = useWishlistStore();
   const { toggleMobileMenu, toggleSearch, searchOpen } = useUIStore();
   const router = useRouter();
+  const [dropdownOpen, setDropdownOpen] = useState(false);
 
   return (
-    <nav className="sticky top-0 z-50 bg-white shadow-sm transition-shadow duration-300">
-      <div className="container mx-auto px-4">
-        <div className="h-16 md:h-14 flex items-center gap-4">
-          {/* Mobile Menu Toggle */}
+    <nav className="sticky top-0 z-50 border-b border-brand-border bg-brand-surface/95 backdrop-blur transition-shadow duration-300">
+      <div className="store-container">
+        <div className="flex h-16 items-center gap-4 md:h-18">
           <button
             onClick={toggleMobileMenu}
             className="md:hidden p-2 -ml-2 flex-shrink-0"
@@ -42,17 +44,15 @@ function Navbar() {
             <Menu className="w-6 h-6" />
           </button>
 
-          {/* Logo */}
           <Link
             href="/"
-            className="text-xl font-bold tracking-tight text-brand-dark flex-shrink-0"
+            className="flex-shrink-0 text-2xl font-bold tracking-tight text-brand-dark"
             aria-label="Go to homepage"
           >
             {BRAND.name}
           </Link>
 
-          {/* Desktop Nav Links */}
-          <div className="hidden md:flex flex-1 items-center justify-center gap-4 text-xs font-semibold uppercase tracking-wider">
+          <div className="hidden flex-1 items-center justify-center gap-5 text-[11px] font-semibold uppercase tracking-[0.16em] md:flex">
             {mainNavItems.map((item) => (
               <div key={item.label} className="nav-item relative">
                 {item.dropdown ? (
@@ -90,14 +90,13 @@ function Navbar() {
                   </Link>
                 )}
 
-                {/* Mega Dropdown */}
                 {item.dropdown && (
-                  <div className="dropdown-menu absolute top-full left-0 bg-white shadow-lg border-t border-brand-border p-4 min-w-[180px] z-50">
+                  <div className="dropdown-menu absolute left-0 top-full z-50 min-w-[210px] rounded-card border border-brand-border bg-white p-3 shadow-subtle">
                     {item.dropdown.map((subItem) => (
                       <Link
                         key={subItem.label}
                         href={subItem.href}
-                        className="block py-2 text-brand-gray hover:text-brand-red transition-colors"
+                        className="block rounded-control px-3 py-2 text-brand-gray hover:bg-brand-light-gray hover:text-brand-red transition-colors"
                       >
                         {subItem.label}
                       </Link>
@@ -108,24 +107,82 @@ function Navbar() {
             ))}
           </div>
 
-          {/* Right Icons */}
-          <div className="flex items-center gap-3">
+          <div className="ml-auto flex items-center gap-1 sm:gap-2">
             <button
               onClick={toggleSearch}
-              className="p-2 hover:text-brand-red transition-colors duration-200"
+              className="rounded-control p-2 hover:bg-brand-light-gray hover:text-brand-red transition-colors duration-200"
               aria-label="Search"
             >
               <Search className="w-5 h-5" />
             </button>
-            <button className="p-2 hover:text-brand-red transition-colors duration-200 relative group">
-              <User className="w-5 h-5" />
-              <span className="absolute -bottom-6 left-1/2 -translate-x-1/2 text-[10px] bg-brand-dark text-white px-2 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap">
-                My Account
-              </span>
-            </button>
+
+            {isAuthenticated ? (
+              <div className="relative">
+                <button
+                  onClick={() => setDropdownOpen(!dropdownOpen)}
+                  className="p-2 hover:bg-brand-light-gray rounded-control hover:text-brand-red transition-colors duration-200 relative group"
+                  aria-label="Account"
+                >
+                  <User className="w-5 h-5" />
+                  <span className="absolute -bottom-6 left-1/2 -translate-x-1/2 text-[10px] bg-brand-dark text-white px-2 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap">
+                    Account
+                  </span>
+                </button>
+
+                {dropdownOpen && (
+                  <>
+                    <div
+                      className="fixed inset-0 z-40"
+                      onClick={() => setDropdownOpen(false)}
+                    />
+                    <div className="absolute right-0 top-full mt-2 w-48 bg-white border border-brand-border rounded-lg shadow-lg z-50 py-1">
+                      {userEmail && (
+                        <div className="px-4 py-2 border-b border-brand-border">
+                          <p className="text-xs text-brand-gray truncate">
+                            {userEmail}
+                          </p>
+                        </div>
+                      )}
+                      <Link
+                        href="/account"
+                        onClick={() => setDropdownOpen(false)}
+                        className="block px-4 py-2 text-sm text-brand-dark hover:bg-brand-light-gray transition-colors"
+                      >
+                        My Account
+                      </Link>
+                      <div className="border-t border-brand-border mt-1 pt-1">
+                        <a
+                          href="/auth/logout"
+                          className="flex items-center gap-2 px-4 py-2 text-sm text-red-500 hover:bg-red-50 transition-colors"
+                        >
+                          <LogOut className="w-3.5 h-3.5" />
+                          Sign Out
+                        </a>
+                      </div>
+                    </div>
+                  </>
+                )}
+              </div>
+            ) : (
+              <div className="flex items-center gap-2">
+                <a
+                  href="/auth/login"
+                  className="hidden text-xs font-semibold uppercase tracking-wider text-brand-dark hover:text-brand-red transition-colors px-3 py-1.5 sm:inline-flex"
+                >
+                  Login
+                </a>
+                <a
+                  href="/auth/login?screen_hint=signup"
+                  className="hidden rounded-control bg-brand-dark px-4 py-2 text-xs font-semibold uppercase tracking-wider text-white transition-colors hover:bg-black sm:inline-flex"
+                >
+                  Sign Up
+                </a>
+              </div>
+            )}
+
             <Link
               href="/wishlist"
-              className="p-2 hover:text-brand-red transition-colors duration-200 relative"
+              className="relative rounded-control p-2 hover:bg-brand-light-gray hover:text-brand-red transition-colors duration-200"
               aria-label="Wishlist"
             >
               <Heart className="w-5 h-5" />
@@ -137,7 +194,7 @@ function Navbar() {
             </Link>
             <button
               onClick={() => useCartStore.getState().toggleCart()}
-              className="p-2 hover:text-brand-red transition-colors duration-200 relative"
+              className="relative rounded-control p-2 hover:bg-brand-light-gray hover:text-brand-red transition-colors duration-200"
               aria-label="Cart"
             >
               <ShoppingCart className="w-5 h-5" />
@@ -150,7 +207,6 @@ function Navbar() {
           </div>
         </div>
 
-        {/* Search Bar */}
         <SearchBar />
       </div>
     </nav>

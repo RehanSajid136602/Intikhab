@@ -28,3 +28,15 @@ export function isNewProduct(createdAt: string | Date): boolean {
   const diffDays = (now.getTime() - created.getTime()) / (1000 * 60 * 60 * 24);
   return diffDays <= 14;
 }
+
+/**
+ * Safely extracts the first valid image URL from the product's images property.
+ * If images is null, undefined, not an array, or does not contain any valid strings, returns null.
+ */
+export function getFirstProductImage(images?: string[] | null | any): string | null {
+  if (!images || !Array.isArray(images) || images.length === 0) {
+    return null;
+  }
+  const firstValid = images.find((img) => typeof img === 'string' && img.trim() !== '');
+  return firstValid || null;
+}

@@ -1,0 +1,1329 @@
+
+=== TABLES ===
+[
+  {
+    "table_name": "_prisma_migrations"
+  },
+  {
+    "table_name": "addresses"
+  },
+  {
+    "table_name": "appearance_settings"
+  },
+  {
+    "table_name": "carts"
+  },
+  {
+    "table_name": "categories"
+  },
+  {
+    "table_name": "coupons"
+  },
+  {
+    "table_name": "customers"
+  },
+  {
+    "table_name": "feedback"
+  },
+  {
+    "table_name": "messages"
+  },
+  {
+    "table_name": "order_items"
+  },
+  {
+    "table_name": "orders"
+  },
+  {
+    "table_name": "products"
+  },
+  {
+    "table_name": "profiles"
+  },
+  {
+    "table_name": "reviews"
+  },
+  {
+    "table_name": "store_settings"
+  },
+  {
+    "table_name": "wishlist_items"
+  }
+]
+
+=== PRISMA MIGRATIONS ===
+[
+  {
+    "id": "cf5f5a65-2dae-4643-a0b6-73630023b85b",
+    "migration_name": "20260410110949_init",
+    "started_at": "2026-04-10T11:09:50.462Z",
+    "finished_at": "2026-04-10T11:09:54.935Z",
+    "applied_steps_count": 1,
+    "is_failed": false,
+    "has_logs": false,
+    "logs": null
+  },
+  {
+    "id": "cbcaf383-2515-4e7c-b208-a80cd51cadfd",
+    "migration_name": "20260411083455_add_stock_deduction_function",
+    "started_at": "2026-04-11T03:35:49.528Z",
+    "finished_at": "2026-04-11T03:35:50.718Z",
+    "applied_steps_count": 1,
+    "is_failed": false,
+    "has_logs": false,
+    "logs": null
+  },
+  {
+    "id": "cd40778d-3273-4507-be08-a50dd7bb96d8",
+    "migration_name": "20260411092930_add_per_size_stock",
+    "started_at": "2026-04-11T04:30:21.563Z",
+    "finished_at": "2026-04-11T04:30:22.481Z",
+    "applied_steps_count": 1,
+    "is_failed": false,
+    "has_logs": false,
+    "logs": null
+  },
+  {
+    "id": "b0e79f5e-7789-486d-931e-dc9f4775ef6f",
+    "migration_name": "20260411093323_update_stock_function_for_per_size",
+    "started_at": "2026-04-11T04:34:29.856Z",
+    "finished_at": "2026-04-11T04:34:30.835Z",
+    "applied_steps_count": 1,
+    "is_failed": false,
+    "has_logs": false,
+    "logs": null
+  },
+  {
+    "id": "8560a169-e84c-4ced-8c29-21e84e00657c",
+    "migration_name": "20260411093620_add_size_to_cart",
+    "started_at": "2026-04-11T04:36:48.799Z",
+    "finished_at": "2026-04-11T04:36:49.699Z",
+    "applied_steps_count": 1,
+    "is_failed": false,
+    "has_logs": false,
+    "logs": null
+  },
+  {
+    "id": "677a3b06-0ae0-491b-9597-5782f693021e",
+    "migration_name": "20260411121859_enhanced_product_categories",
+    "started_at": "2026-04-11T07:21:11.024Z",
+    "finished_at": null,
+    "applied_steps_count": 0,
+    "is_failed": false,
+    "has_logs": true,
+    "logs": "A migration failed to apply. New migrations cannot be applied before the error is recovered from. Read more about how to resolve migration issues in a production database: https://pris.ly/d/migrate-resolve\n\nMigration name: 20260411121859_enhanced_product_categories\n\nDatabase error code: 42804\n\nDatabase error:\nERROR: column \"size\" is of type integer but expression is of type text\nHINT: You will need to rewrite or cast the expression.\n\nPosition:\n\u001b[1m 20\u001b[0m -- Then alter column type\n\u001b[1m 21\u001b[0m ALTER TABLE order_items ALTER COLUMN size TYPE TEXT USING size::TEXT;\n\u001b[1m 22\u001b[0m\n\u001b[1m 23\u001b[0m -- Step 4: Convert carts.size from INT to TEXT\n\u001b[1m 24\u001b[0m -- First, handle NULL values by setting default (size is nullable so this is just for existing non-null INT values)\n\u001b[1m 25\u001b[1;31m UPDATE carts SET size = size::TEXT WHERE size IS NOT NULL;\u001b[0m\n\nDbError { severity: \"ERROR\", parsed_severity: Some(Error), code: SqlState(E42804), message: \"column \\\"size\\\" is of type integer but expression is of type text\", detail: None, hint: Some(\"You will need to rewrite or cast the expression.\"), position: Some(Original(190)), where_: None, schema: None, table: None, column: None, datatype: None, constraint: None, file: Some(\"parse_target.c\"), line: Some(585), routine: Some(\"transformAssignedExpr\") }\n\n   0: sql_schema_connector::apply_migration::apply_script\n           with migration_name=\"20260411121859_enhanced_product_categories\"\n             at schema-engine/connectors/sql-schema-connector/src/apply_migration.rs:113\n   1: schema_commands::commands::apply_migrations::Applying migration\n           with migration_name=\"20260411121859_enhanced_product_categories\"\n             at schema-engine/commands/src/commands/apply_migrations.rs:95\n   2: schema_core::state::ApplyMigrations\n             at schema-engine/core/src/state.rs:255"
+  },
+  {
+    "id": "7b58ebfa-d0c7-414c-86e5-48abfc072654",
+    "migration_name": "20260411121859_enhanced_product_categories",
+    "started_at": "2026-06-24T05:11:05.706Z",
+    "finished_at": "2026-06-24T05:11:05.706Z",
+    "applied_steps_count": 0,
+    "is_failed": false,
+    "has_logs": false,
+    "logs": ""
+  },
+  {
+    "id": "827f1f11-a587-498f-90be-10c869418a25",
+    "migration_name": "20260423120000_add_customer_fields",
+    "started_at": "2026-06-24T05:11:14.966Z",
+    "finished_at": "2026-06-24T05:11:16.687Z",
+    "applied_steps_count": 1,
+    "is_failed": false,
+    "has_logs": false,
+    "logs": null
+  },
+  {
+    "id": "172cf0d0-e7e7-4757-8091-dd82c78b12e3",
+    "migration_name": "20260624120000_cart_variant_unique",
+    "started_at": "2026-06-24T05:11:17.083Z",
+    "finished_at": "2026-06-24T05:11:18.487Z",
+    "applied_steps_count": 1,
+    "is_failed": false,
+    "has_logs": false,
+    "logs": null
+  },
+  {
+    "id": "ec572e43-1700-4970-9742-7507510a4b70",
+    "migration_name": "20260624130000_launch_commerce_systems",
+    "started_at": "2026-06-24T05:11:18.917Z",
+    "finished_at": "2026-06-24T05:11:23.831Z",
+    "applied_steps_count": 1,
+    "is_failed": false,
+    "has_logs": false,
+    "logs": null
+  }
+]
+
+=== TABLE: products ===
+--- COLUMNS ---
+[
+  {
+    "column_name": "id",
+    "data_type": "uuid",
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "column_name": "slug",
+    "data_type": "text",
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "column_name": "name",
+    "data_type": "text",
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "column_name": "brand",
+    "data_type": "text",
+    "is_nullable": "NO",
+    "column_default": "'Intikhab'::text"
+  },
+  {
+    "column_name": "category",
+    "data_type": "text",
+    "is_nullable": "NO",
+    "column_default": "'men'::text"
+  },
+  {
+    "column_name": "price",
+    "data_type": "integer",
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "column_name": "originalPrice",
+    "data_type": "integer",
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "column_name": "images",
+    "data_type": "ARRAY",
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "column_name": "badge",
+    "data_type": "text",
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "column_name": "inStock",
+    "data_type": "boolean",
+    "is_nullable": "NO",
+    "column_default": "true"
+  },
+  {
+    "column_name": "stock",
+    "data_type": "integer",
+    "is_nullable": "NO",
+    "column_default": "0"
+  },
+  {
+    "column_name": "installment",
+    "data_type": "integer",
+    "is_nullable": "NO",
+    "column_default": "0"
+  },
+  {
+    "column_name": "description",
+    "data_type": "text",
+    "is_nullable": "NO",
+    "column_default": "''::text"
+  },
+  {
+    "column_name": "sku",
+    "data_type": "text",
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "column_name": "status",
+    "data_type": "text",
+    "is_nullable": "NO",
+    "column_default": "'active'::text"
+  },
+  {
+    "column_name": "createdAt",
+    "data_type": "timestamp without time zone",
+    "is_nullable": "NO",
+    "column_default": "CURRENT_TIMESTAMP"
+  },
+  {
+    "column_name": "updatedAt",
+    "data_type": "timestamp without time zone",
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "column_name": "sizeStock",
+    "data_type": "jsonb",
+    "is_nullable": "NO",
+    "column_default": "'[]'::jsonb"
+  },
+  {
+    "column_name": "productType",
+    "data_type": "text",
+    "is_nullable": "NO",
+    "column_default": "'shoes'::text"
+  },
+  {
+    "column_name": "subcategory",
+    "data_type": "text",
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "column_name": "sizeSystem",
+    "data_type": "text",
+    "is_nullable": "NO",
+    "column_default": "'eu'::text"
+  }
+]
+--- INDEXES ---
+[
+  {
+    "indexname": "products_pkey",
+    "indexdef": "CREATE UNIQUE INDEX products_pkey ON public.products USING btree (id)"
+  },
+  {
+    "indexname": "products_slug_key",
+    "indexdef": "CREATE UNIQUE INDEX products_slug_key ON public.products USING btree (slug)"
+  },
+  {
+    "indexname": "products_sku_key",
+    "indexdef": "CREATE UNIQUE INDEX products_sku_key ON public.products USING btree (sku)"
+  },
+  {
+    "indexname": "products_slug_idx",
+    "indexdef": "CREATE INDEX products_slug_idx ON public.products USING btree (slug)"
+  },
+  {
+    "indexname": "products_category_idx",
+    "indexdef": "CREATE INDEX products_category_idx ON public.products USING btree (category)"
+  },
+  {
+    "indexname": "products_status_idx",
+    "indexdef": "CREATE INDEX products_status_idx ON public.products USING btree (status)"
+  },
+  {
+    "indexname": "products_productType_idx",
+    "indexdef": "CREATE INDEX \"products_productType_idx\" ON public.products USING btree (\"productType\")"
+  },
+  {
+    "indexname": "products_subcategory_idx",
+    "indexdef": "CREATE INDEX products_subcategory_idx ON public.products USING btree (subcategory)"
+  },
+  {
+    "indexname": "products_productType_category_idx",
+    "indexdef": "CREATE INDEX \"products_productType_category_idx\" ON public.products USING btree (\"productType\", category)"
+  }
+]
+--- CONSTRAINTS ---
+[
+  {
+    "constraint_name": "products_pkey",
+    "constraint_definition": "PRIMARY KEY (id)"
+  }
+]
+
+=== TABLE: customers ===
+--- COLUMNS ---
+[
+  {
+    "column_name": "id",
+    "data_type": "uuid",
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "column_name": "email",
+    "data_type": "text",
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "column_name": "phone",
+    "data_type": "text",
+    "is_nullable": "NO",
+    "column_default": "''::text"
+  },
+  {
+    "column_name": "fullName",
+    "data_type": "text",
+    "is_nullable": "NO",
+    "column_default": "''::text"
+  },
+  {
+    "column_name": "createdAt",
+    "data_type": "timestamp without time zone",
+    "is_nullable": "NO",
+    "column_default": "CURRENT_TIMESTAMP"
+  },
+  {
+    "column_name": "lastOrderAt",
+    "data_type": "timestamp without time zone",
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "column_name": "city",
+    "data_type": "text",
+    "is_nullable": "NO",
+    "column_default": "''::text"
+  },
+  {
+    "column_name": "newsletter",
+    "data_type": "boolean",
+    "is_nullable": "NO",
+    "column_default": "false"
+  },
+  {
+    "column_name": "notes",
+    "data_type": "text",
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "column_name": "status",
+    "data_type": "text",
+    "is_nullable": "NO",
+    "column_default": "'active'::text"
+  }
+]
+--- INDEXES ---
+[
+  {
+    "indexname": "customers_pkey",
+    "indexdef": "CREATE UNIQUE INDEX customers_pkey ON public.customers USING btree (id)"
+  },
+  {
+    "indexname": "customers_email_key",
+    "indexdef": "CREATE UNIQUE INDEX customers_email_key ON public.customers USING btree (email)"
+  },
+  {
+    "indexname": "customers_email_idx",
+    "indexdef": "CREATE INDEX customers_email_idx ON public.customers USING btree (email)"
+  }
+]
+--- CONSTRAINTS ---
+[
+  {
+    "constraint_name": "customers_pkey",
+    "constraint_definition": "PRIMARY KEY (id)"
+  }
+]
+
+=== TABLE: orders ===
+--- COLUMNS ---
+[
+  {
+    "column_name": "id",
+    "data_type": "text",
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "column_name": "customerEmail",
+    "data_type": "text",
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "column_name": "customerName",
+    "data_type": "text",
+    "is_nullable": "NO",
+    "column_default": "''::text"
+  },
+  {
+    "column_name": "shippingAddress",
+    "data_type": "text",
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "column_name": "province",
+    "data_type": "text",
+    "is_nullable": "NO",
+    "column_default": "''::text"
+  },
+  {
+    "column_name": "city",
+    "data_type": "text",
+    "is_nullable": "NO",
+    "column_default": "''::text"
+  },
+  {
+    "column_name": "phone",
+    "data_type": "text",
+    "is_nullable": "NO",
+    "column_default": "''::text"
+  },
+  {
+    "column_name": "paymentMethod",
+    "data_type": "text",
+    "is_nullable": "NO",
+    "column_default": "'cod'::text"
+  },
+  {
+    "column_name": "orderNotes",
+    "data_type": "text",
+    "is_nullable": "YES",
+    "column_default": "''::text"
+  },
+  {
+    "column_name": "total",
+    "data_type": "integer",
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "column_name": "status",
+    "data_type": "text",
+    "is_nullable": "NO",
+    "column_default": "'Pending'::text"
+  },
+  {
+    "column_name": "createdAt",
+    "data_type": "timestamp without time zone",
+    "is_nullable": "NO",
+    "column_default": "CURRENT_TIMESTAMP"
+  },
+  {
+    "column_name": "subtotal",
+    "data_type": "integer",
+    "is_nullable": "NO",
+    "column_default": "0"
+  },
+  {
+    "column_name": "shippingFee",
+    "data_type": "integer",
+    "is_nullable": "NO",
+    "column_default": "0"
+  },
+  {
+    "column_name": "couponCode",
+    "data_type": "text",
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "column_name": "couponDiscount",
+    "data_type": "integer",
+    "is_nullable": "NO",
+    "column_default": "0"
+  },
+  {
+    "column_name": "access_token_hash",
+    "data_type": "text",
+    "is_nullable": "YES",
+    "column_default": null
+  }
+]
+--- INDEXES ---
+[
+  {
+    "indexname": "orders_pkey",
+    "indexdef": "CREATE UNIQUE INDEX orders_pkey ON public.orders USING btree (id)"
+  },
+  {
+    "indexname": "orders_customerEmail_idx",
+    "indexdef": "CREATE INDEX \"orders_customerEmail_idx\" ON public.orders USING btree (\"customerEmail\")"
+  },
+  {
+    "indexname": "orders_status_idx",
+    "indexdef": "CREATE INDEX orders_status_idx ON public.orders USING btree (status)"
+  },
+  {
+    "indexname": "orders_createdAt_idx",
+    "indexdef": "CREATE INDEX \"orders_createdAt_idx\" ON public.orders USING btree (\"createdAt\" DESC)"
+  },
+  {
+    "indexname": "orders_access_token_hash_idx",
+    "indexdef": "CREATE INDEX orders_access_token_hash_idx ON public.orders USING btree (access_token_hash)"
+  }
+]
+--- CONSTRAINTS ---
+[
+  {
+    "constraint_name": "orders_customerEmail_fkey",
+    "constraint_definition": "FOREIGN KEY (\"customerEmail\") REFERENCES customers(email) ON UPDATE CASCADE ON DELETE RESTRICT"
+  },
+  {
+    "constraint_name": "orders_pkey",
+    "constraint_definition": "PRIMARY KEY (id)"
+  }
+]
+
+=== TABLE: order_items ===
+--- COLUMNS ---
+[
+  {
+    "column_name": "id",
+    "data_type": "uuid",
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "column_name": "orderId",
+    "data_type": "text",
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "column_name": "productId",
+    "data_type": "text",
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "column_name": "name",
+    "data_type": "text",
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "column_name": "image",
+    "data_type": "text",
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "column_name": "quantity",
+    "data_type": "integer",
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "column_name": "price",
+    "data_type": "integer",
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "column_name": "size",
+    "data_type": "text",
+    "is_nullable": "NO",
+    "column_default": null
+  }
+]
+--- INDEXES ---
+[
+  {
+    "indexname": "order_items_pkey",
+    "indexdef": "CREATE UNIQUE INDEX order_items_pkey ON public.order_items USING btree (id)"
+  },
+  {
+    "indexname": "order_items_orderId_idx",
+    "indexdef": "CREATE INDEX \"order_items_orderId_idx\" ON public.order_items USING btree (\"orderId\")"
+  }
+]
+--- CONSTRAINTS ---
+[
+  {
+    "constraint_name": "order_items_orderId_fkey",
+    "constraint_definition": "FOREIGN KEY (\"orderId\") REFERENCES orders(id) ON UPDATE CASCADE ON DELETE CASCADE"
+  },
+  {
+    "constraint_name": "order_items_pkey",
+    "constraint_definition": "PRIMARY KEY (id)"
+  }
+]
+
+=== TABLE: carts ===
+--- COLUMNS ---
+[
+  {
+    "column_name": "id",
+    "data_type": "uuid",
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "column_name": "customerEmail",
+    "data_type": "text",
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "column_name": "productId",
+    "data_type": "text",
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "column_name": "quantity",
+    "data_type": "integer",
+    "is_nullable": "NO",
+    "column_default": "1"
+  },
+  {
+    "column_name": "createdAt",
+    "data_type": "timestamp without time zone",
+    "is_nullable": "NO",
+    "column_default": "CURRENT_TIMESTAMP"
+  },
+  {
+    "column_name": "updatedAt",
+    "data_type": "timestamp without time zone",
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "column_name": "size",
+    "data_type": "text",
+    "is_nullable": "YES",
+    "column_default": null
+  }
+]
+--- INDEXES ---
+[
+  {
+    "indexname": "carts_pkey",
+    "indexdef": "CREATE UNIQUE INDEX carts_pkey ON public.carts USING btree (id)"
+  },
+  {
+    "indexname": "carts_customerEmail_idx",
+    "indexdef": "CREATE INDEX \"carts_customerEmail_idx\" ON public.carts USING btree (\"customerEmail\")"
+  },
+  {
+    "indexname": "carts_customerEmail_productId_size_key",
+    "indexdef": "CREATE UNIQUE INDEX \"carts_customerEmail_productId_size_key\" ON public.carts USING btree (\"customerEmail\", \"productId\", size)"
+  }
+]
+--- CONSTRAINTS ---
+[
+  {
+    "constraint_name": "carts_customerEmail_fkey",
+    "constraint_definition": "FOREIGN KEY (\"customerEmail\") REFERENCES customers(email) ON UPDATE CASCADE ON DELETE CASCADE"
+  },
+  {
+    "constraint_name": "carts_pkey",
+    "constraint_definition": "PRIMARY KEY (id)"
+  }
+]
+
+=== TABLE: coupons ===
+--- COLUMNS ---
+[
+  {
+    "column_name": "id",
+    "data_type": "uuid",
+    "is_nullable": "NO",
+    "column_default": "gen_random_uuid()"
+  },
+  {
+    "column_name": "code",
+    "data_type": "text",
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "column_name": "discount_type",
+    "data_type": "text",
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "column_name": "discount_value",
+    "data_type": "integer",
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "column_name": "active",
+    "data_type": "boolean",
+    "is_nullable": "NO",
+    "column_default": "true"
+  },
+  {
+    "column_name": "minimum_order_amount",
+    "data_type": "integer",
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "column_name": "usage_limit",
+    "data_type": "integer",
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "column_name": "used_count",
+    "data_type": "integer",
+    "is_nullable": "NO",
+    "column_default": "0"
+  },
+  {
+    "column_name": "expires_at",
+    "data_type": "timestamp with time zone",
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "column_name": "created_at",
+    "data_type": "timestamp with time zone",
+    "is_nullable": "NO",
+    "column_default": "now()"
+  },
+  {
+    "column_name": "updated_at",
+    "data_type": "timestamp with time zone",
+    "is_nullable": "NO",
+    "column_default": "now()"
+  }
+]
+--- INDEXES ---
+[
+  {
+    "indexname": "coupons_pkey",
+    "indexdef": "CREATE UNIQUE INDEX coupons_pkey ON public.coupons USING btree (id)"
+  },
+  {
+    "indexname": "coupons_code_key",
+    "indexdef": "CREATE UNIQUE INDEX coupons_code_key ON public.coupons USING btree (code)"
+  },
+  {
+    "indexname": "coupons_code_idx",
+    "indexdef": "CREATE INDEX coupons_code_idx ON public.coupons USING btree (code)"
+  },
+  {
+    "indexname": "coupons_active_idx",
+    "indexdef": "CREATE INDEX coupons_active_idx ON public.coupons USING btree (active)"
+  }
+]
+--- CONSTRAINTS ---
+[
+  {
+    "constraint_name": "coupons_code_key",
+    "constraint_definition": "UNIQUE (code)"
+  },
+  {
+    "constraint_name": "coupons_discount_type_check",
+    "constraint_definition": "CHECK ((discount_type = ANY (ARRAY['percentage'::text, 'fixed'::text])))"
+  },
+  {
+    "constraint_name": "coupons_discount_value_check",
+    "constraint_definition": "CHECK ((discount_value > 0))"
+  },
+  {
+    "constraint_name": "coupons_pkey",
+    "constraint_definition": "PRIMARY KEY (id)"
+  }
+]
+
+=== TABLE: addresses ===
+--- COLUMNS ---
+[
+  {
+    "column_name": "id",
+    "data_type": "uuid",
+    "is_nullable": "NO",
+    "column_default": "gen_random_uuid()"
+  },
+  {
+    "column_name": "customer_email",
+    "data_type": "text",
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "column_name": "full_name",
+    "data_type": "text",
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "column_name": "phone",
+    "data_type": "text",
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "column_name": "city",
+    "data_type": "text",
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "column_name": "province",
+    "data_type": "text",
+    "is_nullable": "NO",
+    "column_default": "''::text"
+  },
+  {
+    "column_name": "postal_code",
+    "data_type": "text",
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "column_name": "address_line",
+    "data_type": "text",
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "column_name": "is_default",
+    "data_type": "boolean",
+    "is_nullable": "NO",
+    "column_default": "false"
+  },
+  {
+    "column_name": "created_at",
+    "data_type": "timestamp with time zone",
+    "is_nullable": "NO",
+    "column_default": "now()"
+  },
+  {
+    "column_name": "updated_at",
+    "data_type": "timestamp with time zone",
+    "is_nullable": "NO",
+    "column_default": "now()"
+  }
+]
+--- INDEXES ---
+[
+  {
+    "indexname": "addresses_pkey",
+    "indexdef": "CREATE UNIQUE INDEX addresses_pkey ON public.addresses USING btree (id)"
+  },
+  {
+    "indexname": "addresses_customer_email_idx",
+    "indexdef": "CREATE INDEX addresses_customer_email_idx ON public.addresses USING btree (customer_email)"
+  },
+  {
+    "indexname": "addresses_one_default_per_customer_idx",
+    "indexdef": "CREATE UNIQUE INDEX addresses_one_default_per_customer_idx ON public.addresses USING btree (customer_email) WHERE (is_default = true)"
+  }
+]
+--- CONSTRAINTS ---
+[
+  {
+    "constraint_name": "addresses_customer_email_fkey",
+    "constraint_definition": "FOREIGN KEY (customer_email) REFERENCES customers(email) ON DELETE CASCADE"
+  },
+  {
+    "constraint_name": "addresses_pkey",
+    "constraint_definition": "PRIMARY KEY (id)"
+  }
+]
+
+=== TABLE: reviews ===
+--- COLUMNS ---
+[
+  {
+    "column_name": "id",
+    "data_type": "uuid",
+    "is_nullable": "NO",
+    "column_default": "gen_random_uuid()"
+  },
+  {
+    "column_name": "product_id",
+    "data_type": "uuid",
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "column_name": "customer_email",
+    "data_type": "text",
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "column_name": "guest_name",
+    "data_type": "text",
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "column_name": "guest_email",
+    "data_type": "text",
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "column_name": "rating",
+    "data_type": "integer",
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "column_name": "title",
+    "data_type": "text",
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "column_name": "body",
+    "data_type": "text",
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "column_name": "status",
+    "data_type": "text",
+    "is_nullable": "NO",
+    "column_default": "'pending'::text"
+  },
+  {
+    "column_name": "created_at",
+    "data_type": "timestamp with time zone",
+    "is_nullable": "NO",
+    "column_default": "now()"
+  },
+  {
+    "column_name": "updated_at",
+    "data_type": "timestamp with time zone",
+    "is_nullable": "NO",
+    "column_default": "now()"
+  }
+]
+--- INDEXES ---
+[
+  {
+    "indexname": "reviews_pkey",
+    "indexdef": "CREATE UNIQUE INDEX reviews_pkey ON public.reviews USING btree (id)"
+  },
+  {
+    "indexname": "reviews_product_id_idx",
+    "indexdef": "CREATE INDEX reviews_product_id_idx ON public.reviews USING btree (product_id)"
+  },
+  {
+    "indexname": "reviews_customer_email_idx",
+    "indexdef": "CREATE INDEX reviews_customer_email_idx ON public.reviews USING btree (customer_email)"
+  },
+  {
+    "indexname": "reviews_status_idx",
+    "indexdef": "CREATE INDEX reviews_status_idx ON public.reviews USING btree (status)"
+  }
+]
+--- CONSTRAINTS ---
+[
+  {
+    "constraint_name": "reviews_customer_email_fkey",
+    "constraint_definition": "FOREIGN KEY (customer_email) REFERENCES customers(email) ON DELETE SET NULL"
+  },
+  {
+    "constraint_name": "reviews_pkey",
+    "constraint_definition": "PRIMARY KEY (id)"
+  },
+  {
+    "constraint_name": "reviews_product_id_fkey",
+    "constraint_definition": "FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE"
+  },
+  {
+    "constraint_name": "reviews_rating_check",
+    "constraint_definition": "CHECK (((rating >= 1) AND (rating <= 5)))"
+  },
+  {
+    "constraint_name": "reviews_status_check",
+    "constraint_definition": "CHECK ((status = ANY (ARRAY['pending'::text, 'approved'::text, 'rejected'::text])))"
+  }
+]
+
+=== TABLE: categories ===
+--- COLUMNS ---
+[
+  {
+    "column_name": "id",
+    "data_type": "uuid",
+    "is_nullable": "NO",
+    "column_default": "gen_random_uuid()"
+  },
+  {
+    "column_name": "name",
+    "data_type": "text",
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "column_name": "slug",
+    "data_type": "text",
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "column_name": "description",
+    "data_type": "text",
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "column_name": "image",
+    "data_type": "text",
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "column_name": "active",
+    "data_type": "boolean",
+    "is_nullable": "NO",
+    "column_default": "true"
+  },
+  {
+    "column_name": "sort_order",
+    "data_type": "integer",
+    "is_nullable": "NO",
+    "column_default": "0"
+  },
+  {
+    "column_name": "created_at",
+    "data_type": "timestamp with time zone",
+    "is_nullable": "NO",
+    "column_default": "now()"
+  },
+  {
+    "column_name": "updated_at",
+    "data_type": "timestamp with time zone",
+    "is_nullable": "NO",
+    "column_default": "now()"
+  }
+]
+--- INDEXES ---
+[
+  {
+    "indexname": "categories_pkey",
+    "indexdef": "CREATE UNIQUE INDEX categories_pkey ON public.categories USING btree (id)"
+  },
+  {
+    "indexname": "categories_slug_key",
+    "indexdef": "CREATE UNIQUE INDEX categories_slug_key ON public.categories USING btree (slug)"
+  },
+  {
+    "indexname": "categories_slug_idx",
+    "indexdef": "CREATE INDEX categories_slug_idx ON public.categories USING btree (slug)"
+  },
+  {
+    "indexname": "categories_active_idx",
+    "indexdef": "CREATE INDEX categories_active_idx ON public.categories USING btree (active)"
+  }
+]
+--- CONSTRAINTS ---
+[
+  {
+    "constraint_name": "categories_pkey",
+    "constraint_definition": "PRIMARY KEY (id)"
+  },
+  {
+    "constraint_name": "categories_slug_key",
+    "constraint_definition": "UNIQUE (slug)"
+  }
+]
+
+=== TABLE: wishlist_items ===
+--- COLUMNS ---
+[
+  {
+    "column_name": "id",
+    "data_type": "uuid",
+    "is_nullable": "NO",
+    "column_default": "gen_random_uuid()"
+  },
+  {
+    "column_name": "customer_email",
+    "data_type": "text",
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "column_name": "product_id",
+    "data_type": "uuid",
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "column_name": "created_at",
+    "data_type": "timestamp with time zone",
+    "is_nullable": "NO",
+    "column_default": "now()"
+  }
+]
+--- INDEXES ---
+[
+  {
+    "indexname": "wishlist_items_pkey",
+    "indexdef": "CREATE UNIQUE INDEX wishlist_items_pkey ON public.wishlist_items USING btree (id)"
+  },
+  {
+    "indexname": "wishlist_items_customer_email_product_id_key",
+    "indexdef": "CREATE UNIQUE INDEX wishlist_items_customer_email_product_id_key ON public.wishlist_items USING btree (customer_email, product_id)"
+  },
+  {
+    "indexname": "wishlist_items_customer_email_idx",
+    "indexdef": "CREATE INDEX wishlist_items_customer_email_idx ON public.wishlist_items USING btree (customer_email)"
+  },
+  {
+    "indexname": "wishlist_items_product_id_idx",
+    "indexdef": "CREATE INDEX wishlist_items_product_id_idx ON public.wishlist_items USING btree (product_id)"
+  }
+]
+--- CONSTRAINTS ---
+[
+  {
+    "constraint_name": "wishlist_items_customer_email_fkey",
+    "constraint_definition": "FOREIGN KEY (customer_email) REFERENCES customers(email) ON DELETE CASCADE"
+  },
+  {
+    "constraint_name": "wishlist_items_customer_email_product_id_key",
+    "constraint_definition": "UNIQUE (customer_email, product_id)"
+  },
+  {
+    "constraint_name": "wishlist_items_pkey",
+    "constraint_definition": "PRIMARY KEY (id)"
+  },
+  {
+    "constraint_name": "wishlist_items_product_id_fkey",
+    "constraint_definition": "FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE"
+  }
+]
+
+=== TABLE: feedback ===
+--- COLUMNS ---
+[
+  {
+    "column_name": "id",
+    "data_type": "uuid",
+    "is_nullable": "NO",
+    "column_default": "gen_random_uuid()"
+  },
+  {
+    "column_name": "type",
+    "data_type": "text",
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "column_name": "rating",
+    "data_type": "integer",
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "column_name": "message",
+    "data_type": "text",
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "column_name": "email",
+    "data_type": "text",
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "column_name": "contact_permission",
+    "data_type": "boolean",
+    "is_nullable": "YES",
+    "column_default": "false"
+  },
+  {
+    "column_name": "page_url",
+    "data_type": "text",
+    "is_nullable": "YES",
+    "column_default": "''::text"
+  },
+  {
+    "column_name": "status",
+    "data_type": "text",
+    "is_nullable": "YES",
+    "column_default": "'new'::text"
+  },
+  {
+    "column_name": "notified_at",
+    "data_type": "timestamp with time zone",
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "column_name": "created_at",
+    "data_type": "timestamp with time zone",
+    "is_nullable": "YES",
+    "column_default": "now()"
+  },
+  {
+    "column_name": "updated_at",
+    "data_type": "timestamp with time zone",
+    "is_nullable": "YES",
+    "column_default": "now()"
+  },
+  {
+    "column_name": "subject",
+    "data_type": "text",
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "column_name": "experience_category",
+    "data_type": "text",
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "column_name": "name",
+    "data_type": "text",
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "column_name": "phone",
+    "data_type": "text",
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "column_name": "order_id",
+    "data_type": "text",
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "column_name": "would_recommend",
+    "data_type": "text",
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "column_name": "heard_from",
+    "data_type": "text",
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "column_name": "customer_email",
+    "data_type": "text",
+    "is_nullable": "YES",
+    "column_default": null
+  }
+]
+--- INDEXES ---
+[
+  {
+    "indexname": "feedback_pkey",
+    "indexdef": "CREATE UNIQUE INDEX feedback_pkey ON public.feedback USING btree (id)"
+  },
+  {
+    "indexname": "idx_feedback_status",
+    "indexdef": "CREATE INDEX idx_feedback_status ON public.feedback USING btree (status)"
+  },
+  {
+    "indexname": "idx_feedback_created_at",
+    "indexdef": "CREATE INDEX idx_feedback_created_at ON public.feedback USING btree (created_at DESC)"
+  },
+  {
+    "indexname": "idx_feedback_customer_email",
+    "indexdef": "CREATE INDEX idx_feedback_customer_email ON public.feedback USING btree (customer_email)"
+  }
+]
+--- CONSTRAINTS ---
+[
+  {
+    "constraint_name": "feedback_pkey",
+    "constraint_definition": "PRIMARY KEY (id)"
+  }
+]

@@ -39,7 +39,7 @@ function CartDrawer() {
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
             transition={{ duration: 0.3, ease: 'easeInOut' }}
-            className="fixed right-0 top-0 h-full w-full max-w-md bg-white z-[160] flex flex-col"
+            className="fixed right-0 top-0 z-[160] flex h-full w-full max-w-md flex-col bg-brand-surface shadow-drawer"
             role="dialog"
             aria-modal="true"
             aria-label="Shopping cart"
@@ -74,14 +74,17 @@ function CartDrawer() {
                   </p>
                   <button
                     onClick={handleClose}
-                    className="px-8 py-3 bg-brand-dark text-white text-xs font-bold uppercase tracking-widest hover:bg-black transition-all duration-200 shadow-md hover:shadow-lg"
+                    className="primary-cta"
                   >
                     Start Shopping
                   </button>
                 </div>
               ) : (
                 items.map((item) => (
-                  <CartItemComponent key={item.id} item={item} />
+                  <CartItemComponent
+                    key={item.lineId || `${item.id}:${item.size}`}
+                    item={item}
+                  />
                 ))
               )}
             </div>

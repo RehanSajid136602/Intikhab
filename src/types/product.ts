@@ -42,11 +42,13 @@ export interface Product {
 }
 
 export interface CartItem {
+  lineId: string;
   id: string;
   name: string;
   price: number;
   image: string;
   quantity: number;
   size: string;
+  availableStock?: number;
   productType: ProductType;
 }

@@ -27,7 +27,7 @@ export function Breadcrumbs({ items, className }: BreadcrumbsProps) {
       '@type': 'ListItem',
       position: index + 1,
       name: item.label,
-      item: item.href ? `https://intikhab.vercel.app${item.href}` : undefined,
+      item: item.href ? `https://intikhab.pk${item.href}` : undefined,
     })),
   };
 

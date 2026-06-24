@@ -14,6 +14,7 @@ interface PageProps {
   };
   searchParams: {
     subcategory?: string;
+    sort?: string;
   };
 }
 
@@ -125,6 +126,9 @@ export default async function ProductCategoryPage({
       description={description}
       products={products}
       category={category}
+      productType={productType}
+      subcategory={subcategory}
+      initialSort={searchParams.sort || "featured"}
     />
   );
 }

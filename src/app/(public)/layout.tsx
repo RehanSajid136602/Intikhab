@@ -1,6 +1,6 @@
 import dynamic from 'next/dynamic';
 import { UtilityBar } from '@/components/layout/UtilityBar';
-import { Navbar } from '@/components/layout/Navbar';
+import { NavbarWrapper } from '@/components/layout/NavbarWrapper';
 import { MobileMenu } from '@/components/layout/MobileMenu';
 import { Footer } from '@/components/layout/Footer';
 import { BackToTop } from '@/components/BackToTop';
@@ -10,11 +10,11 @@ const CartDrawer = dynamic(
   { ssr: false, loading: () => null },
 );
 
-/**
- * Public site layout with navbar, footer, cart drawer, etc.
- * Wraps all customer-facing pages (home, products, checkout, etc.).
- * Does NOT wrap admin pages.
- */
+const FeedbackWidget = dynamic(
+  () => import('@/components/FeedbackWidget').then((m) => m.FeedbackWidget),
+  { ssr: false, loading: () => null },
+);
+
 export default function PublicLayout({
   children,
 }: {
@@ -23,9 +23,10 @@ export default function PublicLayout({
   return (
     <>
       <UtilityBar />
-      <Navbar />
+      <NavbarWrapper />
       <MobileMenu />
       <CartDrawer />
+      <FeedbackWidget />
       <main>{children}</main>
       <Footer />
       <BackToTop />

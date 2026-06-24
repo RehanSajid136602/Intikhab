@@ -5,11 +5,12 @@ import Link from 'next/link';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useHeroSlider } from '@/hooks/useHeroSlider';
 import { HERO_SLIDER } from '@/lib/constants';
+import { homepageImages } from '@/data/homepageImages';
 
 const slides = [
   {
-    image: '/intikhab-man-blazer-skyline-sunset.jpeg',
-    alt: 'Hero 1',
+    image: homepageImages.hero[0].src,
+    alt: homepageImages.hero[0].alt,
     label: "NEW COLLECTION '25",
     title: (
       <>
@@ -24,34 +25,35 @@ const slides = [
     alignment: 'left' as const,
   },
   {
-    image: '/intikhab-sneakers-balcony-sunset-blue.jpeg',
-    alt: 'Hero 2',
-    label: 'SUMMER READY',
+    image: homepageImages.hero[1].src,
+    alt: homepageImages.hero[1].alt,
+    label: 'FORMAL EDIT',
     title: (
       <>
-        Stay Cool
+        Sharp Steps
         <br />
-        <span className="italic font-light">This Season</span>
+        <span className="italic font-light">Only</span>
       </>
     ),
-    subtitle: 'Explore Blue Collection',
+    subtitle: 'Explore Formal Collection',
     alignment: 'right' as const,
   },
   {
-    image: '/intikhab-man-sofa-indoor-white.jpeg',
-    alt: 'Hero 3',
-    label: 'YOUR FAVORITES',
+    image: homepageImages.hero[2].src,
+    alt: homepageImages.hero[2].alt,
+    label: 'STREET EDIT',
     title: (
       <>
-        Timeless
+        Built for
         <br />
-        <span className="italic font-light">Classics</span>
+        <span className="italic font-light">Everyday Motion</span>
       </>
     ),
     subtitle: 'Discover Your Style',
     alignment: 'left' as const,
   },
 ];
+
 
 /**
  * Full-bleed hero slider with auto-advance, arrows, dots, and Framer Motion fade.
@@ -97,7 +99,7 @@ function HeroSlider() {
                 priority={index === 0}
                 className="object-cover"
                 sizes="100vw"
-                quality={90}
+                quality={85}
                 placeholder="blur"
                 blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAIAAoDASIAAhEBAxEB/8QAFgABAQEAAAAAAAAAAAAAAAAABgUE/8QAIRAAAgIBBAMBAAAAAAAAAAAAAQIDBAUREiExQVH/xAAUAQEAAAAAAAAAAAAAAAAAAAAA/8QAFBEBAAAAAAAAAAAAAAAAAAAAAP/aAAwDAQACEQMRAD8Amtz1tptx2fa9OxtNrPFJaivjX1Kc4pvpqvFdMoyp0pZUVRXj7gA7QAAH/9k="
               />

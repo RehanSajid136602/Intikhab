@@ -1,30 +1,14 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { motion, useInView } from 'framer-motion';
 import { useRef } from 'react';
-
-const categories = [
-  {
-    label: 'MEN',
-    image: '/intikhab-man-bench-indoor-white.jpeg',
-    href: '/men',
-  },
-  {
-    label: 'WOMEN',
-    image: '/intikhab-sneakers-jute-mat-blue.jpeg',
-    href: '/women',
-  },
-  {
-    label: 'KIDS',
-    image: '/shoe_collection.jpeg',
-    href: '/kids',
-  },
-];
+import { homepageImages } from '@/data/homepageImages';
 
 /**
  * Clean 4-column grid layout for Shop by Categories section
- * All tiles have consistent aspect ratio and alignment
+ * Sourced dynamically from homepageImages config.
  */
 function CategoryMosaic() {
   const ref = useRef(null);
@@ -38,17 +22,16 @@ function CategoryMosaic() {
       transition={{ duration: 0.6 }}
       className="w-full py-12 px-4 md:px-8"
     >
-      {/* HEADING — plain, no background, no positioning */}
+      {/* HEADING */}
       <h2 className="text-center text-xl md:text-2xl font-semibold 
                      tracking-widest text-brand-dark mb-8">
         — Shop by Categories —
       </h2>
 
-      {/* GRID — single unified grid, all tiles in one container */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-3 
+      {/* GRID */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 
                       max-w-7xl mx-auto">
-        
-        {categories.map((category) => (
+        {homepageImages.primaryCategories.map((category) => (
           <Link 
             key={category.label} 
             href={category.href}
@@ -56,16 +39,13 @@ function CategoryMosaic() {
                        aspect-[3/4] block"
           >
             {/* IMAGE */}
-            <img
-              src={category.image}
-              alt={category.label}
-              className="w-full h-full object-cover transition-transform 
-                         duration-500 group-hover:scale-105"
-              loading="lazy"
-              onError={(e) => {
-                console.error(`Failed to load image: ${category.image}`, e);
-                (e.target as HTMLImageElement).src = '/intikhab-man-bench-indoor-white.jpeg';
-              }}
+            <Image
+              src={category.src}
+              alt={category.alt}
+              fill
+              sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, 25vw"
+              className="object-cover transition-transform duration-500 group-hover:scale-105"
+              quality={85}
             />
             
             {/* DARK OVERLAY — only at bottom for label */}
@@ -80,10 +60,10 @@ function CategoryMosaic() {
             </span>
           </Link>
         ))}
-        
       </div>
     </motion.section>
   );
 }
 
 export { CategoryMosaic };
+

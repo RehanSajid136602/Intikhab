@@ -17,7 +17,7 @@ import { Search, Plus, Trash2, Edit, ChevronDown } from "lucide-react";
 import { toast } from "sonner";
 import { Modal } from "@/components/ui/Modal";
 import { useAdminStore } from "@/stores/adminStore";
-import { formatPKR } from "@/lib/utils";
+import { formatPKR, getFirstProductImage } from "@/lib/utils";
 import type { Product } from "@/types/product";
 
 interface ProductsTableProps {
@@ -76,17 +76,23 @@ function ProductsTable({ onAddProduct, onEditProduct }: ProductsTableProps) {
       header: "Image",
       cell: (info) => {
         const images = info.getValue() as string[];
+        const firstImg = getFirstProductImage(images);
+        const name = info.row.original.name || "Product";
         return (
-          <div className="w-10 h-10 bg-brand-light-gray rounded-sm overflow-hidden flex-shrink-0">
-            <Image
-              src={images[0]}
-              alt=""
-              width={40}
-              height={40}
-              className="w-full h-full object-contain"
-              sizes="40px"
-              quality={80}
-            />
+          <div className="w-10 h-10 bg-brand-light-gray rounded-sm overflow-hidden flex-shrink-0 flex items-center justify-center">
+            {firstImg ? (
+              <Image
+                src={firstImg}
+                alt={name}
+                width={40}
+                height={40}
+                className="w-full h-full object-contain"
+                sizes="40px"
+                quality={80}
+              />
+            ) : (
+              <span className="text-[10px] text-slate-500 font-mono">N/A</span>
+            )}
           </div>
         );
       },

@@ -17,6 +17,8 @@ html {
 }
 
 body {
+  background: #fbf7f0;
+  color: #1d1a17;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -35,6 +37,62 @@ button,
 textarea,
 select {
   font: inherit;
+}
+
+:focus-visible {
+  outline: 2px solid #b42318;
+  outline-offset: 3px;
+}
+
+::selection {
+  background: #d8c5aa;
+  color: #1d1a17;
+}
+
+@layer components {
+  .store-container {
+    @apply container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8;
+  }
+
+  .store-section {
+    @apply py-12 md:py-16 lg:py-20;
+  }
+
+  .eyebrow {
+    @apply text-xs font-semibold uppercase tracking-[0.18em] text-brand-red;
+  }
+
+  .page-title {
+    @apply text-3xl md:text-5xl font-bold tracking-tight text-brand-dark;
+  }
+
+  .section-title {
+    @apply text-2xl md:text-3xl font-bold tracking-tight text-brand-dark;
+  }
+
+  .body-muted {
+    @apply text-sm md:text-base leading-relaxed text-brand-gray;
+  }
+
+  .surface-card {
+    @apply rounded-card border border-brand-border bg-brand-surface shadow-subtle;
+  }
+
+  .form-field {
+    @apply w-full rounded-control border border-brand-border bg-white px-4 py-3 text-sm text-brand-dark outline-none transition-colors placeholder:text-brand-gray/70 focus:border-brand-red disabled:cursor-not-allowed disabled:bg-brand-light-gray disabled:text-brand-gray;
+  }
+
+  .primary-cta {
+    @apply inline-flex items-center justify-center rounded-control bg-brand-cta px-6 py-3 text-xs font-bold uppercase tracking-[0.16em] text-white transition-colors hover:bg-brand-cta-hover disabled:cursor-not-allowed disabled:opacity-50;
+  }
+
+  .secondary-cta {
+    @apply inline-flex items-center justify-center rounded-control border border-brand-dark bg-transparent px-6 py-3 text-xs font-bold uppercase tracking-[0.16em] text-brand-dark transition-colors hover:bg-brand-dark hover:text-white disabled:cursor-not-allowed disabled:opacity-50;
+  }
+
+  .ghost-cta {
+    @apply inline-flex items-center justify-center rounded-control px-4 py-2 text-xs font-semibold uppercase tracking-[0.14em] text-brand-dark transition-colors hover:bg-brand-light-gray disabled:cursor-not-allowed disabled:opacity-50;
+  }
 }
 
 /* ===== Marquee Animation ===== */

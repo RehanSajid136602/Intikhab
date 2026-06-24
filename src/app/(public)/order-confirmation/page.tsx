@@ -1,12 +1,13 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
-import { CheckCircle2, ShoppingCart } from 'lucide-react';
+import { CheckCircle2, ShoppingCart, Download, Printer } from 'lucide-react';
 import { formatPKR } from '@/lib/utils';
 import { BRAND } from '@/lib/constants';
+import html2canvas from 'html2canvas';
 
 interface OrderItem {
   productId: string;
@@ -24,6 +25,10 @@ interface OrderData {
   city: string;
   phone: string;
   items: OrderItem[];
+  subtotal?: number;
+  shippingFee?: number;
+  couponCode?: string | null;
+  couponDiscount?: number;
   total: number;
   status: string;
   date: string;
@@ -33,8 +38,11 @@ export default function OrderConfirmationPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const orderId = searchParams.get('orderId');
+  const token = searchParams.get('token');
   const [orderData, setOrderData] = useState<OrderData | null>(null);
   const [isLoading, setIsLoading] = useState(!!orderId);
+  const [downloading, setDownloading] = useState(false);
+  const receiptRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     async function fetchOrder() {
@@ -63,7 +71,8 @@ export default function OrderConfirmationPage() {
       }
 
       try {
-        const response = await fetch(`/api/orders/${orderId}`);
+        const tokenParam = token ? `?token=${encodeURIComponent(token)}` : '';
+        const response = await fetch(`/api/orders/${orderId}${tokenParam}`);
         if (!response.ok) {
           throw new Error('Order not found');
         }
@@ -83,7 +92,7 @@ export default function OrderConfirmationPage() {
             phone: parsed.phone,
             items: parsed.items,
             total: parsed.totalPrice,
-            status: 'Pending',
+          status: 'Pending',
             date: new Date().toISOString().split('T')[0],
           });
           sessionStorage.removeItem('lastOrder');
@@ -96,7 +105,7 @@ export default function OrderConfirmationPage() {
     }
 
     fetchOrder();
-  }, [orderId, router]);
+  }, [orderId, token, router]);
 
   if (isLoading) {
     return (
@@ -110,6 +119,30 @@ export default function OrderConfirmationPage() {
     return null;
   }
 
+  const handleDownloadReceipt = async () => {
+    if (!receiptRef.current) return;
+    setDownloading(true);
+    try {
+      const canvas = await html2canvas(receiptRef.current, {
+        backgroundColor: '#ffffff',
+        scale: 2,
+      });
+      const link = document.createElement('a');
+      link.download = `receipt-${orderData?.id || 'order'}.png`;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    } catch {
+      // fallback: print
+      window.print();
+    } finally {
+      setDownloading(false);
+    }
+  };
+
+  const handlePrintReceipt = () => {
+    window.print();
+  };
+
   const handleWhatsAppChat = () => {
     const message = `Hi, I just placed order ${orderData.id} for ${formatPKR(orderData.total)}. Please confirm my order details. Thank you!`;
     const cleanPhone = BRAND.phone.replace(/\s/g, '');
@@ -121,41 +154,42 @@ export default function OrderConfirmationPage() {
   return (
     <div className="min-h-screen bg-white py-8 md:py-12 px-4">
       <div className="container mx-auto max-w-2xl">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.5 }}
-          className="text-center mb-8"
-        >
+        <div ref={receiptRef}>
           <motion.div
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
-            className="inline-flex items-center justify-center w-20 h-20 bg-green-100 rounded-full mb-4"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5 }}
+            className="text-center mb-8"
           >
-            <CheckCircle2 className="w-10 h-10 text-green-600" />
-          </motion.div>
-          <h1 className="text-3xl md:text-4xl font-bold text-brand-dark mb-2">
-            Order Placed! 🎉
-          </h1>
-          <p className="text-brand-gray">
-            Thank you <span className="font-semibold text-brand-dark">{orderData.customerName}</span>. We'll confirm your order via WhatsApp or call within 2 hours.
-          </p>
-          {orderData.id !== 'N/A' && (
-            <p className="text-sm text-brand-gray mt-2">
-              Order ID: <span className="font-mono font-semibold">{orderData.id}</span>
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
+              className="inline-flex items-center justify-center w-20 h-20 bg-green-100 rounded-full mb-4"
+            >
+              <CheckCircle2 className="w-10 h-10 text-green-600" />
+            </motion.div>
+            <h1 className="text-3xl md:text-4xl font-bold text-brand-dark mb-2">
+              Order Placed! 🎉
+            </h1>
+            <p className="text-brand-gray">
+              Thank you <span className="font-semibold text-brand-dark">{orderData.customerName}</span>. We'll confirm your order via WhatsApp or call within 2 hours.
             </p>
-          )}
-        </motion.div>
+            {orderData.id !== 'N/A' && (
+              <p className="text-sm text-brand-gray mt-2">
+                Order ID: <span className="font-mono font-semibold">{orderData.id}</span>
+              </p>
+            )}
+          </motion.div>
 
-        {/* Order Summary */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-          className="bg-gray-50 p-6 rounded-lg mb-6"
-        >
-          <h2 className="text-lg font-semibold text-brand-dark mb-4">Order Summary</h2>
+          {/* Order Summary */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            className="bg-gray-50 p-6 rounded-lg mb-6"
+          >
+            <h2 className="text-lg font-semibold text-brand-dark mb-4">Order Summary</h2>
           
           {/* Items */}
           <div className="space-y-3 mb-4">
@@ -184,6 +218,20 @@ export default function OrderConfirmationPage() {
 
           {/* Total */}
           <div className="flex justify-between text-lg font-bold">
+            <span className="text-brand-gray">Subtotal</span>
+            <span className="text-brand-dark">{formatPKR(orderData.subtotal || orderData.total)}</span>
+          </div>
+          <div className="mt-2 flex justify-between text-sm">
+            <span className="text-brand-gray">Shipping</span>
+            <span className="text-brand-dark">{formatPKR(orderData.shippingFee || 0)}</span>
+          </div>
+          {orderData.couponDiscount ? (
+            <div className="mt-2 flex justify-between text-sm text-brand-green">
+              <span>Coupon {orderData.couponCode}</span>
+              <span>-{formatPKR(orderData.couponDiscount)}</span>
+            </div>
+          ) : null}
+          <div className="mt-3 flex justify-between text-lg font-bold">
             <span className="text-brand-dark">Total</span>
             <span className="text-brand-dark">{formatPKR(orderData.total)}</span>
           </div>
@@ -198,6 +246,7 @@ export default function OrderConfirmationPage() {
             <p className="text-sm text-brand-gray">{orderData.phone}</p>
           </div>
         </motion.div>
+        </div>
 
         {/* Action Buttons */}
         <motion.div
@@ -206,6 +255,23 @@ export default function OrderConfirmationPage() {
           transition={{ delay: 0.4 }}
           className="space-y-3"
         >
+          <div className="grid grid-cols-2 gap-3">
+            <button
+              onClick={handleDownloadReceipt}
+              disabled={downloading}
+              className="w-full bg-brand-dark text-white py-3 font-semibold text-sm uppercase tracking-wider rounded-lg hover:bg-black transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
+            >
+              <Download className="w-4 h-4" />
+              {downloading ? 'Saving...' : 'Save Receipt'}
+            </button>
+            <button
+              onClick={handlePrintReceipt}
+              className="w-full bg-white text-brand-dark border-2 border-brand-dark py-3 font-semibold text-sm uppercase tracking-wider rounded-lg hover:bg-gray-50 transition-colors flex items-center justify-center gap-2"
+            >
+              <Printer className="w-4 h-4" />
+              Print
+            </button>
+          </div>
           <button
             onClick={handleWhatsAppChat}
             className="w-full bg-green-600 text-white py-4 font-semibold uppercase tracking-wider rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center gap-2"
@@ -219,18 +285,6 @@ export default function OrderConfirmationPage() {
             <ShoppingCart className="w-5 h-5" />
             Continue Shopping
           </button>
-        </motion.div>
-
-        {/* Note */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.5 }}
-          className="mt-8 p-4 bg-yellow-50 border border-yellow-200 rounded-lg"
-        >
-          <p className="text-sm text-yellow-800">
-            💡 <strong>Tip:</strong> Keep this page screenshot for your reference. You'll receive order details via WhatsApp as well.
-          </p>
         </motion.div>
       </div>
     </div>

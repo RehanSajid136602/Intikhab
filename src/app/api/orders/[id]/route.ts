@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
+import { createHash } from "crypto";
 import { createClient } from "@/lib/supabase/server";
 import { verifyAdmin } from "@/lib/supabase/auth";
+import { auth0 } from "@/lib/auth0";
 
 /**
  * GET /api/orders/[id]
@@ -12,6 +14,7 @@ export async function GET(
 ) {
   const supabase = createClient();
   const orderId = params.id;
+  const token = request.nextUrl.searchParams.get("token");
 
   // Fetch order
   const { data: order, error } = await supabase
@@ -22,6 +25,22 @@ export async function GET(
 
   if (error || !order) {
     return NextResponse.json({ error: "Order not found" }, { status: 404 });
+  }
+
+  const { authenticated: isAdmin } = await verifyAdmin(request);
+  const session = await auth0.getSession().catch(() => null);
+  const isOwner =
+    Boolean(session?.user?.email) &&
+    session?.user?.email?.toLowerCase() ===
+      String(order.customerEmail).toLowerCase();
+  const tokenHash = token
+    ? createHash("sha256").update(token).digest("hex")
+    : null;
+  const hasValidToken =
+    Boolean(tokenHash) && tokenHash === order.access_token_hash;
+
+  if (!isAdmin && !isOwner && !hasValidToken) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
   // Fetch order items
@@ -46,6 +65,10 @@ export async function GET(
       size: item.size,
     })),
     total: order.total,
+    subtotal: order.subtotal || order.total,
+    shippingFee: order.shippingFee || 0,
+    couponCode: order.couponCode || null,
+    couponDiscount: order.couponDiscount || 0,
     status: order.status,
     date: new Date(order.createdAt).toISOString().split("T")[0],
   };

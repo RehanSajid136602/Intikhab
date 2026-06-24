@@ -166,8 +166,10 @@ function AddProductModal({
         status: editProduct.status,
       });
       // Set existing image previews
-      if (editProduct.images && editProduct.images.length > 0) {
+      if (Array.isArray(editProduct.images) && editProduct.images.length > 0) {
         setImagePreviews(editProduct.images);
+      } else {
+        setImagePreviews([]);
       }
     } else {
       reset({
@@ -269,12 +271,26 @@ function AddProductModal({
     setSubmitting(true);
     try {
       // Upload images if new files selected
-      let imageUrls = editProduct?.images || ["/shoe_collection.jpeg"];
+      let imageUrls: string[] = [];
+      if (editProduct && Array.isArray(editProduct.images)) {
+        imageUrls = editProduct.images.filter(
+          (img): img is string => typeof img === 'string' && img.trim() !== ''
+        );
+      }
+      if (imageUrls.length === 0) {
+        imageUrls = ["/shoe_collection.jpeg"];
+      }
+
       if (imageFiles.length > 0) {
         setUploading(true);
-        imageUrls = await uploadImages();
+        const uploaded = await uploadImages();
         setUploading(false);
-        if (imageUrls.length === 0) {
+        const validUploaded = uploaded.filter(
+          (img): img is string => typeof img === 'string' && img.trim() !== ''
+        );
+        if (validUploaded.length > 0) {
+          imageUrls = validUploaded;
+        } else {
           toast.warning("No images uploaded, using default");
         }
       }

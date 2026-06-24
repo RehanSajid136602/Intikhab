@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { getMetadata } from "@/lib/seo";
 import { BRAND } from "@/lib/constants";
-import { Mail, Phone, Clock, MapPin, Send } from "lucide-react";
+import { Mail, Phone, Clock, MapPin } from "lucide-react";
+import { ContactForm } from "./ContactForm";
 
 export const metadata: Metadata = getMetadata({
   title: "Contact Intikhab — Shoe Store Support",
@@ -73,75 +74,7 @@ export default function ContactPage() {
           {/* Contact Form */}
           <div className="md:col-span-2 bg-white p-8 rounded-3xl shadow-sm border border-brand-border">
             <h2 className="text-2xl font-bold text-brand-dark mb-6">Send Us a Message</h2>
-            <form className="space-y-6">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                <div>
-                  <label htmlFor="name" className="block text-sm font-medium text-brand-dark mb-2">Your Name</label>
-                  <input
-                    type="text"
-                    id="name"
-                    name="name"
-                    required
-                    className="w-full px-4 py-3 border border-brand-border rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-dark text-brand-dark text-sm bg-gray-50"
-                    placeholder="Enter your name"
-                  />
-                </div>
-                <div>
-                  <label htmlFor="email" className="block text-sm font-medium text-brand-dark mb-2">Email Address</label>
-                  <input
-                    type="email"
-                    id="email"
-                    name="email"
-                    required
-                    className="w-full px-4 py-3 border border-brand-border rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-dark text-brand-dark text-sm bg-gray-50"
-                    placeholder="Enter your email"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label htmlFor="phone" className="block text-sm font-medium text-brand-dark mb-2">Phone Number (Optional)</label>
-                <input
-                  type="tel"
-                  id="phone"
-                  name="phone"
-                  className="w-full px-4 py-3 border border-brand-border rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-dark text-brand-dark text-sm bg-gray-50"
-                  placeholder="e.g. 0300 1234567"
-                />
-              </div>
-
-              <div>
-                <label htmlFor="subject" className="block text-sm font-medium text-brand-dark mb-2">Subject</label>
-                <input
-                  type="text"
-                  id="subject"
-                  name="subject"
-                  required
-                  className="w-full px-4 py-3 border border-brand-border rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-dark text-brand-dark text-sm bg-gray-50"
-                  placeholder="What is your query about?"
-                />
-              </div>
-
-              <div>
-                <label htmlFor="message" className="block text-sm font-medium text-brand-dark mb-2">Message</label>
-                <textarea
-                  id="message"
-                  name="message"
-                  rows={5}
-                  required
-                  className="w-full px-4 py-3 border border-brand-border rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-dark text-brand-dark text-sm bg-gray-50 resize-none"
-                  placeholder="Write your message here..."
-                ></textarea>
-              </div>
-
-              <button
-                type="submit"
-                className="w-full sm:w-auto bg-brand-dark text-white px-8 py-3.5 rounded-xl font-semibold text-sm hover:bg-brand-red transition-colors flex items-center justify-center gap-2"
-              >
-                <Send className="w-4 h-4" />
-                Submit Message
-              </button>
-            </form>
+            <ContactForm />
           </div>
         </div>
       </div>

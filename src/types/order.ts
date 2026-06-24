@@ -10,7 +10,7 @@ export interface OrderItem {
   image: string;
   quantity: number;
   price: number;
-  size: number;
+  size: string;
 }
 
 export interface Order {

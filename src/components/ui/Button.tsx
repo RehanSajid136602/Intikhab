@@ -11,11 +11,11 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const variantClasses: Record<ButtonVariant, string> = {
-  primary: 'bg-brand-dark text-white hover:bg-black transition-colors duration-200',
+  primary: 'bg-brand-cta text-white hover:bg-brand-cta-hover transition-colors duration-200',
   secondary:
-    'bg-white text-brand-dark border border-brand-dark hover:bg-brand-dark hover:text-white transition-colors duration-200',
+    'bg-transparent text-brand-dark border border-brand-dark hover:bg-brand-dark hover:text-white transition-colors duration-200',
   ghost: 'bg-transparent text-brand-dark hover:bg-brand-light-gray transition-colors duration-200',
-  danger: 'bg-brand-red text-white hover:bg-red-700 transition-colors duration-200',
+  danger: 'bg-brand-error text-white hover:bg-brand-cta-hover transition-colors duration-200',
 };
 
 const sizeClasses: Record<ButtonSize, string> = {
@@ -46,6 +46,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         ref={ref}
         className={cn(
           'font-bold uppercase tracking-widest rounded-sm disabled:opacity-50 disabled:cursor-not-allowed',
+          'focus-visible:outline-brand-red',
           variantClasses[variant],
           sizeClasses[size],
           className,

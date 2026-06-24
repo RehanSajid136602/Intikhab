@@ -30,6 +30,15 @@ export const ROUTES = {
   adminDashboard: '/admin',
   adminProducts: '/admin/products',
   adminOrders: '/admin/orders',
+  adminCustomers: '/admin/customers',
+  adminCategories: '/admin/categories',
+  adminCoupons: '/admin/coupons',
+  adminReviews: '/admin/reviews',
+  adminAppearance: '/admin/appearance',
+  adminMessages: '/admin/messages',
+  adminFeedback: '/admin/feedback',
+  adminSettings: '/admin/settings',
+  feedback: '/feedback',
 } as const;
 
 export const ADMIN_SIDEBAR_WIDTH = {

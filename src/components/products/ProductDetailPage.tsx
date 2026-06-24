@@ -17,6 +17,7 @@ import { toast } from "sonner";
 import type { Product, SizeStock } from "@/types/product";
 import { ProductCard } from "@/components/products/ProductCard";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
+import { ProductReviews } from "@/components/products/ProductReviews";
 
 const FALLBACK_IMAGE = "/images/intikhab/intikhab-hero-premium-sneakers.webp";
 
@@ -39,6 +40,7 @@ export function ProductDetailPage({
   const { addItem } = useCartStore();
   const router = useRouter();
   const [activeImage, setActiveImage] = useState(0);
+  const [quantity, setQuantity] = useState(1);
 
   const hasSizeData = product.sizeStock && product.sizeStock.length > 0;
   const anySizeInStock = hasSizeData
@@ -72,7 +74,9 @@ export function ProductDetailPage({
       toast.error("Please select a size");
       return;
     }
-    addItem(product, selectedSize);
+    for (let index = 0; index < quantity; index += 1) {
+      addItem(product, selectedSize);
+    }
   };
 
   const handleBuyNow = () => {
@@ -80,7 +84,9 @@ export function ProductDetailPage({
       toast.error("Please select a size");
       return;
     }
-    addItem(product, selectedSize);
+    for (let index = 0; index < quantity; index += 1) {
+      addItem(product, selectedSize);
+    }
     router.push("/checkout");
   };
 
@@ -259,6 +265,39 @@ export function ProductDetailPage({
                 )}
             </p>
 
+            <div>
+              <h3 className="text-sm font-semibold text-brand-dark mb-2">
+                Quantity
+              </h3>
+              <div className="inline-flex items-center rounded-control border border-brand-border bg-white">
+                <button
+                  type="button"
+                  onClick={() => setQuantity((value) => Math.max(1, value - 1))}
+                  className="h-11 w-11 text-brand-dark hover:bg-brand-light-gray"
+                  aria-label="Decrease quantity"
+                >
+                  -
+                </button>
+                <span className="w-10 text-center text-sm font-semibold">
+                  {quantity}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const max =
+                      selectedSize && sizeStockMap.has(selectedSize)
+                        ? sizeStockMap.get(selectedSize)!
+                        : product.stock || 1;
+                    setQuantity((value) => Math.min(max, value + 1));
+                  }}
+                  className="h-11 w-11 text-brand-dark hover:bg-brand-light-gray"
+                  aria-label="Increase quantity"
+                >
+                  +
+                </button>
+              </div>
+            </div>
+
             {/* Buttons */}
             <div className="flex gap-4 pt-4">
               <button
@@ -300,6 +339,8 @@ export function ProductDetailPage({
             </div>
           </div>
         )}
+
+        <ProductReviews productId={product.id} />
       </div>
     </div>
   );

@@ -2,6 +2,7 @@
 
 import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
+import Link from 'next/link';
 import { useUIStore } from '@/stores/uiStore';
 import { mainNavItems } from '@/data/navigation';
 
@@ -22,7 +23,7 @@ function MobileMenu() {
           className="fixed inset-0 z-[100] bg-white md:hidden"
         >
           <div className="p-4 flex justify-between items-center border-b border-brand-border">
-            <span className="text-xl font-bold">Menu</span>
+            <span className="text-xl font-bold text-brand-dark">Intikhab</span>
             <button
               onClick={() => setMobileMenu(false)}
               className="p-2"
@@ -31,20 +32,20 @@ function MobileMenu() {
               <X className="w-6 h-6" />
             </button>
           </div>
-          <div className="p-4 space-y-4">
+          <div className="p-4 space-y-2">
             {mainNavItems.map((item) => (
-              <a
+              <Link
                 key={item.label}
                 href={item.href}
                 onClick={() => setMobileMenu(false)}
-                className={`block ${
+                className={`block rounded-control px-3 py-3 ${
                   item.isSale
                     ? 'text-brand-red font-semibold'
                     : 'text-brand-dark font-semibold'
-                }`}
+                } hover:bg-brand-light-gray`}
               >
                 {item.label}
-              </a>
+              </Link>
             ))}
           </div>
         </motion.div>

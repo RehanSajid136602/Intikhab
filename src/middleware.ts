@@ -1,18 +1,26 @@
+import { auth0 } from "@/lib/auth0";
 import { createServerClient } from '@supabase/ssr';
 import { type NextRequest, NextResponse } from 'next/server';
+import { isAllowedAdminEmail } from '@/lib/supabase/auth';
 
 export async function middleware(request: NextRequest) {
-  try {
-    const { pathname } = request.nextUrl;
+  const { pathname } = request.nextUrl;
 
-    // Fast static assets exclusion check inside middleware logic
-    if (
-      pathname.startsWith('/_next') ||
-      pathname === '/favicon.ico' ||
-      pathname === '/robots.txt' ||
-      pathname === '/sitemap.xml' ||
-      /\.(svg|png|jpg|jpeg|gif|webp|avif|ico)$/i.test(pathname)
-    ) {
+  if (
+    pathname.startsWith('/_next') ||
+    pathname === '/favicon.ico' ||
+    pathname === '/robots.txt' ||
+    pathname === '/sitemap.xml' ||
+    /\.(svg|png|jpg|jpeg|gif|webp|avif|ico)$/i.test(pathname)
+  ) {
+    return NextResponse.next();
+  }
+
+  // Admin routes: use Supabase Auth (email/password login)
+  if (pathname.startsWith('/admin')) {
+    const isLoginPage = pathname === '/admin/login';
+
+    if (isLoginPage) {
       return NextResponse.next();
     }
 
@@ -24,16 +32,12 @@ export async function middleware(request: NextRequest) {
     }
 
     let supabaseResponse = NextResponse.next({
-      request: {
-        headers: request.headers,
-      },
+      request: { headers: request.headers },
     });
 
     const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
       cookies: {
-        getAll() {
-          return request.cookies.getAll();
-        },
+        getAll() { return request.cookies.getAll(); },
         setAll(cookiesToSet) {
           cookiesToSet.forEach(({ name, value, options }) => {
             request.cookies.set(name, value);
@@ -43,52 +47,53 @@ export async function middleware(request: NextRequest) {
       },
     });
 
-    // Refresh session without blocking the request
-    await supabase.auth.getSession();
+    const { data: { user } } = await supabase.auth.getUser();
 
-    // Admin route protection
-    if (pathname.startsWith('/admin')) {
-      const isLoginPage = pathname === '/admin/login';
+    let isAllowed = false;
+    if (user && user.email) {
+      const normalizedEmail = user.email.trim().toLowerCase();
+      const { data: adminData } = await supabase
+        .from('admin_users')
+        .select('active')
+        .eq('email', normalizedEmail)
+        .single();
 
-      if (isLoginPage) {
-        return supabaseResponse;
-      }
-
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-
-      if (!session) {
-        // Redirect to login if not authenticated
-        const loginUrl = new URL('/admin/login', request.url);
-        // Create redirect response
-        const redirectResponse = NextResponse.redirect(loginUrl);
-        // Copy cookies to ensure auth state sync if needed
-        supabaseResponse.cookies.getAll().forEach((cookie) => {
-          redirectResponse.cookies.set(cookie.name, cookie.value, {
-            path: cookie.path,
-            domain: cookie.domain,
-            secure: cookie.secure,
-            sameSite: cookie.sameSite,
-            expires: cookie.expires,
-            maxAge: cookie.maxAge,
-            httpOnly: cookie.httpOnly,
-          });
-        });
-        return redirectResponse;
+      if (adminData && adminData.active) {
+        isAllowed = true;
+      } else {
+        isAllowed = isAllowedAdminEmail(normalizedEmail);
       }
     }
 
+    if (!isAllowed) {
+      const loginUrl = new URL('/admin/login', request.url);
+      const redirectResponse = NextResponse.redirect(loginUrl);
+      supabaseResponse.cookies.getAll().forEach((cookie) => {
+        redirectResponse.cookies.set(cookie.name, cookie.value, {
+          path: cookie.path, domain: cookie.domain, secure: cookie.secure,
+          sameSite: cookie.sameSite, expires: cookie.expires,
+          maxAge: cookie.maxAge, httpOnly: cookie.httpOnly,
+        });
+      });
+      return redirectResponse;
+    }
+
     return supabaseResponse;
-  } catch (error) {
-    console.error('Middleware error:', error);
-    return NextResponse.next();
   }
+
+  // All other routes (storefront): use Auth0
+  const auth0Response = await auth0.middleware(request);
+
+  // Auth0 middleware returns null for non-auth routes — pass through
+  if (auth0Response) {
+    return auth0Response;
+  }
+
+  return NextResponse.next();
 }
 
 export const config = {
   matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml|.*\\.(?:png|jpg|jpeg|gif|webp|avif|svg|ico)$).*)",
+    "/((?!_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt|.*\\.(?:png|jpg|jpeg|gif|webp|avif|svg|ico)$).*)",
   ],
 };
-

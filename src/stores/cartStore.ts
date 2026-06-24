@@ -3,14 +3,17 @@ import { persist } from "zustand/middleware";
 import type { CartItem } from "@/types/product";
 import type { Product } from "@/types/product";
 import { toast } from "sonner";
+import { getFirstProductImage } from "@/lib/utils";
+
+const getLineId = (productId: string, size: string) => `${productId}:${size}`;
 
 interface CartState {
   items: CartItem[];
   isOpen: boolean;
 
   addItem: (product: Product, size: string) => void;
-  removeItem: (id: string) => void;
-  updateQuantity: (id: string, quantity: number) => void;
+  removeItem: (lineId: string) => void;
+  updateQuantity: (lineId: string, quantity: number) => void;
   clearCart: () => void;
   toggleCart: () => void;
 
@@ -31,14 +34,35 @@ export const useCartStore = create<CartState>()(
       addItem: (product: Product, size: string) => {
         set((state) => {
           const baseName = product.name.split(" — ")[0];
+          const selectedSizeStock = product.sizeStock?.find(
+            (entry) => entry.size === size,
+          );
+          const availableStock =
+            selectedSizeStock?.stock ?? (product.inStock ? product.stock : 0);
+
+          if (availableStock <= 0) {
+            toast.error("Selected size is out of stock");
+            return state;
+          }
+
+          const lineId = getLineId(product.id, size);
           const existing = state.items.find(
-            (item) => item.name === baseName && item.size === size,
+            (item) => (item.lineId || getLineId(item.id, item.size)) === lineId,
           );
           if (existing) {
+            if (existing.quantity >= availableStock) {
+              toast.error(`Only ${availableStock} available in this size`);
+              return state;
+            }
             return {
               items: state.items.map((item) =>
-                item.name === baseName && item.size === size
-                  ? { ...item, quantity: item.quantity + 1 }
+                (item.lineId || getLineId(item.id, item.size)) === lineId
+                  ? {
+                      ...item,
+                      lineId,
+                      quantity: item.quantity + 1,
+                      availableStock,
+                    }
                   : item,
               ),
               totalItems: state.totalItems + 1,
@@ -46,12 +70,14 @@ export const useCartStore = create<CartState>()(
             };
           }
           const newItem: CartItem = {
+            lineId,
             id: product.id,
             name: baseName,
             price: product.price,
-            image: product.images[0],
+            image: getFirstProductImage(product.images) || '',
             quantity: 1,
             size,
+            availableStock,
             productType: product.productType,
           };
           return {
@@ -63,27 +89,40 @@ export const useCartStore = create<CartState>()(
         });
       },
 
-      removeItem: (id: string) => {
+      removeItem: (lineId: string) => {
         set((state) => {
-          const item = state.items.find((item) => item.id === id);
+          const item = state.items.find(
+            (item) => (item.lineId || getLineId(item.id, item.size)) === lineId,
+          );
           if (!item) return state;
           return {
-            items: state.items.filter((item) => item.id !== id),
+            items: state.items.filter(
+              (item) =>
+                (item.lineId || getLineId(item.id, item.size)) !== lineId,
+            ),
             totalItems: state.totalItems - item.quantity,
             totalPrice: state.totalPrice - item.price * item.quantity,
           };
         });
       },
 
-      updateQuantity: (id: string, quantity: number) => {
+      updateQuantity: (lineId: string, quantity: number) => {
         set((state) => {
-          const item = state.items.find((item) => item.id === id);
+          const item = state.items.find(
+            (item) => (item.lineId || getLineId(item.id, item.size)) === lineId,
+          );
           if (!item) return state;
-          const safeQuantity = Math.max(1, quantity);
+          const maxQuantity = item.availableStock ?? Number.MAX_SAFE_INTEGER;
+          const safeQuantity = Math.min(Math.max(1, quantity), maxQuantity);
+          if (quantity > maxQuantity) {
+            toast.error(`Only ${maxQuantity} available in this size`);
+          }
           const diff = safeQuantity - item.quantity;
           return {
             items: state.items.map((item) =>
-              item.id === id ? { ...item, quantity: safeQuantity } : item,
+              (item.lineId || getLineId(item.id, item.size)) === lineId
+                ? { ...item, lineId, quantity: safeQuantity }
+                : item,
             ),
             totalItems: state.totalItems + diff,
             totalPrice: state.totalPrice + diff * item.price,

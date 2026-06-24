@@ -1,7 +1,8 @@
-import { TrendingUp, ShoppingCart, Package, Users } from 'lucide-react';
+import { TrendingUp, ShoppingCart, Package, Users, MessageSquareText } from 'lucide-react';
 import { StatsCard } from '@/components/admin/StatsCard';
 import { SalesChart } from '@/components/admin/SalesChart';
 import { RecentOrders } from '@/components/admin/RecentOrders';
+import { LatestFeedback } from '@/components/admin/LatestFeedback';
 import { createClient } from '@/lib/supabase/server';
 import type { StatsCardConfig } from '@/types/admin';
 
@@ -18,6 +19,12 @@ async function getDashboardStats(): Promise<StatsCardConfig[]> {
   const { data: orders } = await supabase
     .from('orders')
     .select('total, createdAt');
+
+  // Fetch new feedback count
+  const { count: newFeedback } = await supabase
+    .from('feedback')
+    .select('*', { count: 'exact', head: true })
+    .eq('status', 'new');
 
   const totalOrders = orders?.length || 0;
   const totalRevenue = orders?.reduce((sum, o) => sum + (o.total || 0), 0) || 0;
@@ -63,6 +70,14 @@ async function getDashboardStats(): Promise<StatsCardConfig[]> {
       icon: Users,
       iconBg: 'bg-orange-500',
     },
+    {
+      title: 'New Feedback',
+      value: (newFeedback || 0).toString(),
+      change: '',
+      changeType: 'neutral' as const,
+      icon: MessageSquareText,
+      iconBg: 'bg-amber-500',
+    },
   ];
 }
 
@@ -98,7 +113,7 @@ export default async function AdminDashboardPage() {
   return (
     <div className="space-y-6">
       {/* Stats Row */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
         {stats.map((stat) => (
           <StatsCard key={stat.title} {...stat} />
         ))}
@@ -107,8 +122,13 @@ export default async function AdminDashboardPage() {
       {/* Chart */}
       <SalesChart />
 
-      {/* Recent Orders */}
-      <RecentOrders orders={formattedOrders} />
+      {/* Orders + Feedback */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2">
+          <RecentOrders orders={formattedOrders} />
+        </div>
+        <LatestFeedback />
+      </div>
     </div>
   );
 }

@@ -14,9 +14,17 @@ export default function WishlistPage() {
   const { items, removeItem, clearWishlist } = useWishlistStore();
   const { addItem } = useCartStore();
 
+  React.useEffect(() => {
+    const store = useWishlistStore.getState();
+    store.syncToAccount().then(() => store.loadFromAccount());
+  }, []);
+
   const handleMoveToCart = (product: any) => {
-    const firstSize = product.sizeStock?.[0]?.size ?? 0;
-    addItem(product, firstSize);
+    if (!product.sizeStock || product.sizeStock.length === 0) {
+      toast.error("No sizes available");
+      return;
+    }
+    addItem(product, product.sizeStock[0].size);
     removeItem(product.id);
     toast.success("Moved to cart");
   };

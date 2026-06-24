@@ -19,6 +19,7 @@ export async function GET(request: NextRequest) {
   const category = searchParams.get("category");
   const subcategory = searchParams.get("subcategory");
   const slug = searchParams.get("slug");
+  const search = searchParams.get("search");
   const limit = searchParams.get("limit");
   const offset = searchParams.get("offset");
 
@@ -38,6 +39,15 @@ export async function GET(request: NextRequest) {
 
   if (subcategory) {
     query = query.eq("subcategory", subcategory);
+  }
+
+  if (search) {
+    const safeSearch = search.trim();
+    if (safeSearch) {
+      query = query.or(
+        `name.ilike.%${safeSearch}%,brand.ilike.%${safeSearch}%,sku.ilike.%${safeSearch}%,category.ilike.%${safeSearch}%,subcategory.ilike.%${safeSearch}%`,
+      );
+    }
   }
 
   if (slug) {

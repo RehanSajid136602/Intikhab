@@ -5,13 +5,8 @@ import Image from 'next/image';
 import { motion, useInView } from 'framer-motion';
 import { useRef } from 'react';
 import { Instagram } from 'lucide-react';
+import { homepageImages } from '@/data/homepageImages';
 
-const instaImages = [
-  '/intikhab-man-sofa-indoor-white.jpeg',
-  '/intikhab-man-bench-indoor-white.jpeg',
-  '/intikhab-sneakers-jute-mat-blue.jpeg',
-  '/intikhab-man-cafe-outdoor-white.jpeg',
-];
 
 /**
  * Instagram-style photo grid with hover overlay.
@@ -42,7 +37,7 @@ function InstaFeed() {
         </Link>
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-1 md:gap-0">
-          {instaImages.map((src, index) => (
+          {homepageImages.instagramFeed.map((item, index) => (
             <Link
               key={index}
               href="https://www.instagram.com/intikhab_pakistan?igsh=aW5yaWJldTc0d2F2"
@@ -51,10 +46,10 @@ function InstaFeed() {
               className="insta-cell relative aspect-[4/5] overflow-hidden cursor-pointer group block"
             >
               <Image
-                src={src}
-                alt={`Instagram post ${index + 1}`}
+                src={item.src}
+                alt={item.alt || `Instagram post ${index + 1}`}
                 fill
-                sizes="(max-width: 768px) 50vw, 25vw"
+                sizes="(max-width: 768px) 100vw, 33vw"
                 quality={75}
                 className="object-cover transition-transform duration-500 group-hover:scale-110"
               />

@@ -16,6 +16,10 @@ interface CartItemComponentProps {
 function CartItemComponent({ item }: CartItemComponentProps) {
   const updateQuantity = useCartStore((state) => state.updateQuantity);
   const removeItem = useCartStore((state) => state.removeItem);
+  const lineId = item.lineId || `${item.id}:${item.size}`;
+  const atMax =
+    typeof item.availableStock === "number" &&
+    item.quantity >= item.availableStock;
 
   return (
     <div className="flex gap-3 py-3 border-b border-brand-border">
@@ -46,8 +50,8 @@ function CartItemComponent({ item }: CartItemComponentProps) {
       {/* Quantity Controls */}
       <div className="flex items-center gap-2">
         <button
-          onClick={() => updateQuantity(item.id, item.quantity - 1)}
-          className="w-11 h-11 flex items-center justify-center border border-brand-border text-xs hover:bg-brand-light-gray transition-colors"
+          onClick={() => updateQuantity(lineId, item.quantity - 1)}
+          className="w-11 h-11 flex items-center justify-center rounded-control border border-brand-border text-xs hover:bg-brand-light-gray transition-colors"
           aria-label="Decrease quantity"
         >
           <Minus className="w-3 h-3" />
@@ -56,8 +60,9 @@ function CartItemComponent({ item }: CartItemComponentProps) {
           {item.quantity}
         </span>
         <button
-          onClick={() => updateQuantity(item.id, item.quantity + 1)}
-          className="w-11 h-11 flex items-center justify-center border border-brand-border text-xs hover:bg-brand-light-gray transition-colors"
+          onClick={() => updateQuantity(lineId, item.quantity + 1)}
+          disabled={atMax}
+          className="w-11 h-11 flex items-center justify-center rounded-control border border-brand-border text-xs hover:bg-brand-light-gray transition-colors disabled:cursor-not-allowed disabled:opacity-40"
           aria-label="Increase quantity"
         >
           <Plus className="w-3 h-3" />
@@ -66,7 +71,7 @@ function CartItemComponent({ item }: CartItemComponentProps) {
 
       {/* Remove */}
       <button
-        onClick={() => removeItem(item.id)}
+        onClick={() => removeItem(lineId)}
         className="text-brand-gray hover:text-brand-red transition-colors self-start"
         aria-label="Remove item"
       >

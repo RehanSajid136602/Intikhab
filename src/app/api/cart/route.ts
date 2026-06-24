@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
         size: item.size ?? null,
         updatedAt: new Date().toISOString(),
       },
-      { onConflict: "customerEmail,productId" },
+      { onConflict: "customerEmail,productId,size" },
     );
 
     if (error) {

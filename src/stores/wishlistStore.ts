@@ -9,6 +9,8 @@ interface WishlistState {
   toggleItem: (product: Product) => void;
   isInWishlist: (id: string) => boolean;
   clearWishlist: () => void;
+  syncToAccount: () => Promise<void>;
+  loadFromAccount: () => Promise<void>;
 }
 
 export const useWishlistStore = create<WishlistState>()(
@@ -32,8 +34,14 @@ export const useWishlistStore = create<WishlistState>()(
         set((state) => {
           const exists = state.items.some((item) => item.id === product.id);
           if (exists) {
+            fetch(`/api/account/wishlist/${product.id}`, { method: 'DELETE' }).catch(() => {});
             return { items: state.items.filter((item) => item.id !== product.id) };
           }
+          fetch('/api/account/wishlist', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ productId: product.id }),
+          }).catch(() => {});
           return { items: [...state.items, product] };
         });
       },
@@ -42,6 +50,29 @@ export const useWishlistStore = create<WishlistState>()(
       },
       clearWishlist: () => {
         set({ items: [] });
+      },
+      syncToAccount: async () => {
+        const { items } = get();
+        if (items.length === 0) return;
+        await fetch('/api/account/wishlist', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ productIds: items.map((item) => item.id) }),
+        }).catch(() => {});
+      },
+      loadFromAccount: async () => {
+        const response = await fetch('/api/account/wishlist').catch(() => null);
+        if (!response?.ok) return;
+        const remoteItems = (await response.json()) as Product[];
+        set((state) => {
+          const merged = [...state.items];
+          for (const product of remoteItems) {
+            if (!merged.some((item) => item.id === product.id)) {
+              merged.push(product);
+            }
+          }
+          return { items: merged };
+        });
       },
     }),
     {

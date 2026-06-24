@@ -1,7 +1,8 @@
 'use client';
 
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import { Search, X } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import { useUIStore } from '@/stores/uiStore';
 import { AnimatePresence, motion } from 'framer-motion';
 
@@ -11,6 +12,8 @@ import { AnimatePresence, motion } from 'framer-motion';
 function SearchBar() {
   const { searchOpen, setSearch } = useUIStore();
   const inputRef = useRef<HTMLInputElement>(null);
+  const router = useRouter();
+  const [query, setQuery] = useState('');
 
   useEffect(() => {
     if (searchOpen && inputRef.current) {
@@ -28,15 +31,27 @@ function SearchBar() {
           transition={{ duration: 0.2 }}
           className="pb-4"
         >
-          <div className="relative">
+          <form
+            className="relative"
+            onSubmit={(event) => {
+              event.preventDefault();
+              const trimmed = query.trim();
+              if (!trimmed) return;
+              setSearch(false);
+              router.push(`/products?search=${encodeURIComponent(trimmed)}`);
+            }}
+          >
             <input
               ref={inputRef}
               type="text"
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
               placeholder="Search for products, brands..."
-              className="w-full border border-brand-border px-4 py-3 text-sm focus:outline-none focus:border-brand-dark pr-12"
+              className="form-field pr-24"
             />
             <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-2">
               <button
+                type="submit"
                 className="text-brand-gray hover:text-brand-dark"
                 aria-label="Search"
               >
@@ -50,7 +65,7 @@ function SearchBar() {
                 <X className="w-4 h-4" />
               </button>
             </div>
-          </div>
+          </form>
         </motion.div>
       )}
     </AnimatePresence>

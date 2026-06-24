@@ -46,6 +46,8 @@ function ProductCard({ product, showImageCarousel }: ProductCardProps) {
     : product.images?.[0];
 
   const currentImage = getValidImage(rawImage);
+  const firstAvailableSize = product.sizeStock?.find((size) => size.stock > 0);
+  const hasStock = Boolean(firstAvailableSize || product.inStock);
 
   const handleWishlistClick = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -128,17 +130,25 @@ function ProductCard({ product, showImageCarousel }: ProductCardProps) {
           <p className="text-[11px] text-brand-green font-medium mb-3">
             ✓ Cash on Delivery Available
           </p>
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              e.preventDefault();
-              const firstSize = product.sizeStock?.[0]?.size ?? 0;
-              addItem(product, firstSize);
-            }}
-            className="add-to-cart-btn w-full bg-brand-dark text-white text-[11px] font-bold uppercase tracking-widest py-2.5 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
-          >
-            ADD TO CART
-          </button>
+          {hasStock && firstAvailableSize ? (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                e.preventDefault();
+                addItem(product, firstAvailableSize.size);
+              }}
+              className="add-to-cart-btn w-full bg-brand-dark text-white text-[11px] font-bold uppercase tracking-widest py-2.5 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+            >
+              QUICK ADD {firstAvailableSize.size}
+            </button>
+          ) : (
+            <button
+              disabled
+              className="w-full bg-zinc-200 text-zinc-400 text-[11px] font-bold uppercase tracking-widest py-2.5 cursor-not-allowed opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+            >
+              SOLD OUT
+            </button>
+          )}
         </div>
       </div>
     </Link>

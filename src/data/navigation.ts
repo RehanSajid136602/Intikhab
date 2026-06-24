@@ -15,20 +15,31 @@ export interface NavItem {
 }
 
 export const mainNavItems: NavItem[] = [
-  { label: 'SALE', href: '/coming-soon', isSale: true },
-  { label: 'SUMMER', href: '/coming-soon' },
+  { label: 'Home', href: '/' },
+  { label: 'Shop', href: '/products' },
   {
-    label: 'NEW IN',
-    href: '/coming-soon',
+    label: 'New Arrivals',
+    href: '/products?sort=latest',
     dropdown: [
-      { label: 'New Arrivals', href: '/coming-soon' },
-      { label: 'Trending Now', href: '/coming-soon' },
-      { label: 'Best Sellers', href: '/coming-soon' },
-      { label: 'Coming Soon', href: '/coming-soon' },
+      { label: 'All New Arrivals', href: '/products?sort=latest' },
+      { label: 'Women', href: '/shoes/women?sort=latest' },
+      { label: 'Men', href: '/shoes/men?sort=latest' },
+      { label: 'Kids', href: '/shoes/kids?sort=latest' },
     ],
   },
   {
-    label: 'WOMEN',
+    label: 'Categories',
+    href: '/categories',
+    dropdown: [
+      { label: "Women's Shoes", href: '/shoes/women' },
+      { label: "Men's Shoes", href: '/shoes/men' },
+      { label: "Kids' Shoes", href: '/shoes/kids' },
+      { label: 'Bags', href: '/bags/women' },
+      { label: 'Accessories', href: '/accessories/unisex' },
+    ],
+  },
+  {
+    label: 'Women',
     href: '/shoes/women',
     dropdown: [
       { label: 'Casual', href: '/shoes/women?subcategory=casual' },
@@ -38,7 +49,7 @@ export const mainNavItems: NavItem[] = [
     ],
   },
   {
-    label: 'MEN',
+    label: 'Men',
     href: '/shoes/men',
     dropdown: [
       { label: 'Casual', href: '/shoes/men?subcategory=casual' },
@@ -48,7 +59,7 @@ export const mainNavItems: NavItem[] = [
     ],
   },
   {
-    label: 'KIDS',
+    label: 'Kids',
     href: '/shoes/kids',
     dropdown: [
       { label: 'Boys', href: '/shoes/kids?subcategory=boys' },
@@ -56,28 +67,8 @@ export const mainNavItems: NavItem[] = [
       { label: 'Infants', href: '/shoes/kids?subcategory=infants' },
     ],
   },
-  {
-    label: 'BAGS',
-    href: '/bags/women',
-    dropdown: [
-      { label: 'Handbags', href: '/bags/women?subcategory=handbags' },
-      { label: 'Backpacks', href: '/bags/women?subcategory=backpacks' },
-      { label: 'Clutches', href: '/bags/women?subcategory=clutches' },
-    ],
-  },
-  {
-    label: 'ACCESSORIES',
-    href: '/accessories/unisex',
-    dropdown: [
-      { label: 'Belts', href: '/accessories/unisex?subcategory=belts' },
-      { label: 'Wallets', href: '/accessories/unisex?subcategory=wallets' },
-      { label: 'Socks', href: '/accessories/unisex?subcategory=socks' },
-    ],
-  },
-  { label: 'FRAGRANCES', href: '/coming-soon' },
-  { label: 'BEST SELLER', href: '/coming-soon' },
-  { label: 'NAYZA', href: '/coming-soon' },
-  { label: 'PRET', href: '/coming-soon' },
+  { label: 'About', href: '/about' },
+  { label: 'Contact', href: '/contact' },
 ];
 
 export const footerLinks = {
@@ -88,15 +79,15 @@ export const footerLinks = {
     whatsapp: true,
   },
   quickLinks: [
-    { label: 'About Us', href: '/coming-soon' },
-    { label: 'Careers', href: '/coming-soon' },
+    { label: 'About Us', href: '/about' },
+    { label: 'Shop All', href: '/products' },
     { label: 'Blog', href: '/blog' },
-    { label: 'Press', href: '/coming-soon' },
+    { label: 'Contact', href: '/contact' },
   ],
   help: [
     { label: 'FAQ', href: '/faq' },
-    { label: 'Shipping', href: '/coming-soon' },
-    { label: 'Returns', href: '/terms-and-conditions' },
+    { label: 'Shipping', href: '/shipping-policy' },
+    { label: 'Returns & Exchanges', href: '/return-exchange-policy' },
     { label: 'Size Guide', href: '/size-guide' },
   ],
   collections: [
@@ -109,6 +100,7 @@ export const footerLinks = {
   legal: [
     { label: 'Privacy Policy', href: '/privacy-policy' },
     { label: 'Terms & Conditions', href: '/terms-and-conditions' },
+    { label: 'Return & Exchange Policy', href: '/return-exchange-policy' },
     { label: 'Cookie Policy', href: '/cookie-policy' },
   ],
 };

@@ -20,6 +20,7 @@ const VALID_PRODUCT_TYPES = [
 const CATEGORIES = ["men", "women", "kids", "unisex"] as const;
 
 import { getMetadata } from "@/lib/seo";
+import { getFirstProductImage } from "@/lib/utils";
 
 export async function generateMetadata({
   params,
@@ -120,14 +121,21 @@ export default async function ProductTypePage({ params }: PageProps) {
                 >
                   <div className="bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow">
                     <div className="aspect-square bg-gray-100 relative">
-                      {product.images[0] && (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img
-                          src={product.images[0]}
-                          alt={product.name}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform"
-                        />
-                      )}
+                      {(() => {
+                        const img = getFirstProductImage(product.images);
+                        return img ? (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img
+                            src={img}
+                            alt={product.name}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center bg-gray-100 text-gray-400 font-mono text-xs">
+                            No Image
+                          </div>
+                        );
+                      })()}
                     </div>
                     <div className="p-4">
                       <h3 className="font-semibold text-brand-dark text-sm mb-2 line-clamp-2">

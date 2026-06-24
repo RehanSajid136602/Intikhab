@@ -12,7 +12,11 @@ export const metadata: Metadata = getMetadata({
 
 export const dynamic = "force-dynamic";
 
-export default async function ProductsPage() {
+export default async function ProductsPage({
+  searchParams,
+}: {
+  searchParams?: { search?: string; sort?: string };
+}) {
   const supabase = createClient();
   
   const { data } = await supabase
@@ -30,6 +34,8 @@ export default async function ProductsPage() {
       products={products}
       category="all"
       productType="shoes"
+      initialSearch={searchParams?.search || ""}
+      initialSort={searchParams?.sort || "featured"}
     />
   );
 }

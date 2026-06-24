@@ -6,6 +6,7 @@ interface UIState {
   mobileMenuOpen: boolean;
   searchOpen: boolean;
   cartDrawerOpen: boolean;
+  feedbackWidgetOpen: boolean;
   announcementVisible: boolean;
   activeTabs: Record<TabGroup, string>;
 
@@ -15,6 +16,8 @@ interface UIState {
   setSearch: (open: boolean) => void;
   toggleCartDrawer: () => void;
   setCartDrawer: (open: boolean) => void;
+  toggleFeedbackWidget: () => void;
+  setFeedbackWidget: (open: boolean) => void;
   dismissAnnouncement: () => void;
   setActiveTab: (group: TabGroup, tab: string) => void;
 }
@@ -23,6 +26,7 @@ export const useUIStore = create<UIState>()((set) => ({
   mobileMenuOpen: false,
   searchOpen: false,
   cartDrawerOpen: false,
+  feedbackWidgetOpen: false,
   announcementVisible: true,
   activeTabs: {
     gender: 'men',
@@ -50,6 +54,14 @@ export const useUIStore = create<UIState>()((set) => ({
 
   setCartDrawer: (open: boolean) => {
     set({ cartDrawerOpen: open });
+  },
+
+  toggleFeedbackWidget: () => {
+    set((state) => ({ feedbackWidgetOpen: !state.feedbackWidgetOpen }));
+  },
+
+  setFeedbackWidget: (open: boolean) => {
+    set({ feedbackWidgetOpen: open });
   },
 
   dismissAnnouncement: () => {

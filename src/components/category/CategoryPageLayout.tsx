@@ -1,12 +1,18 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Filter, SlidersHorizontal, X } from "lucide-react";
+import { Filter, Search, X } from "lucide-react";
 import { ProductCard } from "@/components/products/ProductCard";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import type { Product } from "@/types/product";
 import { formatPKR } from "@/lib/utils";
+
+interface StoreCategory {
+  id: string;
+  name: string;
+  slug: string;
+}
 
 interface CategoryPageLayoutProps {
   title: string;
@@ -16,6 +22,8 @@ interface CategoryPageLayoutProps {
   category?: string;
   productType?: string;
   subcategory?: string;
+  initialSearch?: string;
+  initialSort?: string;
 }
 
 /**
@@ -30,19 +38,38 @@ export function CategoryPageLayout({
   category,
   productType,
   subcategory,
+  initialSearch = "",
+  initialSort = "featured",
 }: CategoryPageLayoutProps) {
+  const [searchQuery, setSearchQuery] = useState(initialSearch);
   const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
-  const [selectedColors, setSelectedColors] = useState<string[]>([]);
+  const [availability, setAvailability] = useState<"all" | "in-stock">("all");
+  const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 50000]);
-  const [sortBy, setSortBy] = useState("featured");
+  const [sortBy, setSortBy] = useState(initialSort);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [storeCategories, setStoreCategories] = useState<StoreCategory[]>([]);
+
+  useEffect(() => {
+    fetch("/api/categories")
+      .then((response) => (response.ok ? response.json() : []))
+      .then((data) => setStoreCategories(data))
+      .catch(() => setStoreCategories([]));
+  }, []);
 
   // Dynamic sizes based on product type
   const allSizes = productType === "shoes" ? ["35", "36", "37", "38", "39", "40", "41", "42", "43", "44", "45", "46"] : ["small", "medium", "large", "xl", "one-size"];
-  const allColors = ["Black", "Blue", "White", "Red", "Brown"];
-
   const filteredAndSortedProducts = useMemo(() => {
     let filtered = [...products];
+
+    if (searchQuery.trim()) {
+      const q = searchQuery.trim().toLowerCase();
+      filtered = filtered.filter((p) =>
+        [p.name, p.brand, p.sku, p.category, p.productType, p.subcategory]
+          .filter(Boolean)
+          .some((value) => String(value).toLowerCase().includes(q)),
+      );
+    }
 
     // Filter by size (now using string sizes)
     if (selectedSizes.length > 0) {
@@ -53,10 +80,22 @@ export function CategoryPageLayout({
       );
     }
 
+    if (selectedCategory !== "all") {
+      filtered = filtered.filter((p) => p.category === selectedCategory);
+    }
+
     // Filter by price
     filtered = filtered.filter(
       (p) => p.price >= priceRange[0] && p.price <= priceRange[1],
     );
+
+    if (availability === "in-stock") {
+      filtered = filtered.filter((p) =>
+        p.sizeStock?.length
+          ? p.sizeStock.some((size) => size.stock > 0)
+          : p.inStock,
+      );
+    }
 
     // Sort
     switch (sortBy) {
@@ -67,7 +106,11 @@ export function CategoryPageLayout({
         filtered.sort((a, b) => b.price - a.price);
         break;
       case "newest":
-        filtered.sort((a, b) => b.id.localeCompare(a.id));
+      case "latest":
+        filtered.sort(
+          (a, b) =>
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+        );
         break;
       default:
         // featured - keep original order
@@ -75,23 +118,25 @@ export function CategoryPageLayout({
     }
 
     return filtered;
-  }, [products, selectedSizes, selectedColors, priceRange, sortBy]);
+  }, [products, searchQuery, selectedSizes, selectedCategory, priceRange, availability, sortBy]);
 
-  const activeFilterCount = selectedSizes.length + selectedColors.length;
+  const activeFilterCount =
+    selectedSizes.length + (availability === "in-stock" ? 1 : 0);
 
   const clearFilters = () => {
     setSelectedSizes([]);
-    setSelectedColors([]);
+    setAvailability("all");
+    setSelectedCategory("all");
     setPriceRange([0, 50000]);
   };
 
   const hasProducts = filteredAndSortedProducts.length > 0;
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-brand-background">
       {/* Hero Section */}
       <section className="relative bg-brand-dark text-white py-16 md:py-24">
-        <div className="container mx-auto px-4">
+        <div className="store-container">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -112,7 +157,7 @@ export function CategoryPageLayout({
 
       {/* Products Section */}
       <section className="py-12 md:py-16">
-        <div className="container mx-auto px-4">
+        <div className="store-container">
           {/* Breadcrumbs */}
           {category && (
             <Breadcrumbs
@@ -126,7 +171,18 @@ export function CategoryPageLayout({
           )}
 
           {/* Filter & Sort Bar */}
-          <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 gap-4">
+          <div className="mb-8 grid gap-4 lg:grid-cols-[1fr_auto]">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-brand-gray" />
+              <input
+                value={searchQuery}
+                onChange={(event) => setSearchQuery(event.target.value)}
+                className="form-field pl-10"
+                placeholder="Search by product, category, SKU..."
+                aria-label="Search products"
+              />
+            </div>
+            <div className="flex flex-wrap items-center gap-3">
             {/* Subcategory Filter Pills */}
             {subcategory && (
               <div className="flex items-center gap-2 mb-4 md:mb-0">
@@ -135,10 +191,9 @@ export function CategoryPageLayout({
               </div>
             )}
 
-            <div className="flex items-center gap-4">
               <button
                 onClick={() => setIsFilterOpen(!isFilterOpen)}
-                className="flex items-center gap-2 px-4 py-2 border border-brand-border rounded-lg hover:border-brand-dark transition-colors"
+                className="secondary-cta px-4 py-2"
               >
                 <Filter className="w-4 h-4" />
                 <span className="text-sm font-medium">Filters</span>
@@ -166,12 +221,12 @@ export function CategoryPageLayout({
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
-                className="px-4 py-2 border border-brand-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-dark"
+                className="form-field w-auto min-w-[190px] py-2"
               >
                 <option value="featured">Featured</option>
                 <option value="price-low">Price: Low to High</option>
                 <option value="price-high">Price: High to Low</option>
-                <option value="newest">Newest First</option>
+                <option value="latest">Latest</option>
               </select>
             </div>
           </div>
@@ -179,7 +234,7 @@ export function CategoryPageLayout({
           <div className="flex flex-col lg:flex-row gap-8">
             {/* Filter Sidebar - Desktop */}
             <aside className="hidden lg:block w-64 flex-shrink-0">
-              <div className="bg-gray-50 p-6 rounded-lg sticky top-24">
+              <div className="surface-card sticky top-24 p-6">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="font-semibold text-brand-dark">Filters</h3>
                   {activeFilterCount > 0 && (
@@ -191,6 +246,48 @@ export function CategoryPageLayout({
                     </button>
                   )}
                 </div>
+
+                <div className="mb-6">
+                  <h4 className="text-sm font-medium text-brand-dark mb-3">
+                    Availability
+                  </h4>
+                  <label className="flex items-center gap-2 text-sm text-brand-gray">
+                    <input
+                      type="checkbox"
+                      checked={availability === "in-stock"}
+                      onChange={(event) =>
+                        setAvailability(event.target.checked ? "in-stock" : "all")
+                      }
+                    />
+                    In stock only
+                  </label>
+                </div>
+
+                {/* Size Filter */}
+                {storeCategories.length > 0 && (
+                  <div className="mb-6">
+                    <h4 className="text-sm font-medium text-brand-dark mb-3">
+                      Category
+                    </h4>
+                    <div className="space-y-2">
+                      <button
+                        onClick={() => setSelectedCategory("all")}
+                        className={`block text-sm ${selectedCategory === "all" ? "text-brand-red" : "text-brand-gray"}`}
+                      >
+                        All categories
+                      </button>
+                      {storeCategories.map((item) => (
+                        <button
+                          key={item.id}
+                          onClick={() => setSelectedCategory(item.slug)}
+                          className={`block text-sm capitalize ${selectedCategory === item.slug ? "text-brand-red" : "text-brand-gray"}`}
+                        >
+                          {item.name}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
 
                 {/* Size Filter */}
                 <div className="mb-6">
@@ -210,7 +307,7 @@ export function CategoryPageLayout({
                         }}
                         className={`w-10 h-10 border-2 rounded-lg text-sm font-medium transition-all ${
                           selectedSizes.includes(size)
-                            ? "border-brand-dark bg-brand-dark text-white"
+                              ? "border-brand-dark bg-brand-dark text-white"
                             : "border-brand-border text-brand-dark hover:border-brand-dark"
                         }`}
                       >
@@ -283,7 +380,7 @@ export function CategoryPageLayout({
                     </p>
                     <button
                       onClick={clearFilters}
-                      className="inline-block bg-brand-dark text-white px-8 py-3 rounded-full font-semibold text-sm uppercase tracking-wider hover:bg-brand-red transition-colors duration-300"
+                      className="primary-cta"
                     >
                       Clear Filters
                     </button>
@@ -351,6 +448,22 @@ export function CategoryPageLayout({
                     </button>
                   ))}
                 </div>
+              </div>
+
+              <div className="mb-6">
+                <h4 className="text-sm font-medium text-brand-dark mb-3">
+                  Availability
+                </h4>
+                <label className="flex items-center gap-2 text-sm text-brand-gray">
+                  <input
+                    type="checkbox"
+                    checked={availability === "in-stock"}
+                    onChange={(event) =>
+                      setAvailability(event.target.checked ? "in-stock" : "all")
+                    }
+                  />
+                  In stock only
+                </label>
               </div>
 
               {/* Price Filter */}

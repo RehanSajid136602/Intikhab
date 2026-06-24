@@ -33,6 +33,9 @@ model Product {
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
+  reviews       Review[]
+  wishlistItems WishlistItem[]
+
   @@index([slug])
   @@index([productType])
   @@index([category])
@@ -47,11 +50,18 @@ model Customer {
   email        String    @unique
   phone        String    @default("")
   fullName     String    @default("")
+  city         String    @default("")
+  status       String    @default("active") // active, vip, blocked
+  newsletter   Boolean   @default(false)
+  notes        String?
   createdAt    DateTime  @default(now())
   lastOrderAt  DateTime?
 
   orders       Order[]
   carts        Cart[]
+  addresses    Address[]
+  reviews      Review[]
+  wishlistItems WishlistItem[]
 
   @@index([email])
   @@map("customers")
@@ -67,6 +77,11 @@ model Order {
   phone          String      @default("")
   paymentMethod  String      @default("cod") // cod, jazzcash, easypaisa
   orderNotes     String?     @default("")
+  subtotal        Int         @default(0)
+  shippingFee     Int         @default(0)
+  couponCode      String?
+  couponDiscount  Int         @default(0)
+  accessTokenHash String?     @map("access_token_hash")
   total          Int
   status         String      @default("Pending") // Pending, Processing, Shipped, Delivered
   createdAt      DateTime    @default(now())
@@ -76,6 +91,7 @@ model Order {
 
   @@index([customerEmail])
   @@index([status])
+  @@index([accessTokenHash])
   @@index([createdAt(sort: Desc)])
   @@map("orders")
 }
@@ -107,7 +123,204 @@ model Cart {
 
   customer       Customer @relation(fields: [customerEmail], references: [email], onDelete: Cascade)
 
-  @@unique([customerEmail, productId])
+  @@unique([customerEmail, productId, size])
   @@index([customerEmail])
   @@map("carts")
+}
+
+model Coupon {
+  id                 String   @id @default(uuid()) @db.Uuid
+  code               String   @unique
+  discountType       String   @map("discount_type") // percentage, fixed
+  discountValue      Int      @map("discount_value")
+  active             Boolean  @default(true)
+  minimumOrderAmount Int?     @map("minimum_order_amount")
+  usageLimit         Int?     @map("usage_limit")
+  usedCount          Int      @default(0) @map("used_count")
+  expiresAt          DateTime? @map("expires_at")
+  createdAt          DateTime @default(now()) @map("created_at")
+  updatedAt          DateTime @updatedAt @map("updated_at")
+
+  @@index([code])
+  @@index([active])
+  @@map("coupons")
+}
+
+model Address {
+  id              String   @id @default(uuid()) @db.Uuid
+  customerEmail   String   @map("customer_email")
+  fullName        String   @map("full_name")
+  phone           String
+  city            String
+  province        String   @default("")
+  postalCode      String   @map("postal_code")
+  addressLine     String   @map("address_line")
+  isDefault       Boolean  @default(false) @map("is_default")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  customer        Customer @relation(fields: [customerEmail], references: [email], onDelete: Cascade)
+
+  @@index([customerEmail])
+  @@map("addresses")
+}
+
+model Review {
+  id            String   @id @default(uuid()) @db.Uuid
+  productId     String   @map("product_id") @db.Uuid
+  customerEmail String?  @map("customer_email")
+  guestName     String?  @map("guest_name")
+  guestEmail    String?  @map("guest_email")
+  rating        Int
+  title         String?
+  body          String
+  status        String   @default("pending") // pending, approved, rejected
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  product       Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  customer      Customer? @relation(fields: [customerEmail], references: [email], onDelete: SetNull)
+
+  @@index([productId])
+  @@index([customerEmail])
+  @@index([status])
+  @@map("reviews")
+}
+
+model Category {
+  id          String   @id @default(uuid()) @db.Uuid
+  name        String
+  slug        String   @unique
+  description String?
+  image       String?
+  active      Boolean  @default(true)
+  sortOrder   Int      @default(0) @map("sort_order")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@index([slug])
+  @@index([active])
+  @@map("categories")
+}
+
+model WishlistItem {
+  id            String   @id @default(uuid()) @db.Uuid
+  customerEmail String   @map("customer_email")
+  productId     String   @map("product_id") @db.Uuid
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  customer      Customer @relation(fields: [customerEmail], references: [email], onDelete: Cascade)
+  product       Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([customerEmail, productId])
+  @@index([customerEmail])
+  @@index([productId])
+  @@map("wishlist_items")
+}
+
+model Message {
+  id        String   @id @default(uuid()) @db.Uuid
+  name      String
+  email     String
+  phone     String?
+  subject   String
+  body      String
+  type      String   @default("general")    // order-support, size-question, delivery, return, general
+  status    String   @default("unread")     // unread, open, resolved, archived
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status])
+  @@index([createdAt(sort: Desc)])
+  @@map("messages")
+}
+
+model StoreSetting {
+  id                          String   @id @default(uuid()) @db.Uuid
+  storeName                   String   @default("Intikhab")
+  publicEmail                 String   @default("intikhab.pakistan@gmail.com")
+  supportPhone                String   @default("0319 2776896")
+  whatsappNumber              String   @default("0319 2776896")
+  storeLocation               String   @default("Lahore, Pakistan")
+  businessHours               String   @default("Monday - Saturday: 10:00 AM - 8:00 PM")
+  codEnabled                  Boolean  @default(true)
+  jazzcashEnabled             Boolean  @default(true)
+  easypaisaEnabled            Boolean  @default(true)
+  cardEnabled                 Boolean  @default(false)
+  freeDeliveryEnabled         Boolean  @default(true)
+  freeDeliveryMinimum         Int      @default(3000)
+  standardDeliveryFee         Int      @default(150)
+  estimatedDeliveryDays       Int      @default(3)
+  newOrderEmailNotifications  Boolean  @default(true)
+  lowStockAlerts              Boolean  @default(true)
+  customerMessageAlerts       Boolean  @default(true)
+  newsletterSignupAlerts      Boolean  @default(false)
+  createdAt                   DateTime @default(now())
+  updatedAt                   DateTime @updatedAt
+
+  @@map("store_settings")
+}
+
+model Feedback {
+  id                 String   @id @default(uuid()) @db.Uuid
+  type               String   // bug, suggestion, content_issue, general
+  subject            String?  // short summary (detailed form only)
+  experienceCategory String?  @map("experience_category") // shopping_experience, product_quality, delivery, customer_service, website_usability, other
+  rating             Int?
+  name               String?  // full name (detailed form only)
+  email              String?
+  phone              String?  // phone number (detailed form only)
+  message            String
+  orderId            String?  @map("order_id") // order reference (detailed form only)
+  wouldRecommend     String?  @map("would_recommend") // yes, no, maybe (detailed form only)
+  heardFrom          String?  @map("heard_from") // social_media, friend_family, search_engine, advertisement, influencer, other (detailed form only)
+  customerEmail      String?  @map("customer_email") // Auth0 user email (set server-side)
+  contactPermission  Boolean  @default(false) @map("contact_permission")
+  pageUrl            String   @default("") @map("page_url")
+  status             String   @default("new") // new, read, resolved
+  notifiedAt         DateTime? @map("notified_at")
+  createdAt          DateTime @default(now()) @map("created_at")
+  updatedAt          DateTime @updatedAt @map("updated_at")
+
+  @@index([status])
+  @@index([createdAt(sort: Desc)])
+  @@map("feedback")
+}
+
+model AppearanceSetting {
+  id                String   @id @default(uuid()) @db.Uuid
+  storeName         String   @default("Intikhab")
+  tagline           String   @default("Selection That Matters")
+  primaryColor      String   @default("#1A1A1A")
+  accentColor       String   @default("#E53935")
+  backgroundColor   String   @default("#F7F7F7")
+  textColor         String   @default("#1A1A1A")
+  heroTitle         String   @default("Step Into Style")
+  heroSubtitle      String   @default("Discover premium footwear that elevates your every step.")
+  heroCtaLabel      String   @default("Shop Now")
+  heroCtaLink       String   @default("/products")
+  heroImage         String?
+  showHero          Boolean  @default(true)
+  showCategoryCards Boolean  @default(true)
+  showInstagramFeed Boolean  @default(true)
+  showTestimonials  Boolean  @default(true)
+  showNewsletter    Boolean  @default(true)
+  showTrustBadges   Boolean  @default(true)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@map("appearance_settings")
+}
+
+model AdminUser {
+  id        String   @id @default(uuid()) @db.Uuid
+  email     String   @unique
+  role      String   @default("admin")
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([email])
+  @@index([active])
+  @@map("admin_users")
 }

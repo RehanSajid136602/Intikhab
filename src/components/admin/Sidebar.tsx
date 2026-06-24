@@ -10,7 +10,11 @@ import {
   Palette,
   MessageSquare,
   Settings,
+  MessageSquareText,
   LogOut,
+  Tags,
+  TicketPercent,
+  Star,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ROUTES } from '@/lib/constants';
@@ -19,10 +23,14 @@ const navLinks = [
   { label: 'Dashboard', href: ROUTES.adminDashboard, icon: LayoutDashboard },
   { label: 'Products', href: ROUTES.adminProducts, icon: Package },
   { label: 'Orders', href: ROUTES.adminOrders, icon: ShoppingCart },
-  { label: 'Customers', href: '/admin/coming-soon', icon: Users },
-  { label: 'Appearance', href: '/admin/coming-soon', icon: Palette },
-  { label: 'Messages', href: '/admin/coming-soon', icon: MessageSquare },
-  { label: 'Settings', href: '/admin/coming-soon', icon: Settings },
+  { label: 'Customers', href: ROUTES.adminCustomers, icon: Users },
+  { label: 'Categories', href: ROUTES.adminCategories, icon: Tags },
+  { label: 'Coupons', href: ROUTES.adminCoupons, icon: TicketPercent },
+  { label: 'Reviews', href: ROUTES.adminReviews, icon: Star },
+  { label: 'Appearance', href: ROUTES.adminAppearance, icon: Palette },
+  { label: 'Messages', href: ROUTES.adminMessages, icon: MessageSquare },
+  { label: 'Feedback', href: ROUTES.adminFeedback, icon: MessageSquareText },
+  { label: 'Settings', href: ROUTES.adminSettings, icon: Settings },
 ];
 
 /**
