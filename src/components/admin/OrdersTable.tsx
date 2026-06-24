@@ -463,4 +463,4 @@ function OrderDetailModal({ order, onStatusUpdate }: OrderDetailModalProps) {
   );
 }
 
-export { OrdersTable };
+export default OrdersTable;

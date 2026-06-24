@@ -3,8 +3,11 @@
 import dynamic from 'next/dynamic';
 
 const OrdersTable = dynamic(
-  () => import('@/components/admin/OrdersTable').then((m) => m.OrdersTable),
-  { loading: () => <TableSkeleton /> },
+  () => import('@/components/admin/OrdersTable'),
+  { 
+    loading: () => <TableSkeleton />,
+    ssr: false
+  },
 );
 
 function TableSkeleton() {
