@@ -3,18 +3,28 @@ import { createHash, randomBytes } from "crypto";
 import { createClient } from "@/lib/supabase/server";
 import { verifyAdmin } from "@/lib/supabase/auth";
 import { getFirstProductImage } from "@/lib/utils";
+import { checkoutSchema } from "@/lib/validation";
+import { getClientIp, checkRateLimit } from "@/lib/rateLimit";
 
-/**
- * POST /api/orders
- * Creates a new order (guest checkout — no auth required).
- * Uses the PostgreSQL function `create_order_with_stock_deduction` for
- * atomic order creation with stock validation and automatic deduction.
- *
- * Expects: { customerName, customerEmail, phone, shippingAddress, province, city, paymentMethod, orderNotes, items: [{ productId, name, image, quantity, price }], total }
- */
 export async function POST(request: NextRequest) {
-  const supabase = createClient();
+  const ip = getClientIp(request);
+  const rateLimitResult = await checkRateLimit(`checkout:${ip}`, 5, 5 * 60 * 1000);
+  if (!rateLimitResult.success) {
+    return NextResponse.json(
+      { error: "Too many requests. Please try again in a few minutes." },
+      { status: 429 },
+    );
+  }
+
   const body = await request.json();
+
+  const result = checkoutSchema.safeParse(body);
+  if (!result.success) {
+    return NextResponse.json(
+      { error: "Validation failed", details: result.error.format() },
+      { status: 400 },
+    );
+  }
 
   const {
     customerName,
@@ -28,28 +38,9 @@ export async function POST(request: NextRequest) {
     orderNotes,
     items,
     couponCode,
-  } = body;
+  } = result.data;
 
-  console.log("Order payload:", JSON.stringify(body, null, 2));
-
-  if (!customerEmail || !items || !Array.isArray(items) || items.length === 0) {
-    console.error("Missing required fields:", {
-      customerEmail: !!customerEmail,
-      items: !!items,
-      itemsLength: Array.isArray(items) ? items.length : 0,
-    });
-    return NextResponse.json(
-      { error: "Missing required fields" },
-      { status: 400 },
-    );
-  }
-
-  if (!customerName || !phone || !shippingAddress || !city || !postalCode) {
-    return NextResponse.json(
-      { error: "Missing customer or shipping details" },
-      { status: 400 },
-    );
-  }
+  const supabase = createClient();
 
   const productIds = Array.from(new Set(items.map((item) => item.productId)));
   const { data: products, error: productError } = await supabase

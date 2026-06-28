@@ -1,26 +1,39 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { messageSchema } from "@/lib/validation";
+import { getClientIp, checkRateLimit } from "@/lib/rateLimit";
 
 export async function POST(request: Request) {
-  const body = await request.json();
-  const { name, email, phone, subject, message, type } = body;
-
-  if (!name || !email || !subject || !message) {
+  const ip = getClientIp(request);
+  const rateLimitResult = await checkRateLimit(`messages:${ip}`, 5, 5 * 60 * 1000);
+  if (!rateLimitResult.success) {
     return NextResponse.json(
-      { error: "Name, email, subject, and message are required." },
+      { error: "Too many requests. Please try again in a few minutes." },
+      { status: 429 },
+    );
+  }
+
+  const body = await request.json();
+
+  const result = messageSchema.safeParse(body);
+  if (!result.success) {
+    return NextResponse.json(
+      { error: "Validation failed", details: result.error.format() },
       { status: 400 },
     );
   }
 
+  const { name, email, phone, subject, message, type } = result.data;
+
   const supabase = createClient();
   const { error } = await supabase.from("messages").insert({
     id: crypto.randomUUID(),
-    name: String(name).trim(),
-    email: String(email).trim(),
-    phone: phone ? String(phone).trim() : null,
-    subject: String(subject).trim(),
-    body: String(message).trim(),
-    type: type || "general",
+    name,
+    email,
+    phone,
+    subject,
+    body: message,
+    type,
     status: "unread",
     updatedAt: new Date().toISOString(),
   });

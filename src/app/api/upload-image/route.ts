@@ -23,13 +23,27 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'No file provided' }, { status: 400 });
   }
 
+  // Validate file size (max 5MB)
+  if (file.size > 5 * 1024 * 1024) {
+    return NextResponse.json({ error: 'File size exceeds the 5MB limit.' }, { status: 400 });
+  }
+
   // Validate file type
   if (!file.type.startsWith('image/')) {
     return NextResponse.json({ error: 'File must be an image' }, { status: 400 });
   }
 
+  // Validate file extension
+  const ext = file.name.split('.').pop()?.toLowerCase();
+  const allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'avif'];
+  if (!ext || !allowedExtensions.includes(ext)) {
+    return NextResponse.json(
+      { error: 'Invalid file extension. Only jpg, jpeg, png, gif, webp, avif are allowed.' },
+      { status: 400 },
+    );
+  }
+
   // Generate unique filename
-  const ext = file.name.split('.').pop();
   const fileName = `product-${Date.now()}-${Math.random().toString(36).substring(7)}.${ext}`;
 
   // Upload to Supabase Storage

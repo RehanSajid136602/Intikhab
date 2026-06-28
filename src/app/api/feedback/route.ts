@@ -3,8 +3,19 @@ import { auth } from '@/lib/auth';
 import { headers } from 'next/headers';
 import { createClient } from '@/lib/supabase/server';
 import { notifyFeedback } from '@/lib/feedback-notify';
+import { feedbackSchema } from '@/lib/validation';
+import { getClientIp, checkRateLimit } from '@/lib/rateLimit';
 
 export async function POST(request: Request) {
+  const ip = getClientIp(request);
+  const rateLimitResult = await checkRateLimit(`feedback:${ip}`, 5, 5 * 60 * 1000);
+  if (!rateLimitResult.success) {
+    return NextResponse.json(
+      { error: "Too many feedback submissions. Please try again in a few minutes." },
+      { status: 429 },
+    );
+  }
+
   try {
     const session = await auth.api.getSession({
       headers: headers(),
@@ -19,22 +30,28 @@ export async function POST(request: Request) {
 
     const body = await request.json();
 
-    const { type, rating, message, email, contactPermission, pageUrl } = body;
-
-    if (!message || typeof message !== 'string' || !message.trim()) {
+    const result = feedbackSchema.safeParse(body);
+    if (!result.success) {
       return NextResponse.json(
-        { error: 'Message is required.' },
+        { error: 'Validation failed', details: result.error.format() },
         { status: 400 },
       );
     }
 
-    const validTypes = ['bug', 'suggestion', 'content_issue', 'general'];
-    if (!validTypes.includes(type)) {
-      return NextResponse.json(
-        { error: 'Invalid feedback type.' },
-        { status: 400 },
-      );
-    }
+    const {
+      type,
+      rating,
+      message,
+      name,
+      phone,
+      contactPermission,
+      pageUrl,
+      subject,
+      experienceCategory,
+      orderId,
+      wouldRecommend,
+      heardFrom,
+    } = result.data;
 
     const supabase = createClient();
 
@@ -47,22 +64,20 @@ export async function POST(request: Request) {
 
     const insertData: Record<string, unknown> = {
       type,
-      rating: typeof rating === 'number' ? rating : null,
-      message: message.trim(),
+      rating,
+      message,
       customer_email: session.user.email,
-      name: profile?.fullName || body.name || session.user.name || null,
+      name: profile?.fullName || name || session.user.name || null,
       email: session.user.email,
-      phone: body.phone || profile?.phone || null,
-      contact_permission: Boolean(contactPermission),
-      page_url: typeof pageUrl === 'string' ? pageUrl : '',
+      phone: phone || profile?.phone || null,
+      contact_permission: contactPermission,
+      page_url: pageUrl,
+      subject,
+      experience_category: experienceCategory,
+      order_id: orderId,
+      would_recommend: wouldRecommend,
+      heard_from: heardFrom,
     };
-
-    // Detailed form fields (optional)
-    if (body.subject !== undefined) insertData.subject = body.subject || null;
-    if (body.experienceCategory !== undefined) insertData.experience_category = body.experienceCategory || null;
-    if (body.orderId !== undefined) insertData.order_id = body.orderId || null;
-    if (body.wouldRecommend !== undefined) insertData.would_recommend = body.wouldRecommend || null;
-    if (body.heardFrom !== undefined) insertData.heard_from = body.heardFrom || null;
 
     const { data, error } = await supabase
       .from('feedback')

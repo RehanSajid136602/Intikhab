@@ -1,35 +1,7 @@
-import { cookies } from 'next/headers';
-import { redirect } from 'next/navigation';
-import { createServerClient } from '@supabase/ssr';
+import { requireAdmin } from '@/lib/auth/requireAdmin';
 import AdminComingSoonClient from './AdminComingSoonClient';
 
-/**
- * Admin coming soon page.
- * Only accessible to authenticated admins.
- */
 export default async function AdminComingSoonPage() {
-  const cookieStore = cookies();
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
-
-  const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
-    cookies: {
-      getAll() {
-        return cookieStore.getAll();
-      },
-      setAll() {
-        // Handled by middleware
-      },
-    },
-  });
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    redirect('/admin/login');
-  }
-
+  await requireAdmin();
   return <AdminComingSoonClient />;
 }

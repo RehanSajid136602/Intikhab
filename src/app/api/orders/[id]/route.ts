@@ -95,6 +95,11 @@ export async function PUT(
   const supabase = createClient();
   const body = await request.json();
 
+  const allowedStatuses = ["Pending", "Processing", "Shipped", "Delivered"];
+  if (body.status !== undefined && !allowedStatuses.includes(body.status)) {
+    return NextResponse.json({ error: "Invalid status value" }, { status: 400 });
+  }
+
   const updateData: Record<string, unknown> = {};
   if (body.status !== undefined) updateData.status = body.status;
 

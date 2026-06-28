@@ -30,25 +30,40 @@ export async function GET(
   });
 }
 
+import { reviewSchema } from "@/lib/validation";
+import { getClientIp, checkRateLimit } from "@/lib/rateLimit";
+
 export async function POST(
   request: NextRequest,
   { params }: { params: { id: string } },
 ) {
-  const body = await request.json();
-  const rating = Number(body.rating);
-  const title = body.title ? String(body.title).trim() : null;
-  const reviewBody = String(body.body || "").trim();
-
-  if (rating < 1 || rating > 5 || !reviewBody) {
-    return NextResponse.json({ error: "Rating and review are required" }, { status: 400 });
+  const ip = getClientIp(request);
+  const rateLimitResult = await checkRateLimit(`reviews:${ip}`, 5, 10 * 60 * 1000);
+  if (!rateLimitResult.success) {
+    return NextResponse.json(
+      { error: "Too many review attempts. Please try again in a few minutes." },
+      { status: 429 },
+    );
   }
+
+  const body = await request.json();
+
+  const result = reviewSchema.safeParse(body);
+  if (!result.success) {
+    return NextResponse.json(
+      { error: "Validation failed", details: result.error.format() },
+      { status: 400 },
+    );
+  }
+
+  const { rating, title, body: reviewBody, guestName: bodyGuestName, guestEmail: bodyGuestEmail } = result.data;
 
   const session = await auth.api.getSession({
     headers: headers(),
   }).catch(() => null);
   const customerEmail = session?.user?.email || null;
-  const guestName = customerEmail ? null : String(body.guestName || "").trim();
-  const guestEmail = customerEmail ? null : String(body.guestEmail || "").trim();
+  const guestName = customerEmail ? null : bodyGuestName;
+  const guestEmail = customerEmail ? null : bodyGuestEmail;
 
   if (!customerEmail && (!guestName || !guestEmail)) {
     return NextResponse.json(

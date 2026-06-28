@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
 
 /**
  * POST /api/cart
@@ -7,7 +9,6 @@ import { createClient } from "@/lib/supabase/server";
  * Expects: { email: string, items: [{ productId, quantity, size }] }
  */
 export async function POST(request: NextRequest) {
-  const supabase = createClient();
   const body = await request.json();
 
   const { email, items } = body;
@@ -18,6 +19,16 @@ export async function POST(request: NextRequest) {
       { status: 400 },
     );
   }
+
+  const session = await auth.api.getSession({
+    headers: headers(),
+  }).catch(() => null);
+
+  if (!session || !session.user?.email || session.user.email.toLowerCase() !== email.toLowerCase()) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+
+  const supabase = createClient();
 
   // Upsert each cart item
   for (const item of items) {
@@ -47,7 +58,6 @@ export async function POST(request: NextRequest) {
  * Returns cart items for the given email.
  */
 export async function GET(request: NextRequest) {
-  const supabase = createClient();
   const email = request.nextUrl.searchParams.get("email");
 
   if (!email) {
@@ -56,6 +66,16 @@ export async function GET(request: NextRequest) {
       { status: 400 },
     );
   }
+
+  const session = await auth.api.getSession({
+    headers: headers(),
+  }).catch(() => null);
+
+  if (!session || !session.user?.email || session.user.email.toLowerCase() !== email.toLowerCase()) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+
+  const supabase = createClient();
 
   const { data, error } = await supabase
     .from("carts")

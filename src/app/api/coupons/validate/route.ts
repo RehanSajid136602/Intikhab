@@ -1,7 +1,17 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { getClientIp, checkRateLimit } from "@/lib/rateLimit";
 
 export async function POST(request: Request) {
+  const ip = getClientIp(request);
+  const rateLimitResult = await checkRateLimit(`coupon-validate:${ip}`, 10, 5 * 60 * 1000);
+  if (!rateLimitResult.success) {
+    return NextResponse.json(
+      { error: "Too many attempts. Please try again later." },
+      { status: 429 },
+    );
+  }
+
   let body;
   try {
     body = await request.json();
