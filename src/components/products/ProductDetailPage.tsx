@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
 import { useCartStore } from "@/stores/cartStore";
+import { useWishlistStore } from "@/stores/wishlistStore";
 import { formatPKR } from "@/lib/utils";
 import {
   ArrowLeft,
@@ -38,6 +39,7 @@ export function ProductDetailPage({
   relatedProducts,
 }: ProductDetailPageProps) {
   const { addItem } = useCartStore();
+  const { toggleItem, isInWishlist } = useWishlistStore();
   const router = useRouter();
   const [activeImage, setActiveImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
@@ -314,6 +316,19 @@ export function ProductDetailPage({
                 className="flex-1 bg-brand-red text-white py-4 font-semibold uppercase tracking-wider rounded-sm hover:bg-red-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Buy Now
+              </button>
+              <button
+                onClick={() => toggleItem(product)}
+                className="w-14 h-14 flex items-center justify-center border border-brand-border rounded-sm hover:border-brand-dark transition-colors"
+                aria-label={isInWishlist(product.id) ? "Remove from wishlist" : "Add to wishlist"}
+              >
+                <Heart
+                  className={`w-5 h-5 transition-colors ${
+                    isInWishlist(product.id)
+                      ? "fill-brand-red text-brand-red"
+                      : "text-brand-dark"
+                  }`}
+                />
               </button>
             </div>
 

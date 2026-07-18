@@ -1,10 +1,10 @@
+import type { Metadata } from 'next';
 import { ComingSoonPage } from '@/components/ui/ComingSoon';
 
-/**
- * Catch-all route for any unimplemented paths.
- * Maps the URL segments to a human-readable label (e.g. /men/casual → "Men — Casual").
- * Does NOT shadow existing routes (/, /admin, /admin/*) since static routes take priority.
- */
+export const metadata: Metadata = {
+  robots: { index: false, follow: false },
+};
+
 export default function CatchAllPage({
   params,
 }: {

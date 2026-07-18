@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { useCartStore } from "@/stores/cartStore";
 import { formatPKR } from "@/lib/utils";
 import { toast } from "sonner";
-import { Trash2 } from "lucide-react";
+import { Trash2, Wallet, Banknote } from "lucide-react";
 import { BRAND } from "@/lib/constants";
 
 const CITIES = [
@@ -662,8 +662,8 @@ export default function CheckoutPage() {
                       className="mr-3"
                     />
                     <div className="flex-1">
-                      <span className="font-semibold text-brand-dark">
-                        💵 Cash on Delivery (COD)
+                      <span className="font-semibold text-brand-dark inline-flex items-center gap-2">
+                        <Banknote className="w-4 h-4" /> Cash on Delivery (COD)
                       </span>
                       <span className="ml-2 text-xs bg-brand-red text-white px-2 py-1 rounded-full">
                         Most Popular
@@ -686,8 +686,8 @@ export default function CheckoutPage() {
                       className="mr-3"
                     />
                     <div className="flex-1">
-                      <span className="font-semibold text-brand-dark">
-                        📱 JazzCash
+                      <span className="font-semibold text-brand-dark inline-flex items-center gap-2">
+                        <Wallet className="w-4 h-4" /> JazzCash
                       </span>
                     </div>
                   </label>
@@ -733,8 +733,8 @@ export default function CheckoutPage() {
                       className="mr-3"
                     />
                     <div className="flex-1">
-                      <span className="font-semibold text-brand-dark">
-                        📱 Easypaisa
+                      <span className="font-semibold text-brand-dark inline-flex items-center gap-2">
+                        <Wallet className="w-4 h-4" /> Easypaisa
                       </span>
                     </div>
                   </label>

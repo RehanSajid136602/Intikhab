@@ -6,7 +6,7 @@ export const BRAND = {
   name: 'Intikhab',
   tagline: 'Selection That Matters',
   email: 'intikhab.pakistan@gmail.com',
-  phone: '0319 2776896',
+  phone: '+92 332 3130689',
   facebook: 'https://www.facebook.com/share/1AjG4bGKpc/',
   instagram: 'https://www.instagram.com/intikhab_pakistan?igsh=aW5yaWJldTc0d2F2',
   instagramHandle: '@intikhab_pakistan',

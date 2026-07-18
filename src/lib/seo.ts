@@ -64,7 +64,7 @@ export function getMetadata({
         },
       ],
       type: "website",
-      locale: "en_PK",
+      locale: "en-PK",
     },
     twitter: {
       card: "summary_large_image",

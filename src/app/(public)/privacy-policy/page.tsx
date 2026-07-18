@@ -174,7 +174,7 @@ export default function PrivacyPolicyPage() {
           <li>
             <strong>Phone:</strong>{' '}
             <span className="bg-yellow-200 px-2 py-1 rounded font-semibold">
-              0319 2776896
+              +92 332 3130689
             </span>
           </li>
         </ul>

@@ -190,7 +190,7 @@ export function FeedbackPageClient() {
             Please sign in to your account to submit detailed feedback.
           </p>
           <Link
-            href="/auth/login"
+            href="/login"
             className="inline-block px-8 py-3 bg-brand-dark text-white text-xs font-bold uppercase tracking-widest hover:bg-black transition-all duration-200"
           >
             Sign In

@@ -45,7 +45,7 @@ export default function ReturnExchangePolicyPage() {
             How to Request Help
           </h2>
           <p>
-            Contact us at intikhab.pakistan@gmail.com or WhatsApp/call 0319 2776896 with your order ID, product name, and reason for return or exchange.
+            Contact us at intikhab.pakistan@gmail.com or WhatsApp/call +92 332 3130689 with your order ID, product name, and reason for return or exchange.
           </p>
         </div>
       </section>

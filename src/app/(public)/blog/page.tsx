@@ -1,19 +1,9 @@
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Blog | Intikhab Shoe Store',
+  title: 'Blog | Intikhab',
   description: 'Blog posts coming soon. Stay tuned for the latest updates on shoes, fashion trends, and more.',
-  openGraph: {
-    title: 'Blog | Intikhab Shoe Store',
-    description: 'Blog posts coming soon. Stay tuned for the latest updates on shoes, fashion trends, and more.',
-    url: '/blog',
-    type: 'website',
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: 'Blog | Intikhab Shoe Store',
-    description: 'Blog posts coming soon. Stay tuned for the latest updates on shoes, fashion trends, and more.',
-  },
+  robots: { index: false, follow: false },
 };
 
 export default function BlogPage() {

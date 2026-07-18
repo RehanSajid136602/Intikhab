@@ -17,7 +17,7 @@ const badges = [
   },
   {
     icon: RotateCcw,
-    title: 'Easy 30-Day Returns',
+    title: 'Easy 7-Day Returns',
     subtitle: 'Hassle-free exchange',
   },
   {
@@ -27,8 +27,8 @@ const badges = [
   },
   {
     icon: MessageCircle,
-    title: '24/7 Support',
-    subtitle: '0319 2776896',
+    title: 'Mon–Sat Support',
+    subtitle: '10am – 9:30pm',
   },
 ];
 

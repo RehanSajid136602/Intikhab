@@ -22,4 +22,5 @@ export interface Order {
   total: number;
   status: OrderStatus;
   date: string;
+  paymentMethod?: string;
 }

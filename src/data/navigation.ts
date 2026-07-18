@@ -74,7 +74,7 @@ export const mainNavItems: NavItem[] = [
 export const footerLinks = {
   getInTouch: {
     email: 'intikhab.pakistan@gmail.com',
-    phone: '0319 2776896',
+    phone: '+92 332 3130689',
     hours: 'Monday–Saturday, 10:00 am to 9:30 pm',
     whatsapp: true,
   },

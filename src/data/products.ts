@@ -21,7 +21,7 @@ export const products: Product[] = [
     stock: 18,
     installment: 0,
     description:
-      "A vibrant blue sneaker perfect for adding a pop of color to any outfit.",
+      "Vibrant blue canvas upper with a cushioned textile insole and a flexible rubber outsole. Lightweight enough for daily wear, sturdy enough for Karachi streets.",
     sku: "INK-BLU-001",
     status: "active",
     createdAt: new Date().toISOString(),
@@ -54,7 +54,7 @@ export const products: Product[] = [
     stock: 24,
     installment: 0,
     description:
-      "A timeless black sneaker crafted for everyday comfort and style. Features premium materials and a durable rubber sole.",
+      "Black woven textile upper with a padded collar and a grippy gum-rubber sole. The insole has built-in arch support — designed for people who spend all day on their feet.",
     sku: "INK-BLK-001",
     status: "active",
     createdAt: new Date().toISOString(),
@@ -86,7 +86,7 @@ export const products: Product[] = [
     stock: 18,
     installment: 0,
     description:
-      "A premium designer sneaker with elegant color blocking, crafted for modern women's fashion and style.",
+      "Pastel blue and cream color-blocked upper stitched on a slim white sole. The padded tongue and heel tab make these easy to slip on — no breaking-in required.",
     sku: "INK-BLU-002",
     status: "active",
     createdAt: new Date().toISOString(),

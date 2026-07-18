@@ -46,7 +46,7 @@ export const homepageImages = {
       label: "New Arrivals",
       src: "/images/intikhab/intikhab-boots-rugged-premium.webp",
       alt: "Premium leather boots photographed for Intikhab new arrivals",
-      href: "/coming-soon",
+      href: "/products?sort=latest",
     },
   ],
 

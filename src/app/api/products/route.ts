@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { verifyAdmin } from "@/lib/supabase/auth";
 import { PRODUCT_TYPE_CONFIG } from "@/lib/sizeSystems";
 import type { ProductType } from "@/types/product";
+import { transformProduct } from "@/lib/transformers";
 
 /**
  * GET /api/products
@@ -232,39 +233,4 @@ export async function POST(request: NextRequest) {
   return NextResponse.json(transformProduct(data), { status: 201 });
 }
 
-function transformProduct(row: Record<string, unknown>) {
-  return {
-    id: row.id as string,
-    slug: row.slug as string,
-    name: row.name as string,
-    brand: row.brand as string,
-    productType: row.productType as
-      | "shoes"
-      | "bags"
-      | "accessories"
-      | "clothing",
-    category: row.category as "men" | "women" | "kids" | "unisex",
-    subcategory: row.subcategory as string | undefined,
-    price: row.price as number,
-    originalPrice: row.originalPrice as number | undefined,
-    images: row.images as string[],
-    badge: row.badge as "SALE" | "NEW" | null,
-    inStock: row["inStock"] as boolean,
-    stock: row.stock as number,
-    installment: row.installment as number,
-    description: row.description as string,
-    sku: row.sku as string,
-    status: row.status as "active" | "draft",
-    sizeStock:
-      (row["sizeStock"] as { size: string; stock: number; label?: string }[]) ||
-      [],
-    sizeSystem: row.sizeSystem as
-      | "eu"
-      | "uk"
-      | "us"
-      | "bag"
-      | "general"
-      | "numeric",
-    createdAt: row["createdAt"] as string,
-  };
-}
+

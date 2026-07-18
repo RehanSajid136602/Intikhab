@@ -129,7 +129,7 @@ function HeroSlider() {
                 </h1>
                 <p className="text-white/80 text-sm md:text-base mb-6 font-medium">{slide.subtitle}</p>
                 <Link
-                  href="/coming-soon"
+                  href="/products"
                   className="inline-block bg-white text-brand-dark px-8 py-3.5 text-xs font-bold uppercase tracking-widest hover:bg-brand-dark hover:text-white transition-all duration-200 shadow-lg hover:shadow-xl"
                 >
                   SHOP NOW

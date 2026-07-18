@@ -88,7 +88,7 @@ export default function TermsAndConditionsPage() {
           <strong>How to Initiate a Return:</strong>
         </p>
         <p className="mb-4">
-          Contact us at <a href="mailto:intikhab.pakistan@gmail.com" className="font-bold text-brand-red hover:underline">intikhab.pakistan@gmail.com</a> or call <a href="tel:03192776896" className="font-bold text-brand-red hover:underline">0319 2776896</a> to initiate your return. Our team will guide you through the process and provide return shipping instructions.
+          Contact us at <a href="mailto:intikhab.pakistan@gmail.com" className="font-bold text-brand-red hover:underline">intikhab.pakistan@gmail.com</a> or call <a href="tel:+923323130689" className="font-bold text-brand-red hover:underline">+92 332 3130689</a> to initiate your return. Our team will guide you through the process and provide return shipping instructions.
         </p>
         <p className="mb-4">
           <strong>Size Exchanges:</strong>
@@ -189,8 +189,8 @@ export default function TermsAndConditionsPage() {
           </li>
           <li>
             <strong>Phone:</strong>{' '}
-            <a href="tel:03192776896" className="font-bold text-brand-red hover:underline">
-              0319 2776896
+            <a href="tel:+923323130689" className="font-bold text-brand-red hover:underline">
+              +92 332 3130689
             </a>
           </li>
         </ul>

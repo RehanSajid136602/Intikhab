@@ -1,49 +1,40 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { motion, useInView } from 'framer-motion';
 import { useRef } from 'react';
 import { Star } from 'lucide-react';
 import { SectionTitle } from '@/components/ui/SectionTitle';
 
-// TODO: Replace with real reviews from client
-const testimonials = [
-  {
-    name: 'Ali Hassan',
-    city: 'Lahore',
-    rating: 5,
-    review: 'Amazing quality! The sneakers are super comfortable and the delivery was fast. Will definitely order again.',
-    product: 'Urban Runner X',
-  },
-  {
-    name: 'Sara Ahmed',
-    city: 'Karachi',
-    rating: 5,
-    review: 'Best online shoe shopping experience in Pakistan. The fit is perfect and material is top-notch.',
-    product: 'Classic White Kicks',
-  },
-  {
-    name: 'Usman Khan',
-    city: 'Islamabad',
-    rating: 4,
-    review: 'Great value for money. The shoes look exactly like the pictures. Customer service was very helpful.',
-    product: 'Street Style Pro',
-  },
-  {
-    name: 'Fatima Malik',
-    city: 'Faisalabad',
-    rating: 5,
-    review: 'I was skeptical about ordering shoes online, but Intikhab proved me wrong. Excellent quality and quick delivery!',
-    product: 'Urban Runner X',
-  },
-];
+interface Testimonial {
+  id: string;
+  name: string;
+  rating: number;
+  review: string;
+  product: string;
+  date: string;
+}
 
-/**
- * Testimonials section with customer reviews.
- * Horizontal scroll on mobile, 2x2 grid on desktop.
- */
 function Testimonials() {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: '-100px' });
+  const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function load() {
+      try {
+        const res = await fetch('/api/testimonials');
+        const data = await res.json();
+        setTestimonials(data.testimonials || []);
+      } catch {
+        setTestimonials([]);
+      } finally {
+        setLoading(false);
+      }
+    }
+    load();
+  }, []);
 
   return (
     <motion.section
@@ -56,40 +47,48 @@ function Testimonials() {
       <div className="container mx-auto px-4">
         <SectionTitle title="What Our Customers Say" />
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {testimonials.map((testimonial, index) => (
-            <motion.div
-              key={index}
-              initial={{ opacity: 0, y: 20 }}
-              animate={isInView ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 0.4, delay: index * 0.1 }}
-              className="bg-gray-50 p-6 rounded-lg"
-            >
-              {/* Stars */}
-              <div className="flex gap-1 mb-3">
-                {[...Array(testimonial.rating)].map((_, i) => (
-                  <Star key={i} className="w-4 h-4 fill-brand-red text-brand-red" />
-                ))}
-              </div>
-
-              {/* Review */}
-              <p className="text-brand-gray text-sm mb-4 leading-relaxed">
-                "{testimonial.review}"
-              </p>
-
-              {/* Customer Info */}
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="font-semibold text-brand-dark text-sm">{testimonial.name}</p>
-                  <p className="text-xs text-brand-gray">{testimonial.city}</p>
+        {loading ? (
+          <div className="flex justify-center py-12">
+            <div className="w-8 h-8 border-2 border-brand-gray border-t-brand-dark rounded-full animate-spin" />
+          </div>
+        ) : testimonials.length === 0 ? (
+          <p className="text-center text-brand-gray py-12">
+            Reviews from our customers will appear here once approved.
+          </p>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {testimonials.map((testimonial, index) => (
+              <motion.div
+                key={testimonial.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={isInView ? { opacity: 1, y: 0 } : {}}
+                transition={{ duration: 0.4, delay: index * 0.1 }}
+                className="bg-gray-50 p-6 rounded-lg"
+              >
+                <div className="flex gap-1 mb-3">
+                  {[...Array(testimonial.rating)].map((_, i) => (
+                    <Star key={i} className="w-4 h-4 fill-brand-red text-brand-red" />
+                  ))}
                 </div>
-                <p className="text-xs text-brand-gray bg-white px-3 py-1 rounded-full">
-                  {testimonial.product}
+
+                <p className="text-brand-gray text-sm mb-4 leading-relaxed">
+                  &ldquo;{testimonial.review}&rdquo;
                 </p>
-              </div>
-            </motion.div>
-          ))}
-        </div>
+
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="font-semibold text-brand-dark text-sm">{testimonial.name}</p>
+                  </div>
+                  {testimonial.product && (
+                    <p className="text-xs text-brand-gray bg-white px-3 py-1 rounded-full">
+                      {testimonial.product}
+                    </p>
+                  )}
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        )}
       </div>
     </motion.section>
   );

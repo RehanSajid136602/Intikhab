@@ -180,8 +180,8 @@ export async function getOrCreateSettings() {
     .insert({
       storeName: 'Intikhab',
       publicEmail: 'intikhab.pakistan@gmail.com',
-      supportPhone: '0319 2776896',
-      whatsappNumber: '0319 2776896',
+      supportPhone: '+92 332 3130689',
+      whatsappNumber: '+92 332 3130689',
       storeLocation: 'Lahore, Pakistan',
       businessHours: 'Monday - Saturday: 10:00 AM - 8:00 PM',
       codEnabled: true,

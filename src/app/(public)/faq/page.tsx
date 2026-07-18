@@ -38,7 +38,7 @@ export default function FAQPage() {
     },
     {
       question: 'How do I initiate a return?',
-      answer: `Contact us at <span class="bg-yellow-200 px-2 py-1 rounded font-semibold">intikhab.pakistan@gmail.com</span> or call <span class="bg-yellow-200 px-2 py-1 rounded font-semibold">0319 2776896</span> to initiate your return. Our team will guide you through the process.`,
+      answer: `Contact us at <span class="bg-yellow-200 px-2 py-1 rounded font-semibold">intikhab.pakistan@gmail.com</span> or call <span class="bg-yellow-200 px-2 py-1 rounded font-semibold">+92 332 3130689</span> to initiate your return. Our team will guide you through the process.`,
     },
     {
       question: 'Can I exchange for a different size?',

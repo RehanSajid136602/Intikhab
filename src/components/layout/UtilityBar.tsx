@@ -21,12 +21,12 @@ function UtilityBar() {
           </span>
         </div>
         <div className="hidden md:flex items-center gap-3 ml-auto">
-          <Link href="/coming-soon" className="hover:text-brand-dark transition-colors">
+          <Link href="/account/orders" className="hover:text-brand-dark transition-colors">
             Track Order
           </Link>
           <span className="text-brand-border">|</span>
-          <Link href="/coming-soon" className="hover:text-brand-dark transition-colors">
-            Store Locator
+          <Link href="/contact" className="hover:text-brand-dark transition-colors">
+            Contact Us
           </Link>
           <span className="text-brand-border">|</span>
           <span>Free Delivery on Prepaid Orders</span>

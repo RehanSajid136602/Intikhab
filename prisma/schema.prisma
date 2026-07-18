@@ -239,8 +239,8 @@ model StoreSetting {
   id                          String   @id @default(uuid()) @db.Uuid
   storeName                   String   @default("Intikhab")
   publicEmail                 String   @default("intikhab.pakistan@gmail.com")
-  supportPhone                String   @default("0319 2776896")
-  whatsappNumber              String   @default("0319 2776896")
+  supportPhone                String   @default("+92 332 3130689")
+  whatsappNumber              String   @default("+92 332 3130689")
   storeLocation               String   @default("Lahore, Pakistan")
   businessHours               String   @default("Monday - Saturday: 10:00 AM - 8:00 PM")
   codEnabled                  Boolean  @default(true)
@@ -259,6 +259,17 @@ model StoreSetting {
   updatedAt                   DateTime @updatedAt
 
   @@map("store_settings")
+}
+
+model NewsletterSubscriber {
+  id        String   @id @default(uuid()) @db.Uuid
+  email     String   @unique
+  source    String?  @default("homepage") // homepage, checkout, footer, etc.
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([email])
+  @@index([createdAt(sort: Desc)])
+  @@map("newsletter_subscribers")
 }
 
 model Feedback {

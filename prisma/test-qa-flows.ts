@@ -187,7 +187,7 @@ async function main() {
       data: {
         customerEmail: testEmailCustomerA,
         fullName: 'Rehan Sajid',
-        phone: '03192776896',
+        phone: '+923323130689',
         city: 'Lahore',
         province: 'Punjab',
         postalCode: '54000',

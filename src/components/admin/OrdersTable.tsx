@@ -144,7 +144,32 @@ function OrdersTable() {
   });
 
   const handleExport = () => {
-    toast.info("Export feature coming soon!");
+    if (filteredOrders.length === 0) {
+      toast.error("No orders to export");
+      return;
+    }
+
+    const headers = ["Order ID", "Customer", "Email", "Total", "Status", "Date", "Payment", "Items"];
+    const rows = filteredOrders.map((o) => [
+      o.id,
+      o.customerName,
+      o.customerEmail,
+      o.total.toString(),
+      o.status,
+      o.date,
+      o.paymentMethod || "COD",
+      o.items.map((i) => `${i.name} (${i.size} x${i.quantity})`).join("; "),
+    ]);
+
+    const csv = [headers.join(","), ...rows.map((r) => r.map((c) => `"${c.replace(/"/g, '""')}"`).join(","))].join("\n");
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `orders-export-${new Date().toISOString().split("T")[0]}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast.success(`Exported ${filteredOrders.length} orders`);
   };
 
   const handleStatusUpdate = async (
