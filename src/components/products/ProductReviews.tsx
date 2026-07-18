@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Star } from "lucide-react";
+import { Star, MessageSquareText } from "lucide-react";
 
 interface Review {
   id: string;
@@ -64,8 +64,12 @@ export function ProductReviews({ productId }: { productId: string }) {
       </div>
 
       {reviews.length === 0 ? (
-        <div className="surface-card p-6 text-sm text-brand-gray">
-          No reviews yet. Be the first to share feedback after your order.
+        <div className="surface-card py-12 px-6 text-center">
+          <div className="w-12 h-12 bg-brand-light-gray rounded-full flex items-center justify-center mx-auto mb-4">
+            <MessageSquareText className="w-5 h-5 text-brand-gray" />
+          </div>
+          <p className="text-sm font-semibold text-brand-dark">No reviews yet</p>
+          <p className="text-xs text-brand-gray mt-1">Be the first to share feedback after your order.</p>
         </div>
       ) : (
         <div className="grid gap-4 md:grid-cols-2">

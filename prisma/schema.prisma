@@ -1,9 +1,7 @@
-// Intikhab Ecommerce — Prisma Schema
-// Supabase Postgres database
-
 generator client {
-  provider = "prisma-client-js"
-  output   = "../src/generated/prisma"
+  provider        = "prisma-client-js"
+  output          = "../src/generated/prisma"
+  previewFeatures = ["partialIndexes"]
 }
 
 datasource db {
@@ -11,28 +9,27 @@ datasource db {
 }
 
 model Product {
-  id            String   @id @default(uuid()) @db.Uuid
-  slug          String   @unique
+  id            String         @id @default(uuid()) @db.Uuid
+  slug          String         @unique
   name          String
-  brand         String   @default("Intikhab")
-  productType   String   @default("shoes") // shoes, bags, accessories, clothing
-  category      String   @default("men") // men, women, kids, unisex
-  subcategory   String?  // sneakers, formal, casual, sandals, handbags, etc.
+  brand         String         @default("Intikhab")
+  category      String         @default("men")
   price         Int
   originalPrice Int?
   images        String[]
-  badge         String?  // SALE, NEW
-  inStock       Boolean  @default(true)
-  stock         Int      @default(0)
-  installment   Int      @default(0)
-  description   String   @default("")
-  sku           String   @unique
-  status        String   @default("active") // active, draft
-  sizeStock     Json     @default("[]") // [{size: string, stock: number, label?: string}]
-  sizeSystem    String   @default("eu") // eu, uk, us, bag, general, numeric
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-
+  badge         String?
+  inStock       Boolean        @default(true)
+  stock         Int            @default(0)
+  installment   Int            @default(0)
+  description   String         @default("")
+  sku           String         @unique
+  status        String         @default("active")
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  sizeStock     Json           @default("[]")
+  productType   String         @default("shoes")
+  subcategory   String?
+  sizeSystem    String         @default("eu")
   reviews       Review[]
   wishlistItems WishlistItem[]
 
@@ -46,21 +43,20 @@ model Product {
 }
 
 model Customer {
-  id           String    @id @default(uuid()) @db.Uuid
-  email        String    @unique
-  phone        String    @default("")
-  fullName     String    @default("")
-  city         String    @default("")
-  status       String    @default("active") // active, vip, blocked
-  newsletter   Boolean   @default(false)
-  notes        String?
-  createdAt    DateTime  @default(now())
-  lastOrderAt  DateTime?
-
-  orders       Order[]
-  carts        Cart[]
-  addresses    Address[]
-  reviews      Review[]
+  id            String         @id @default(uuid()) @db.Uuid
+  email         String         @unique
+  phone         String         @default("")
+  fullName      String         @default("")
+  createdAt     DateTime       @default(now())
+  lastOrderAt   DateTime?
+  city          String         @default("")
+  newsletter    Boolean        @default(false)
+  notes         String?
+  status        String         @default("active")
+  addresses     Address?
+  carts         Cart[]
+  orders        Order[]
+  reviews       Review[]
   wishlistItems WishlistItem[]
 
   @@index([email])
@@ -68,26 +64,25 @@ model Customer {
 }
 
 model Order {
-  id             String      @id // INK-001 format, generated server-side
-  customerEmail  String
-  customerName   String      @default("")
+  id              String      @id
+  customerEmail   String
+  customerName    String      @default("")
   shippingAddress String
-  province       String      @default("")
-  city           String      @default("")
-  phone          String      @default("")
-  paymentMethod  String      @default("cod") // cod, jazzcash, easypaisa
-  orderNotes     String?     @default("")
+  province        String      @default("")
+  city            String      @default("")
+  phone           String      @default("")
+  paymentMethod   String      @default("cod")
+  orderNotes      String?     @default("")
+  total           Int
+  status          String      @default("Pending")
+  createdAt       DateTime    @default(now())
   subtotal        Int         @default(0)
   shippingFee     Int         @default(0)
   couponCode      String?
   couponDiscount  Int         @default(0)
   accessTokenHash String?     @map("access_token_hash")
-  total          Int
-  status         String      @default("Pending") // Pending, Processing, Shipped, Delivered
-  createdAt      DateTime    @default(now())
-
-  customer       Customer    @relation(fields: [customerEmail], references: [email])
-  items          OrderItem[]
+  items           OrderItem[]
+  customer        Customer    @relation(fields: [customerEmail], references: [email])
 
   @@index([customerEmail])
   @@index([status])
@@ -97,31 +92,29 @@ model Order {
 }
 
 model OrderItem {
-  id         String  @id @default(uuid()) @db.Uuid
-  orderId    String
-  productId  String
-  name       String
-  image      String
-  quantity   Int
-  price      Int
-  size       String  // Changed from Int to String for flexible size systems
-
-  order      Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  id        String @id @default(uuid()) @db.Uuid
+  orderId   String
+  productId String
+  name      String
+  image     String
+  quantity  Int
+  price     Int
+  size      String
+  order     Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
 
   @@index([orderId])
   @@map("order_items")
 }
 
 model Cart {
-  id             String   @id @default(uuid()) @db.Uuid
-  customerEmail  String
-  productId      String
-  size           String?  // Changed from Int to String for flexible size systems
-  quantity       Int      @default(1)
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
-
-  customer       Customer @relation(fields: [customerEmail], references: [email], onDelete: Cascade)
+  id            String   @id @default(uuid()) @db.Uuid
+  customerEmail String
+  productId     String
+  quantity      Int      @default(1)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  size          String?
+  customer      Customer @relation(fields: [customerEmail], references: [email], onDelete: Cascade)
 
   @@unique([customerEmail, productId, size])
   @@index([customerEmail])
@@ -129,17 +122,17 @@ model Cart {
 }
 
 model Coupon {
-  id                 String   @id @default(uuid()) @db.Uuid
-  code               String   @unique
-  discountType       String   @map("discount_type") // percentage, fixed
-  discountValue      Int      @map("discount_value")
-  active             Boolean  @default(true)
-  minimumOrderAmount Int?     @map("minimum_order_amount")
-  usageLimit         Int?     @map("usage_limit")
-  usedCount          Int      @default(0) @map("used_count")
+  id                 String    @id @default(uuid()) @db.Uuid
+  code               String    @unique
+  discountType       String    @map("discount_type")
+  discountValue      Int       @map("discount_value")
+  active             Boolean   @default(true)
+  minimumOrderAmount Int?      @map("minimum_order_amount")
+  usageLimit         Int?      @map("usage_limit")
+  usedCount          Int       @default(0) @map("used_count")
   expiresAt          DateTime? @map("expires_at")
-  createdAt          DateTime @default(now()) @map("created_at")
-  updatedAt          DateTime @updatedAt @map("updated_at")
+  createdAt          DateTime  @default(now()) @map("created_at")
+  updatedAt          DateTime  @updatedAt @map("updated_at")
 
   @@index([code])
   @@index([active])
@@ -147,39 +140,37 @@ model Coupon {
 }
 
 model Address {
-  id              String   @id @default(uuid()) @db.Uuid
-  customerEmail   String   @map("customer_email")
-  fullName        String   @map("full_name")
-  phone           String
-  city            String
-  province        String   @default("")
-  postalCode      String   @map("postal_code")
-  addressLine     String   @map("address_line")
-  isDefault       Boolean  @default(false) @map("is_default")
-  createdAt       DateTime @default(now()) @map("created_at")
-  updatedAt       DateTime @updatedAt @map("updated_at")
-
-  customer        Customer @relation(fields: [customerEmail], references: [email], onDelete: Cascade)
+  id            String   @id @default(uuid()) @db.Uuid
+  customerEmail String   @unique(map: "addresses_one_default_per_customer_idx", where: raw("(is_default = true)")) @map("customer_email")
+  fullName      String   @map("full_name")
+  phone         String
+  city          String
+  province      String   @default("")
+  postalCode    String   @map("postal_code")
+  addressLine   String   @map("address_line")
+  isDefault     Boolean  @default(false) @map("is_default")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+  customer      Customer @relation(fields: [customerEmail], references: [email], onDelete: Cascade)
 
   @@index([customerEmail])
   @@map("addresses")
 }
 
 model Review {
-  id            String   @id @default(uuid()) @db.Uuid
-  productId     String   @map("product_id") @db.Uuid
-  customerEmail String?  @map("customer_email")
-  guestName     String?  @map("guest_name")
-  guestEmail    String?  @map("guest_email")
+  id            String    @id @default(uuid()) @db.Uuid
+  productId     String    @map("product_id") @db.Uuid
+  customerEmail String?   @map("customer_email")
+  guestName     String?   @map("guest_name")
+  guestEmail    String?   @map("guest_email")
   rating        Int
   title         String?
   body          String
-  status        String   @default("pending") // pending, approved, rejected
-  createdAt     DateTime @default(now()) @map("created_at")
-  updatedAt     DateTime @updatedAt @map("updated_at")
-
-  product       Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
-  customer      Customer? @relation(fields: [customerEmail], references: [email], onDelete: SetNull)
+  status        String    @default("pending")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+  customer      Customer? @relation(fields: [customerEmail], references: [email])
+  product       Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
 
   @@index([productId])
   @@index([customerEmail])
@@ -208,7 +199,6 @@ model WishlistItem {
   customerEmail String   @map("customer_email")
   productId     String   @map("product_id") @db.Uuid
   createdAt     DateTime @default(now()) @map("created_at")
-
   customer      Customer @relation(fields: [customerEmail], references: [email], onDelete: Cascade)
   product       Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
 
@@ -225,8 +215,8 @@ model Message {
   phone     String?
   subject   String
   body      String
-  type      String   @default("general")    // order-support, size-question, delivery, return, general
-  status    String   @default("unread")     // unread, open, resolved, archived
+  type      String   @default("general")
+  status    String   @default("unread")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -236,62 +226,51 @@ model Message {
 }
 
 model StoreSetting {
-  id                          String   @id @default(uuid()) @db.Uuid
-  storeName                   String   @default("Intikhab")
-  publicEmail                 String   @default("intikhab.pakistan@gmail.com")
-  supportPhone                String   @default("+92 332 3130689")
-  whatsappNumber              String   @default("+92 332 3130689")
-  storeLocation               String   @default("Lahore, Pakistan")
-  businessHours               String   @default("Monday - Saturday: 10:00 AM - 8:00 PM")
-  codEnabled                  Boolean  @default(true)
-  jazzcashEnabled             Boolean  @default(true)
-  easypaisaEnabled            Boolean  @default(true)
-  cardEnabled                 Boolean  @default(false)
-  freeDeliveryEnabled         Boolean  @default(true)
-  freeDeliveryMinimum         Int      @default(3000)
-  standardDeliveryFee         Int      @default(150)
-  estimatedDeliveryDays       Int      @default(3)
-  newOrderEmailNotifications  Boolean  @default(true)
-  lowStockAlerts              Boolean  @default(true)
-  customerMessageAlerts       Boolean  @default(true)
-  newsletterSignupAlerts      Boolean  @default(false)
-  createdAt                   DateTime @default(now())
-  updatedAt                   DateTime @updatedAt
+  id                         String   @id @default(uuid()) @db.Uuid
+  storeName                  String   @default("Intikhab")
+  publicEmail                String   @default("intikhab.pakistan@gmail.com")
+  supportPhone               String   @default("+92 332 3130689")
+  whatsappNumber             String   @default("+92 332 3130689")
+  storeLocation              String   @default("Lahore, Pakistan")
+  businessHours              String   @default("Monday - Saturday: 10:00 AM - 8:00 PM")
+  codEnabled                 Boolean  @default(true)
+  jazzcashEnabled            Boolean  @default(true)
+  easypaisaEnabled           Boolean  @default(true)
+  cardEnabled                Boolean  @default(false)
+  freeDeliveryEnabled        Boolean  @default(true)
+  freeDeliveryMinimum        Int      @default(3000)
+  standardDeliveryFee        Int      @default(150)
+  estimatedDeliveryDays      Int      @default(3)
+  newOrderEmailNotifications Boolean  @default(true)
+  lowStockAlerts             Boolean  @default(true)
+  customerMessageAlerts      Boolean  @default(true)
+  newsletterSignupAlerts     Boolean  @default(false)
+  createdAt                  DateTime @default(now())
+  updatedAt                  DateTime @updatedAt
 
   @@map("store_settings")
 }
 
-model NewsletterSubscriber {
-  id        String   @id @default(uuid()) @db.Uuid
-  email     String   @unique
-  source    String?  @default("homepage") // homepage, checkout, footer, etc.
-  createdAt DateTime @default(now()) @map("created_at")
-
-  @@index([email])
-  @@index([createdAt(sort: Desc)])
-  @@map("newsletter_subscribers")
-}
-
 model Feedback {
-  id                 String   @id @default(uuid()) @db.Uuid
-  type               String   // bug, suggestion, content_issue, general
-  subject            String?  // short summary (detailed form only)
-  experienceCategory String?  @map("experience_category") // shopping_experience, product_quality, delivery, customer_service, website_usability, other
+  id                 String    @id @default(uuid()) @db.Uuid
+  type               String
   rating             Int?
-  name               String?  // full name (detailed form only)
-  email              String?
-  phone              String?  // phone number (detailed form only)
   message            String
-  orderId            String?  @map("order_id") // order reference (detailed form only)
-  wouldRecommend     String?  @map("would_recommend") // yes, no, maybe (detailed form only)
-  heardFrom          String?  @map("heard_from") // social_media, friend_family, search_engine, advertisement, influencer, other (detailed form only)
-  customerEmail      String?  @map("customer_email") // Auth0 user email (set server-side)
-  contactPermission  Boolean  @default(false) @map("contact_permission")
-  pageUrl            String   @default("") @map("page_url")
-  status             String   @default("new") // new, read, resolved
+  email              String?
+  contactPermission  Boolean   @default(false) @map("contact_permission")
+  pageUrl            String    @default("") @map("page_url")
+  status             String    @default("new")
   notifiedAt         DateTime? @map("notified_at")
-  createdAt          DateTime @default(now()) @map("created_at")
-  updatedAt          DateTime @updatedAt @map("updated_at")
+  createdAt          DateTime  @default(now()) @map("created_at")
+  updatedAt          DateTime  @updatedAt @map("updated_at")
+  subject            String?
+  experienceCategory String?   @map("experience_category")
+  name               String?
+  phone              String?
+  orderId            String?   @map("order_id")
+  wouldRecommend     String?   @map("would_recommend")
+  heardFrom          String?   @map("heard_from")
+  customerEmail      String?   @map("customer_email")
 
   @@index([status])
   @@index([createdAt(sort: Desc)])
@@ -344,8 +323,8 @@ model User {
   image         String?
   createdAt     DateTime  @default(now()) @map("created_at")
   updatedAt     DateTime  @updatedAt @map("updated_at")
-  sessions      Session[]
   accounts      Account[]
+  sessions      Session[]
 
   @@map("user")
 }
@@ -369,7 +348,6 @@ model Account {
   accountId             String    @map("account_id")
   providerId            String    @map("provider_id")
   userId                String    @map("user_id")
-  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   accessToken           String?   @map("access_token")
   refreshToken          String?   @map("refresh_token")
   idToken               String?   @map("id_token")
@@ -379,6 +357,7 @@ model Account {
   password              String?
   createdAt             DateTime  @default(now()) @map("created_at")
   updatedAt             DateTime  @updatedAt @map("updated_at")
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("account")
 }
@@ -393,4 +372,3 @@ model Verification {
 
   @@map("verification")
 }
-

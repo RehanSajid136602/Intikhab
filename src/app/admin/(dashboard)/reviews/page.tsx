@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
+import { MessageSquareText } from "lucide-react";
 
 interface Review {
   id: string;
@@ -81,7 +82,13 @@ export default function AdminReviewsPage() {
 
       <div className="bg-white rounded-sm border border-brand-border overflow-hidden">
         {filtered.length === 0 ? (
-          <div className="p-8 text-sm text-brand-gray text-center">No reviews found.</div>
+          <div className="py-16 flex flex-col items-center gap-3 text-center">
+            <div className="w-12 h-12 bg-brand-light-gray rounded-full flex items-center justify-center">
+              <MessageSquareText className="w-5 h-5 text-brand-gray" />
+            </div>
+            <p className="text-sm font-semibold text-brand-dark">No reviews found</p>
+            <p className="text-xs text-brand-gray">Reviews from customers will appear here</p>
+          </div>
         ) : (
           filtered.map((review) => (
             <div key={review.id} className="border-b border-brand-border p-5 last:border-b-0">

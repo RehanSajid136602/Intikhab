@@ -13,7 +13,7 @@ import {
   type ColumnDef,
   type ColumnFiltersState,
 } from "@tanstack/react-table";
-import { Search, Plus, Trash2, Edit, ChevronDown } from "lucide-react";
+import { Search, Plus, Trash2, Edit, ChevronDown, Package } from "lucide-react";
 import { toast } from "sonner";
 import { Modal } from "@/components/ui/Modal";
 import { useAdminStore } from "@/stores/adminStore";
@@ -382,9 +382,15 @@ function ProductsTable({ onAddProduct, onEditProduct }: ProductsTableProps) {
               <tr>
                 <td
                   colSpan={columns.length}
-                  className="py-8 text-center text-sm text-brand-gray"
+                  className="py-16 text-center"
                 >
-                  No products found.
+                  <div className="flex flex-col items-center gap-3">
+                    <div className="w-12 h-12 bg-brand-light-gray rounded-full flex items-center justify-center">
+                      <Package className="w-5 h-5 text-brand-gray" />
+                    </div>
+                    <p className="text-sm font-semibold text-brand-dark">No products found</p>
+                    <p className="text-xs text-brand-gray">Add your first product to get started</p>
+                  </div>
                 </td>
               </tr>
             ) : (

@@ -150,7 +150,7 @@ export function FeedbackWidget() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 10 }}
-            className="fixed bottom-20 left-6 z-40 bg-brand-dark text-white text-xs px-3 py-2 rounded-sm shadow-lg max-w-[200px]"
+            className="fixed bottom-20 left-4 md:left-6 z-50 bg-brand-dark text-white text-xs px-3 py-2 rounded-sm shadow-lg max-w-[200px]"
           >
             <button
               onClick={dismissTip}
@@ -173,7 +173,7 @@ export function FeedbackWidget() {
           setFeedbackWidget(true);
           dismissTip();
         }}
-        className="fixed bottom-6 left-6 z-40 bg-brand-dark text-white p-3 rounded-full shadow-lg hover:bg-black transition-colors"
+        className="fixed bottom-4 md:bottom-6 left-4 md:left-6 z-50 bg-brand-dark text-white p-3 rounded-full shadow-lg hover:bg-black transition-colors"
         aria-label="Open feedback form"
       >
         <MessageSquareText className="w-5 h-5" />

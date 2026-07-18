@@ -8,7 +8,7 @@ export type Category = "men" | "women" | "kids" | "unisex";
 
 export type SizeSystem = "eu" | "uk" | "us" | "bag" | "general" | "numeric";
 
-export type ProductStatus = "active" | "draft";
+export type ProductStatus = "active" | "draft" | "coming_soon";
 
 export type ProductBadge = "SALE" | "NEW" | null;
 

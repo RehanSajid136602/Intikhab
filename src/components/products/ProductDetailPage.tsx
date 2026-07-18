@@ -302,34 +302,47 @@ export function ProductDetailPage({
 
             {/* Buttons */}
             <div className="flex gap-4 pt-4">
-              <button
-                onClick={handleAddToCart}
-                disabled={!productInStock}
-                className="flex-1 flex items-center justify-center gap-2 bg-brand-dark text-white py-4 font-semibold uppercase tracking-wider rounded-sm hover:bg-black transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <ShoppingCart className="w-5 h-5" />
-                Add to Cart
-              </button>
-              <button
-                onClick={handleBuyNow}
-                disabled={!productInStock}
-                className="flex-1 bg-brand-red text-white py-4 font-semibold uppercase tracking-wider rounded-sm hover:bg-red-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                Buy Now
-              </button>
-              <button
-                onClick={() => toggleItem(product)}
-                className="w-14 h-14 flex items-center justify-center border border-brand-border rounded-sm hover:border-brand-dark transition-colors"
-                aria-label={isInWishlist(product.id) ? "Remove from wishlist" : "Add to wishlist"}
-              >
-                <Heart
-                  className={`w-5 h-5 transition-colors ${
-                    isInWishlist(product.id)
-                      ? "fill-brand-red text-brand-red"
-                      : "text-brand-dark"
-                  }`}
-                />
-              </button>
+              {product.status === "coming_soon" ? (
+                <div className="w-full bg-amber-50 border border-amber-200 rounded-sm px-4 py-4 text-center">
+                  <p className="text-amber-800 font-semibold text-sm uppercase tracking-wider">
+                    Coming Soon
+                  </p>
+                  <p className="text-amber-600 text-xs mt-1">
+                    This product is not yet available for purchase
+                  </p>
+                </div>
+              ) : (
+                <>
+                  <button
+                    onClick={handleAddToCart}
+                    disabled={!productInStock}
+                    className="flex-1 flex items-center justify-center gap-2 bg-brand-dark text-white py-4 font-semibold uppercase tracking-wider rounded-sm hover:bg-black transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <ShoppingCart className="w-5 h-5" />
+                    Add to Cart
+                  </button>
+                  <button
+                    onClick={handleBuyNow}
+                    disabled={!productInStock}
+                    className="flex-1 bg-brand-red text-white py-4 font-semibold uppercase tracking-wider rounded-sm hover:bg-red-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    Buy Now
+                  </button>
+                  <button
+                    onClick={() => toggleItem(product)}
+                    className="w-14 h-14 flex items-center justify-center border border-brand-border rounded-sm hover:border-brand-dark transition-colors"
+                    aria-label={isInWishlist(product.id) ? "Remove from wishlist" : "Add to wishlist"}
+                  >
+                    <Heart
+                      className={`w-5 h-5 transition-colors ${
+                        isInWishlist(product.id)
+                          ? "fill-brand-red text-brand-red"
+                          : "text-brand-dark"
+                      }`}
+                    />
+                  </button>
+                </>
+              )}
             </div>
 
             {/* Installment */}
@@ -344,7 +357,7 @@ export function ProductDetailPage({
         {/* Related Products */}
         {relatedProducts.length > 0 && (
           <div className="mt-16 md:mt-24">
-            <h2 className="text-2xl font-bold text-brand-dark mb-8">
+            <h2 className="section-title mb-8">
               You May Also Like
             </h2>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">

@@ -35,7 +35,7 @@ function Footer() {
               <div className="space-y-2 text-sm text-brand-gray">
                 <p>{getInTouch.hours.split(',')[0]}</p>
                 <p>{getInTouch.hours.split(',')[1]}</p>
-                <a href={`https://wa.me/92${getInTouch.phone.replace(/\D/g, '').replace(/^0/, '')}`} className="mt-2 flex items-center gap-2 text-brand-gray hover:text-brand-red transition-colors duration-200" target="_blank" rel="noreferrer">
+                <a href={`https://wa.me/${getInTouch.phone.replace(/\D/g, '').replace(/^0/, '')}`} className="mt-2 flex items-center gap-2 text-brand-gray hover:text-brand-red transition-colors duration-200" target="_blank" rel="noreferrer">
                   <MessageCircle className="h-4 w-4" /> WhatsApp Chat
                 </a>
               </div>
@@ -47,6 +47,9 @@ function Footer() {
               </a>
               <a href={BRAND.instagram} target="_blank" rel="noopener noreferrer" className="text-brand-gray hover:text-brand-red transition-colors duration-200" aria-label="Visit our Instagram page">
                 <Instagram className="w-5 h-5" />
+              </a>
+              <a href={BRAND.whatsappChannel} target="_blank" rel="noopener noreferrer" className="text-brand-gray hover:text-brand-red transition-colors duration-200" aria-label="Follow our WhatsApp Channel">
+                <MessageCircle className="w-5 h-5" />
               </a>
             </div>
           </div>

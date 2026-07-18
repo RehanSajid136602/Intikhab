@@ -3,6 +3,7 @@ import { createHash, randomBytes } from "crypto";
 import { createClient } from "@/lib/supabase/server";
 import { verifyAdmin } from "@/lib/supabase/auth";
 import { getFirstProductImage } from "@/lib/utils";
+import { getShippingFee } from "@/lib/shipping";
 import { checkoutSchema } from "@/lib/validation";
 import { getClientIp, checkRateLimit } from "@/lib/rateLimit";
 
@@ -114,14 +115,16 @@ export async function POST(request: NextRequest) {
 
   const { data: settings } = await supabase
     .from("store_settings")
-    .select("freeDeliveryEnabled, freeDeliveryMinimum, standardDeliveryFee")
+    .select("freeDeliveryEnabled, freeDeliveryMinimum")
     .limit(1)
     .maybeSingle();
+
+  const baseShippingFee = city ? getShippingFee(city) : 350;
 
   const shippingFee =
     settings?.freeDeliveryEnabled && subtotal >= (settings.freeDeliveryMinimum || 0)
       ? 0
-      : settings?.standardDeliveryFee ?? 150;
+      : baseShippingFee;
 
   let normalizedCouponCode: string | null = null;
   let couponDiscount = 0;

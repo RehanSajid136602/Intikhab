@@ -31,7 +31,9 @@ export async function middleware(request: NextRequest) {
     }
 
     // Call Better Auth session API endpoint internally
-    const getSessionUrl = new URL('/api/auth/get-session', request.url);
+    // Use BETTER_AUTH_URL as base for internal fetch (avoids tunnel loop issues in dev)
+    const baseUrl = process.env.BETTER_AUTH_URL || request.url;
+    const getSessionUrl = new URL('/api/auth/get-session', baseUrl);
     const sessionRes = await fetch(getSessionUrl, {
       headers: {
         cookie: request.headers.get('cookie') || '',

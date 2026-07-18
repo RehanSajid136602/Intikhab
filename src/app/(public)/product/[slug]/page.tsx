@@ -22,7 +22,7 @@ export async function generateMetadata({
     .from("products")
     .select("name, description, category, images")
     .eq("slug", params.slug)
-    .eq("status", "active")
+    .in("status", ["active", "coming_soon"])
     .single();
 
   if (!data) {
@@ -53,7 +53,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
     .from("products")
     .select("*")
     .eq("slug", params.slug)
-    .eq("status", "active")
+    .in("status", ["active", "coming_soon"])
     .single();
 
   if (!productRow) {
@@ -65,7 +65,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
     .from("products")
     .select("*")
     .eq("category", productRow.category)
-    .eq("status", "active")
+    .in("status", ["active", "coming_soon"])
     .neq("id", productRow.id)
     .limit(4);
 

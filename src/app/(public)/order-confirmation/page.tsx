@@ -145,7 +145,7 @@ export default function OrderConfirmationPage() {
 
   const handleWhatsAppChat = () => {
     const message = `Hi, I just placed order ${orderData.id} for ${formatPKR(orderData.total)}. Please confirm my order details. Thank you!`;
-    const cleanPhone = BRAND.phone.replace(/\s/g, '');
+    const cleanPhone = BRAND.phone.replace(/\D/g, '').replace(/^0/, '');
     const phoneNumber = cleanPhone.startsWith('0') ? '92' + cleanPhone.slice(1) : cleanPhone;
     const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, '_blank');

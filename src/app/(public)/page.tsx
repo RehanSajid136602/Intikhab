@@ -63,7 +63,7 @@ export default async function HomePage() {
   const { data, error } = await supabase
     .from("products")
     .select("*")
-    .eq("status", "active")
+    .in("status", ["active", "coming_soon"])
     .order("createdAt", { ascending: false });
 
   const products: Product[] = (data || []).map(transformProduct);
@@ -90,7 +90,7 @@ export default async function HomePage() {
     "url": SITE_URL,
     "logo": `${SITE_URL}/favicon.ico`,
     "sameAs": [
-      "https://www.facebook.com/share/1AjG4bGKpc/",
+      "https://www.facebook.com/share/19FBC1RsV7/",
       "https://www.instagram.com/intikhab_pakistan?igsh=aW5yaWJldTc0d2F2"
     ]
   };

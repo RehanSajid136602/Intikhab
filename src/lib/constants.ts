@@ -7,9 +7,10 @@ export const BRAND = {
   tagline: 'Selection That Matters',
   email: 'intikhab.pakistan@gmail.com',
   phone: '+92 332 3130689',
-  facebook: 'https://www.facebook.com/share/1AjG4bGKpc/',
+  facebook: 'https://www.facebook.com/share/19FBC1RsV7/',
   instagram: 'https://www.instagram.com/intikhab_pakistan?igsh=aW5yaWJldTc0d2F2',
   instagramHandle: '@intikhab_pakistan',
+  whatsappChannel: 'https://whatsapp.com/channel/0029VbEJ9pmCHDycPVpTZ51X',
 } as const;
 
 export const BREAKPOINTS = {
@@ -47,3 +48,9 @@ export const ADMIN_SIDEBAR_WIDTH = {
 } as const;
 
 export const ADMIN_TOPBAR_HEIGHT = 64;
+
+export const SHIPPING = {
+  KARACHI_RATE: 220,
+  DEFAULT_RATE: 350,
+  KARACHI_ALIASES: ['karachi', 'korachi', 'krachi'],
+} as const;

@@ -32,6 +32,10 @@ export const useCartStore = create<CartState>()(
       isOpen: false,
 
       addItem: (product: Product, size: string) => {
+        if (product.status === "coming_soon") {
+          toast.error("This product is coming soon and cannot be added to the cart");
+          return;
+        }
         set((state) => {
           const baseName = product.name.split(" — ")[0];
           const selectedSizeStock = product.sizeStock?.find(

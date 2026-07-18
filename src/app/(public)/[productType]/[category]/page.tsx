@@ -93,7 +93,7 @@ export default async function ProductCategoryPage({
     .select("*")
     .eq("productType", productType)
     .eq("category", category)
-    .eq("status", "active")
+    .in("status", ["active", "coming_soon"])
     .order("createdAt", { ascending: false });
 
   // Add subcategory filter if provided

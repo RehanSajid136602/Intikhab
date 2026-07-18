@@ -1,24 +1,15 @@
-import { auth } from "@/lib/auth";
-import { headers } from "next/headers";
-import { Navbar } from "./Navbar";
+'use client';
 
-export async function NavbarWrapper() {
-  let isAuthenticated = false;
-  let userEmail: string | undefined;
+import { useSession } from '@/lib/auth-client';
+import { Navbar } from './Navbar';
 
-  try {
-    const session = await auth.api.getSession({
-      headers: headers(),
-    }).catch(() => null);
+export function NavbarWrapper() {
+  const { data: session } = useSession();
 
-    if (session) {
-      isAuthenticated = true;
-      userEmail = session.user.email;
-    }
-  } catch (e) {
-    console.error("Error reading session in NavbarWrapper:", e);
-  }
-
-  return <Navbar isAuthenticated={isAuthenticated} userEmail={userEmail} />;
+  return (
+    <Navbar
+      isAuthenticated={!!session}
+      userEmail={session?.user.email}
+    />
+  );
 }
-

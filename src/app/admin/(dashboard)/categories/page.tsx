@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
+import { AdminEmptyState } from "@/components/admin/AdminEmptyState";
+import { Tag } from "lucide-react";
 
 interface Category {
   id: string;
@@ -81,6 +83,13 @@ export default function AdminCategoriesPage() {
         </button>
       </form>
 
+      {sorted.length === 0 ? (
+        <AdminEmptyState
+          icon={Tag}
+          title="No categories yet"
+          description="Create your first category to organize products"
+        />
+      ) : (
       <div className="bg-white rounded-sm border border-brand-border overflow-hidden">
         <table className="w-full text-sm">
           <thead className="border-b border-brand-border bg-brand-light-gray">
@@ -154,6 +163,7 @@ export default function AdminCategoriesPage() {
           </tbody>
         </table>
       </div>
+      )}
     </div>
   );
 }

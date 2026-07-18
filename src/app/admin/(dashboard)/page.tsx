@@ -9,22 +9,15 @@ import type { StatsCardConfig } from '@/types/admin';
 async function getDashboardStats(): Promise<StatsCardConfig[]> {
   const supabase = createClient();
 
-  // Fetch products count
-  const { count: activeProducts } = await supabase
-    .from('products')
-    .select('*', { count: 'exact', head: true })
-    .eq('status', 'active');
+  const [activeProductsResult, ordersResult, newFeedbackResult] = await Promise.all([
+    supabase.from('products').select('*', { count: 'exact', head: true }).in('status', ['active', 'coming_soon']),
+    supabase.from('orders').select('total, createdAt'),
+    supabase.from('feedback').select('*', { count: 'exact', head: true }).eq('status', 'new'),
+  ]);
 
-  // Fetch orders
-  const { data: orders } = await supabase
-    .from('orders')
-    .select('total, createdAt');
-
-  // Fetch new feedback count
-  const { count: newFeedback } = await supabase
-    .from('feedback')
-    .select('*', { count: 'exact', head: true })
-    .eq('status', 'new');
+  const { count: activeProducts } = activeProductsResult;
+  const { data: orders } = ordersResult;
+  const { count: newFeedback } = newFeedbackResult;
 
   const totalOrders = orders?.length || 0;
   const totalRevenue = orders?.reduce((sum, o) => sum + (o.total || 0), 0) || 0;

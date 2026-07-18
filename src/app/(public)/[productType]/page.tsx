@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import type { Product } from "@/types/product";
@@ -52,7 +53,7 @@ export default async function ProductTypePage({ params }: PageProps) {
     .from("products")
     .select("*")
     .eq("productType", productType)
-    .eq("status", "active")
+    .in("status", ["active", "coming_soon"])
     .order("createdAt", { ascending: false })
     .limit(8);
 
@@ -71,7 +72,7 @@ export default async function ProductTypePage({ params }: PageProps) {
       {/* Hero Section */}
       <section className="bg-brand-dark text-white py-20 md:py-32">
         <div className="container mx-auto px-4 text-center">
-          <h1 className="text-4xl md:text-6xl font-bold mb-4">
+          <h1 className="text-4xl md:text-5xl font-bold mb-4">
             {productTypeLabel}
           </h1>
           <p className="text-lg text-gray-300 max-w-2xl mx-auto mb-8">
@@ -110,8 +111,8 @@ export default async function ProductTypePage({ params }: PageProps) {
       {featuredProducts.length > 0 && (
         <section className="py-16 bg-gray-50">
           <div className="container mx-auto px-4">
-            <h2 className="text-2xl font-bold text-brand-dark mb-8">
-              Featured {productTypeLabel}
+            <h2 className="section-title mb-8">
+              All {productTypeLabel}
             </h2>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
               {featuredProducts.map((product) => (
@@ -125,11 +126,12 @@ export default async function ProductTypePage({ params }: PageProps) {
                       {(() => {
                         const img = getFirstProductImage(product.images);
                         return img ? (
-                          // eslint-disable-next-line @next/next/no-img-element
-                          <img
+                          <Image
                             src={img}
                             alt={product.name}
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                            fill
+                            className="object-cover group-hover:scale-105 transition-transform"
+                            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
                           />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center bg-gray-100 text-gray-400 font-mono text-xs">
@@ -158,7 +160,7 @@ export default async function ProductTypePage({ params }: PageProps) {
       {subcategories.length > 0 && (
         <section className="py-16">
           <div className="container mx-auto px-4">
-            <h2 className="text-2xl font-bold text-brand-dark mb-8">
+            <h2 className="section-title mb-8">
               Browse by Style
             </h2>
             <div className="flex flex-wrap gap-3">

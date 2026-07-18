@@ -52,7 +52,7 @@ const productSchema = z
       .enum(["eu", "uk", "us", "bag", "general", "numeric"])
       .default("eu"),
     description: z.string().optional(),
-    status: z.enum(["active", "draft"]),
+    status: z.enum(["active", "draft", "coming_soon"]),
   })
   .refine(
     (data) => {
@@ -742,6 +742,15 @@ function AddProductModal({
                         className="w-4 h-4"
                       />
                       <span className="text-sm text-brand-dark">Draft</span>
+                    </label>
+                    <label className="flex items-center gap-2">
+                      <input
+                        {...register("status")}
+                        type="radio"
+                        value="coming_soon"
+                        className="w-4 h-4"
+                      />
+                      <span className="text-sm text-amber-600 font-medium">Coming Soon</span>
                     </label>
                   </div>
                 </div>

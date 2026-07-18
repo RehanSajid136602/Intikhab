@@ -27,7 +27,7 @@ export async function GET(request: NextRequest) {
   let query = supabase
     .from("products")
     .select("*")
-    .eq("status", "active")
+    .in("status", ["active", "coming_soon"])
     .order("createdAt", { ascending: false });
 
   if (productType) {

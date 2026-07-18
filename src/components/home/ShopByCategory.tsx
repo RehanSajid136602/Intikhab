@@ -3,12 +3,11 @@
 import { AnimatePresence, motion, useInView } from 'framer-motion';
 import { useRef } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
+import { Package } from 'lucide-react';
 import { SectionTitle } from '@/components/ui/SectionTitle';
 import { ProductCard } from '@/components/products/ProductCard';
 import { useProductTabs } from '@/hooks/useProductTabs';
 import type { Category, Product } from '@/types/product';
-import { homepageImages } from '@/data/homepageImages';
 
 const tabs = [
   { label: 'MEN', value: 'men' },
@@ -95,31 +94,23 @@ function ShopByCategory({ products }: ShopByCategoryProps) {
             className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6"
           >
             {!hasProducts ? (
-              homepageImages.primaryCategories.map((cat, i) => (
+              <div className="col-span-full flex flex-col items-center justify-center py-16 text-center">
+                <div className="w-16 h-16 bg-brand-light-gray rounded-full flex items-center justify-center mb-4">
+                  <Package className="w-7 h-7 text-brand-gray" />
+                </div>
+                <h3 className="text-sm font-semibold text-brand-dark">
+                  No products in this category yet
+                </h3>
+                <p className="text-xs text-brand-gray mt-1 max-w-xs">
+                  We&apos;re refreshing our collection for this category. Check back soon or browse our other categories.
+                </p>
                 <Link
-                  key={cat.label}
-                  href={cat.href}
-                  className="group relative overflow-hidden rounded-sm aspect-square block border border-brand-border"
+                  href="/products"
+                  className="mt-5 px-6 py-2.5 bg-brand-dark text-white text-xs font-semibold uppercase tracking-wider rounded-sm hover:bg-black transition-colors"
                 >
-                  <Image
-                    src={cat.src}
-                    alt={cat.alt}
-                    fill
-                    sizes="(max-width: 768px) 100vw, 25vw"
-                    className="object-cover transition-transform duration-500 group-hover:scale-105"
-                    quality={85}
-                  />
-                  <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/60 to-transparent" />
-                  <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-4">
-                    <span className="text-white font-bold text-sm tracking-widest uppercase mb-1 drop-shadow-md">
-                      {cat.label}
-                    </span>
-                    <span className="text-white/80 text-[10px] uppercase tracking-wider opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                      Explore →
-                    </span>
-                  </div>
+                  Browse All Products
                 </Link>
-              ))
+              </div>
             ) : (
               currentProducts.map((product: Product, index: number) => (
                 <motion.div

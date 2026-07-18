@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
+import { AdminEmptyState } from "@/components/admin/AdminEmptyState";
+import { Percent } from "lucide-react";
 
 interface Coupon {
   id: string;
@@ -147,6 +149,14 @@ export default function AdminCouponsPage() {
         </button>
       </form>
 
+      {paged.length === 0 ? (
+        <AdminEmptyState
+          icon={Percent}
+          title="No coupons yet"
+          description="Create your first coupon to offer discounts to customers"
+        />
+      ) : (
+        <>
       <div className="bg-white rounded-sm border border-brand-border overflow-hidden">
         <table className="w-full text-sm">
           <thead className="border-b border-brand-border bg-brand-light-gray">
@@ -215,6 +225,8 @@ export default function AdminCouponsPage() {
             </button>
           ))}
         </div>
+      )}
+        </>
       )}
     </div>
   );

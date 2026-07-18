@@ -13,7 +13,7 @@ import {
   type ColumnDef,
   type ColumnFiltersState,
 } from "@tanstack/react-table";
-import { Search, Download, ChevronDown, X } from "lucide-react";
+import { Search, Download, ChevronDown, X, ShoppingCart } from "lucide-react";
 import { toast } from "sonner";
 import { useAdminStore } from "@/stores/adminStore";
 import { Badge } from "@/components/ui/Badge";
@@ -278,9 +278,15 @@ function OrdersTable() {
               <tr>
                 <td
                   colSpan={columns.length}
-                  className="py-8 text-center text-sm text-brand-gray"
+                  className="py-16 text-center"
                 >
-                  No orders found.
+                  <div className="flex flex-col items-center gap-3">
+                    <div className="w-12 h-12 bg-brand-light-gray rounded-full flex items-center justify-center">
+                      <ShoppingCart className="w-5 h-5 text-brand-gray" />
+                    </div>
+                    <p className="text-sm font-semibold text-brand-dark">No orders found</p>
+                    <p className="text-xs text-brand-gray">Orders from customers will appear here</p>
+                  </div>
                 </td>
               </tr>
             ) : (

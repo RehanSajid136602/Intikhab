@@ -22,7 +22,7 @@ export default async function ProductsPage({
   const { data } = await supabase
     .from("products")
     .select("*")
-    .eq("status", "active")
+    .in("status", ["active", "coming_soon"])
     .order("createdAt", { ascending: false });
 
   const products = transformProducts(data || []);

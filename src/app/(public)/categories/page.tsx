@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { getMetadata } from "@/lib/seo";
 import { ArrowRight } from "lucide-react";
@@ -74,10 +75,12 @@ export default function CategoriesPage() {
             >
               {/* Category Image */}
               <div className="aspect-[4/3] w-full bg-gray-100 relative overflow-hidden">
-                <img
+                <Image
                   src={cat.image}
                   alt={`${cat.name} Collection by Intikhab`}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  fill
+                  className="object-cover group-hover:scale-105 transition-transform duration-500"
+                  sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
                 />
                 <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm text-brand-dark text-xs font-semibold px-3 py-1 rounded-full border border-brand-border">
                   {cat.count}

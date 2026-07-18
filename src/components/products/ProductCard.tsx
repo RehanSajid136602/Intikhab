@@ -57,16 +57,21 @@ function ProductCard({ product, showImageCarousel }: ProductCardProps) {
 
   return (
     <Link href={`/product/${product.slug}`} className="block">
-      <div className="product-card relative bg-white rounded-sm overflow-hidden border border-brand-border group cursor-pointer">
-        {/* Badge - Auto-shows NEW if within 14 days */}
+      <motion.div
+        whileHover={{ y: -2 }}
+        transition={{ duration: 0.2 }}
+        className="product-card relative bg-white rounded-sm overflow-hidden border border-brand-border group cursor-pointer"
+      >
+        {/* Badge - Auto-shows NEW if within 14 days, or COMING SOON */}
         <ProductBadgeComponent
           badge={isNewProduct(product.createdAt) ? "NEW" : product.badge}
+          comingSoon={product.status === "coming_soon"}
         />
 
         {/* Wishlist Heart */}
         <button
           onClick={handleWishlistClick}
-          className="absolute top-3 right-3 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-200 p-1 min-w-11 min-h-11 flex items-center justify-center"
+          className="absolute top-3 right-3 z-10 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-200 p-1 min-w-11 min-h-11 flex items-center justify-center"
           aria-label={isInWishlist ? "Remove from wishlist" : "Add to wishlist"}
         >
           <Heart
@@ -130,27 +135,35 @@ function ProductCard({ product, showImageCarousel }: ProductCardProps) {
           <p className="text-[11px] text-brand-green font-medium mb-3">
             ✓ Cash on Delivery Available
           </p>
-          {hasStock && firstAvailableSize ? (
-            <button
+            {product.status === "coming_soon" ? (
+            <motion.button
+              disabled
+              className="w-full bg-amber-600/10 text-amber-700 text-[11px] font-bold uppercase tracking-widest py-2.5 cursor-default md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-200"
+            >
+              COMING SOON
+            </motion.button>
+          ) : hasStock && firstAvailableSize ? (
+            <motion.button
+              whileTap={{ scale: 0.97 }}
               onClick={(e) => {
                 e.stopPropagation();
                 e.preventDefault();
                 addItem(product, firstAvailableSize.size);
               }}
-              className="add-to-cart-btn w-full bg-brand-dark text-white text-[11px] font-bold uppercase tracking-widest py-2.5 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+              className="add-to-cart-btn w-full bg-brand-dark text-white text-[11px] font-bold uppercase tracking-widest py-2.5 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-200"
             >
               QUICK ADD {firstAvailableSize.size}
-            </button>
+            </motion.button>
           ) : (
-            <button
+            <motion.button
               disabled
-              className="w-full bg-zinc-200 text-zinc-400 text-[11px] font-bold uppercase tracking-widest py-2.5 cursor-not-allowed opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+              className="w-full bg-zinc-200 text-zinc-400 text-[11px] font-bold uppercase tracking-widest py-2.5 cursor-not-allowed md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-200"
             >
               SOLD OUT
-            </button>
+            </motion.button>
           )}
         </div>
-      </div>
+      </motion.div>
     </Link>
   );
 }

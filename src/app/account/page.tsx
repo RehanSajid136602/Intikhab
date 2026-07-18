@@ -71,6 +71,7 @@ export default async function AccountPage() {
           <main className="lg:col-span-3 space-y-6">
             {user.image && (
               <div className="flex items-center gap-4 bg-white border border-zinc-200 rounded-xl p-5">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={user.image}
                   alt=""

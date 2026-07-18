@@ -99,7 +99,7 @@ export default async function ShoeCategoryPage({ params }: CategoryPageProps) {
   const { data } = await supabase
     .from("products")
     .select("*")
-    .eq("status", "active")
+    .in("status", ["active", "coming_soon"])
     .order("createdAt", { ascending: false });
 
   const allProducts = transformProducts(data || []);

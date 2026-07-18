@@ -8,6 +8,7 @@ import { formatPKR } from "@/lib/utils";
 import { toast } from "sonner";
 import { Trash2, Wallet, Banknote } from "lucide-react";
 import { BRAND } from "@/lib/constants";
+import { getShippingFee } from "@/lib/shipping";
 
 const CITIES = [
   "Karachi",
@@ -63,6 +64,7 @@ export default function CheckoutPage() {
   const [couponCode, setCouponCode] = useState("");
   const [couponDiscount, setCouponDiscount] = useState(0);
   const [couponMessage, setCouponMessage] = useState("");
+  const [shippingFee, setShippingFee] = useState(0);
 
   // Form state
   const [formData, setFormData] = useState({
@@ -98,6 +100,7 @@ export default function CheckoutPage() {
             phone: prev.phone || data.profile?.phone || "",
             city: prev.city || data.profile?.city || "",
           }));
+          setShippingFee(getShippingFee(data.profile?.city || ""));
           const addressRes = await fetch("/api/account/addresses");
           if (addressRes.ok) {
             const addresses: SavedAddress[] = await addressRes.json();
@@ -188,6 +191,7 @@ export default function CheckoutPage() {
       city,
       province: PROVINCE_MAP[city] || "",
     }));
+    setShippingFee(getShippingFee(city));
   };
 
   const applySavedAddress = (addressId: string) => {
@@ -202,6 +206,7 @@ export default function CheckoutPage() {
       postalCode: address.postal_code,
       streetAddress: address.address_line,
     }));
+    setShippingFee(getShippingFee(address.city));
   };
 
   const validateForm = () => {
@@ -354,7 +359,7 @@ export default function CheckoutPage() {
       whatsappMessage += `Please confirm my order. Thank you!`;
 
       // Open WhatsApp
-      const cleanPhone = BRAND.phone.replace(/\s/g, "");
+      const cleanPhone = BRAND.phone.replace(/\D/g, "").replace(/^0/, "");
       const whatsappNumber = cleanPhone.startsWith("0")
         ? "92" + cleanPhone.slice(1)
         : cleanPhone;
@@ -890,8 +895,12 @@ export default function CheckoutPage() {
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-brand-gray">Shipping</span>
-                  <span className="text-brand-gray">
-                    Confirmed before dispatch
+                  <span className="font-semibold text-brand-dark">
+                    {shippingFee > 0
+                      ? formatPKR(shippingFee)
+                      : formData.city
+                        ? "Free delivery"
+                        : "—"}
                   </span>
                 </div>
                 {couponDiscount > 0 && (
@@ -904,7 +913,9 @@ export default function CheckoutPage() {
                 <div className="flex justify-between text-lg font-bold">
                   <span className="text-brand-dark">Total</span>
                   <span className="text-brand-dark">
-                    {formatPKR(Math.max(0, totalPrice - couponDiscount))}
+                    {formatPKR(
+                      Math.max(0, totalPrice + shippingFee - couponDiscount),
+                    )}
                   </span>
                 </div>
               </div>

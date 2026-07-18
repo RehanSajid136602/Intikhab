@@ -56,7 +56,7 @@ export default function ProductDetailClient({
   const handleWhatsAppOrder = () => {
     const size = selectedSize ? `Size: ${selectedSize}` : "Size not selected";
     const message = `Hi, I'd like to order:\n\n${product.name}\nPrice: ${formatPKR(product.price)}\n${size}\n\nPlease confirm availability and payment details.`;
-    const cleanPhone = BRAND.phone.replace(/\s/g, "");
+    const cleanPhone = BRAND.phone.replace(/\D/g, "").replace(/^0/, "");
     const phoneNumber = cleanPhone.startsWith("0")
       ? "92" + cleanPhone.slice(1)
       : cleanPhone;
