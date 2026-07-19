@@ -4,9 +4,10 @@ import React, { useEffect, useState, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
-import { CheckCircle2, ShoppingCart, Download, Printer } from 'lucide-react';
+import { CheckCircle2, ShoppingCart, Download, Printer, MessageCircle } from 'lucide-react';
 import { formatPKR } from '@/lib/utils';
 import { BRAND } from '@/lib/constants';
+import { toWhatsAppNumber } from '@/lib/phone';
 import html2canvas from 'html2canvas';
 
 interface OrderItem {
@@ -15,6 +16,7 @@ interface OrderItem {
   image: string;
   quantity: number;
   price: number;
+  size?: string;
 }
 
 interface OrderData {
@@ -30,6 +32,7 @@ interface OrderData {
   couponCode?: string | null;
   couponDiscount?: number;
   total: number;
+  receiptUrl?: string | null;
   status: string;
   date: string;
 }
@@ -144,11 +147,22 @@ export default function OrderConfirmationPage() {
   };
 
   const handleWhatsAppChat = () => {
-    const message = `Hi, I just placed order ${orderData.id} for ${formatPKR(orderData.total)}. Please confirm my order details. Thank you!`;
-    const cleanPhone = BRAND.phone.replace(/\D/g, '').replace(/^0/, '');
-    const phoneNumber = cleanPhone.startsWith('0') ? '92' + cleanPhone.slice(1) : cleanPhone;
+    const itemNames = orderData.items
+      .map((item) => {
+        const sizePart = item.size ? ` (size ${item.size})` : '';
+        return `${item.name}${sizePart} x${item.quantity}`;
+      })
+      .join(', ');
+    const city = orderData.city || 'Pakistan';
+    let message =
+      `Hi, I just placed order #${orderData.id} for ${itemNames} — total ${formatPKR(orderData.total)}, delivery to ${city}. Please confirm.`;
+    if (orderData.receiptUrl) {
+      message += `\n\nReceipt: ${orderData.receiptUrl}`;
+    }
+    // Business WhatsApp: +92 332 3130689 → wa.me/923323130689
+    const phoneNumber = toWhatsAppNumber(BRAND.phone) || '923323130689';
     const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
-    window.open(whatsappUrl, '_blank');
+    window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
   };
 
   return (
@@ -245,6 +259,24 @@ export default function OrderConfirmationPage() {
             </p>
             <p className="text-sm text-brand-gray">{orderData.phone}</p>
           </div>
+
+          {orderData.receiptUrl && (
+            <>
+              <hr className="border-brand-border my-4" />
+              <div>
+                <h3 className="font-semibold text-brand-dark mb-2">Payment Receipt</h3>
+                <div className="relative w-48 h-48 bg-white rounded-lg overflow-hidden border border-brand-border">
+                  <Image
+                    src={orderData.receiptUrl}
+                    alt="Payment receipt"
+                    fill
+                    className="object-contain"
+                    sizes="192px"
+                  />
+                </div>
+              </div>
+            </>
+          )}
         </motion.div>
         </div>
 
@@ -274,10 +306,14 @@ export default function OrderConfirmationPage() {
           </div>
           <button
             onClick={handleWhatsAppChat}
-            className="w-full bg-green-600 text-white py-4 font-semibold uppercase tracking-wider rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center gap-2"
+            className="w-full bg-green-600 text-white py-4 font-semibold uppercase tracking-wider rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center gap-2 shadow-sm"
           >
-            Chat with us on WhatsApp
+            <MessageCircle className="w-5 h-5" />
+            Confirm your order on WhatsApp
           </button>
+          <p className="text-center text-xs text-brand-gray">
+            Optional — your order is already placed. WhatsApp helps us confirm faster.
+          </p>
           <button
             onClick={() => router.push('/')}
             className="w-full bg-brand-dark text-white py-4 font-semibold uppercase tracking-wider rounded-lg hover:bg-black transition-colors flex items-center justify-center gap-2"

@@ -145,7 +145,7 @@ function AddProductModal({
         productType: editProduct.productType || "shoes",
         category: editProduct.category,
         subcategory: editProduct.subcategory || "",
-        price: editProduct.price,
+        price: editProduct.price ?? 0,
         originalPrice: editProduct.originalPrice,
         size35: editProduct.sizeStock?.find((s) => s.size === "35")?.stock ?? 0,
         size36: editProduct.sizeStock?.find((s) => s.size === "36")?.stock ?? 0,

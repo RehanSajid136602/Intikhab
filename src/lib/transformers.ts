@@ -14,7 +14,7 @@ export function transformProduct(row: Record<string, unknown>): Product {
     productType: (row.productType as Product["productType"]) || "shoes",
     category: (row.category as Product["category"]) || "men",
     subcategory: row.subcategory as string | undefined,
-    price: row.price as number,
+    price: row.price == null ? null : (row.price as number),
     originalPrice: row.originalPrice as number | undefined,
     images: row.images as string[],
     badge: (row.badge as Product["badge"]) || null,

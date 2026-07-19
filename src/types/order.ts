@@ -23,4 +23,5 @@ export interface Order {
   status: OrderStatus;
   date: string;
   paymentMethod?: string;
+  receiptUrl?: string | null;
 }

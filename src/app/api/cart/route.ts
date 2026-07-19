@@ -25,7 +25,8 @@ export async function POST(request: NextRequest) {
   }).catch(() => null);
 
   if (!session || !session.user?.email || session.user.email.toLowerCase() !== email.toLowerCase()) {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    // Guest checkout — skip cart persist silently. Order can still be placed.
+    return NextResponse.json({ success: true, guest: true });
   }
 
   const supabase = createClient();
@@ -72,7 +73,7 @@ export async function GET(request: NextRequest) {
   }).catch(() => null);
 
   if (!session || !session.user?.email || session.user.email.toLowerCase() !== email.toLowerCase()) {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    return NextResponse.json({ items: [] });
   }
 
   const supabase = createClient();

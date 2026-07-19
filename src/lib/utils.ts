@@ -14,7 +14,8 @@ export function cn(...inputs: ClassValue[]): string {
  * @param amount - The amount in PKR to format.
  * @returns Formatted string like "PKR 3,500".
  */
-export function formatPKR(amount: number): string {
+export function formatPKR(amount: number | null | undefined): string {
+  if (amount == null) return "Pricing coming soon";
   return `PKR ${amount.toLocaleString("en-PK")}`;
 }
 

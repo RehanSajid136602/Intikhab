@@ -21,7 +21,7 @@ function UtilityBar() {
           </span>
         </div>
         <div className="hidden md:flex items-center gap-3 ml-auto">
-          <Link href="/account/orders" className="hover:text-brand-dark transition-colors">
+          <Link href="/track-order" className="hover:text-brand-dark transition-colors">
             Track Order
           </Link>
           <span className="text-brand-border">|</span>

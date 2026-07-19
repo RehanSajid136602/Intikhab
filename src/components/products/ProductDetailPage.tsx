@@ -14,6 +14,7 @@ import {
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
+import { BLUR_DATA_URL } from "@/lib/constants";
 import { toast } from "sonner";
 import type { Product, SizeStock } from "@/types/product";
 import { ProductCard } from "@/components/products/ProductCard";
@@ -118,6 +119,8 @@ export function ProductDetailPage({
                 className="object-contain p-8"
                 sizes="(max-width: 768px) 100vw, 50vw"
                 priority
+                placeholder="blur"
+                blurDataURL={BLUR_DATA_URL}
               />
 
               {/* Left Arrow */}
@@ -177,6 +180,8 @@ export function ProductDetailPage({
                       fill
                       className="object-contain p-1"
                       sizes="80px"
+                      placeholder="blur"
+                      blurDataURL={BLUR_DATA_URL}
                     />
                   </button>
                 ))}
@@ -219,96 +224,112 @@ export function ProductDetailPage({
               {product.description}
             </p>
 
-            {/* Sizes - Show selector if sizes exist, skip for generic one-size products */}
-            {displaySizes.length > 0 && !(displaySizes.length === 1 && displaySizes[0].size === "one-size") && (
-              <div>
-                <h3 className="text-sm font-semibold text-brand-dark mb-2">
-                  {displaySizes.length === 1 ? "Size" : "Select Size"}
-                </h3>
-                <div className="flex flex-wrap gap-2">
-                  {displaySizes.map((ss: SizeStock) => {
-                    const hasStock = ss.stock > 0;
-                    const isSelected = selectedSize === ss.size;
-                    return (
-                      <button
-                        key={ss.size}
-                        onClick={() => hasStock && setSelectedSize(ss.size)}
-                        disabled={!hasStock}
-                        className={`w-12 h-12 flex items-center justify-center border text-sm rounded-sm transition-all ${
-                          !hasStock
-                            ? "border-brand-border text-brand-gray line-through cursor-not-allowed opacity-50"
-                            : isSelected
-                              ? "border-brand-dark bg-brand-dark text-white font-semibold"
-                              : "border-brand-border text-brand-dark hover:border-brand-dark cursor-pointer"
-                        }`}
-                        title={hasStock ? `${ss.stock} in stock` : "Out of stock"}
-                      >
-                        {ss.size}
-                      </button>
-                    );
-                  })}
+            {product.status === "coming_soon" || !productInStock ? null : (
+              <>
+                {/* Sizes - Show selector if sizes exist, skip for generic one-size products */}
+                {displaySizes.length > 0 && !(displaySizes.length === 1 && displaySizes[0].size === "one-size") && (
+                  <div>
+                    <h3 className="text-sm font-semibold text-brand-dark mb-2">
+                      {displaySizes.length === 1 ? "Size" : "Select Size"}
+                    </h3>
+                    <div className="flex flex-wrap gap-2">
+                      {displaySizes.map((ss: SizeStock) => {
+                        const hasStock = ss.stock > 0;
+                        const isSelected = selectedSize === ss.size;
+                        return (
+                          <button
+                            key={ss.size}
+                            onClick={() => hasStock && setSelectedSize(ss.size)}
+                            disabled={!hasStock}
+                            className={`w-12 h-12 flex items-center justify-center border text-sm rounded-sm transition-all ${
+                              !hasStock
+                                ? "border-brand-border text-brand-gray line-through cursor-not-allowed opacity-50"
+                                : isSelected
+                                  ? "border-brand-dark bg-brand-dark text-white font-semibold"
+                                  : "border-brand-border text-brand-dark hover:border-brand-dark cursor-pointer"
+                            }`}
+                            title={hasStock ? `${ss.stock} in stock` : "Out of stock"}
+                          >
+                            {ss.size}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+
+                {/* Stock Status */}
+                <p
+                  className={`text-sm font-medium ${productInStock ? "text-brand-green" : "text-brand-red"}`}
+                >
+                  {productInStock ? "✓ In Stock" : "✗ Out of Stock"}
+                  {selectedSize &&
+                    sizeStockMap.has(selectedSize) &&
+                    sizeStockMap.get(selectedSize)! > 0 &&
+                    sizeStockMap.get(selectedSize)! <= 10 && (
+                      <span className="ml-2 text-brand-red">
+                        (Only {sizeStockMap.get(selectedSize)} left in size{" "}
+                        {selectedSize})
+                      </span>
+                    )}
+                </p>
+
+                {/* Quantity */}
+                <div>
+                  <h3 className="text-sm font-semibold text-brand-dark mb-2">
+                    Quantity
+                  </h3>
+                  <div className="inline-flex items-center rounded-control border border-brand-border bg-white">
+                    <button
+                      type="button"
+                      onClick={() => setQuantity((value) => Math.max(1, value - 1))}
+                      className="h-11 w-11 text-brand-dark hover:bg-brand-light-gray"
+                      aria-label="Decrease quantity"
+                    >
+                      -
+                    </button>
+                    <span className="w-10 text-center text-sm font-semibold">
+                      {quantity}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const max =
+                          selectedSize && sizeStockMap.has(selectedSize)
+                            ? sizeStockMap.get(selectedSize)!
+                            : product.stock || 1;
+                        setQuantity((value) => Math.min(max, value + 1));
+                      }}
+                      className="h-11 w-11 text-brand-dark hover:bg-brand-light-gray"
+                      aria-label="Increase quantity"
+                    >
+                      +
+                    </button>
+                  </div>
                 </div>
-              </div>
+              </>
             )}
 
-            {/* Stock Status */}
-            <p
-              className={`text-sm font-medium ${productInStock ? "text-brand-green" : "text-brand-red"}`}
-            >
-              {productInStock ? "✓ In Stock" : "✗ Out of Stock"}
-              {selectedSize &&
-                sizeStockMap.has(selectedSize) &&
-                sizeStockMap.get(selectedSize)! > 0 &&
-                sizeStockMap.get(selectedSize)! <= 10 && (
-                  <span className="ml-2 text-brand-red">
-                    (Only {sizeStockMap.get(selectedSize)} left in size{" "}
-                    {selectedSize})
-                  </span>
-                )}
-            </p>
-
-            <div>
-              <h3 className="text-sm font-semibold text-brand-dark mb-2">
-                Quantity
-              </h3>
-              <div className="inline-flex items-center rounded-control border border-brand-border bg-white">
-                <button
-                  type="button"
-                  onClick={() => setQuantity((value) => Math.max(1, value - 1))}
-                  className="h-11 w-11 text-brand-dark hover:bg-brand-light-gray"
-                  aria-label="Decrease quantity"
-                >
-                  -
-                </button>
-                <span className="w-10 text-center text-sm font-semibold">
-                  {quantity}
-                </span>
-                <button
-                  type="button"
-                  onClick={() => {
-                    const max =
-                      selectedSize && sizeStockMap.has(selectedSize)
-                        ? sizeStockMap.get(selectedSize)!
-                        : product.stock || 1;
-                    setQuantity((value) => Math.min(max, value + 1));
-                  }}
-                  className="h-11 w-11 text-brand-dark hover:bg-brand-light-gray"
-                  aria-label="Increase quantity"
-                >
-                  +
-                </button>
-              </div>
-            </div>
-
-            {/* Buttons */}
+            {/* Buttons / Status Banner */}
             <div className="flex gap-4 pt-4">
               {product.status === "coming_soon" ? (
                 <div className="w-full bg-amber-50 border border-amber-200 rounded-sm px-4 py-4 text-center">
                   <p className="text-amber-800 font-semibold text-sm uppercase tracking-wider">
                     Coming Soon
                   </p>
-                  <p className="text-amber-600 text-xs mt-1">
-                    This product is not yet available for purchase
+                  {!productInStock && (
+                    <p className="text-amber-600 text-xs mt-1">
+                      Pricing and availability coming soon
+                    </p>
+                  )}
+                </div>
+              ) : !productInStock ? (
+                <div className="w-full bg-zinc-100 border border-zinc-200 rounded-sm px-4 py-4 text-center">
+                  <p className="text-zinc-700 font-semibold text-sm uppercase tracking-wider">
+                    Sold Out
+                  </p>
+                  <p className="text-zinc-500 text-xs mt-1">
+                    This product is currently out of stock
                   </p>
                 </div>
               ) : (

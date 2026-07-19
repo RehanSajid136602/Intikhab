@@ -9,6 +9,7 @@ import { useWishlistStore } from "@/stores/wishlistStore";
 import { useProductImageCarousel } from "@/hooks/useProductImageCarousel";
 import { ProductBadgeComponent } from "./ProductBadge";
 import { formatPKR, isNewProduct } from "@/lib/utils";
+import { BLUR_DATA_URL } from "@/lib/constants";
 import { toast } from "sonner";
 import type { Product } from "@/types/product";
 
@@ -46,7 +47,11 @@ function ProductCard({ product, showImageCarousel }: ProductCardProps) {
     : product.images?.[0];
 
   const currentImage = getValidImage(rawImage);
-  const firstAvailableSize = product.sizeStock?.find((size) => size.stock > 0);
+  const firstAvailableSize = product.sizeStock?.length
+    ? product.sizeStock.find((size) => size.stock > 0)
+    : product.inStock
+      ? { size: "one-size", stock: product.stock }
+      : undefined;
   const hasStock = Boolean(firstAvailableSize || product.inStock);
 
   const handleWishlistClick = (e: React.MouseEvent) => {
@@ -105,6 +110,8 @@ function ProductCard({ product, showImageCarousel }: ProductCardProps) {
                 className="object-contain p-4 transition-transform duration-500 group-hover:scale-105"
                 sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
                 quality={85}
+                placeholder="blur"
+                blurDataURL={BLUR_DATA_URL}
               />
             </motion.div>
           </AnimatePresence>
@@ -119,18 +126,26 @@ function ProductCard({ product, showImageCarousel }: ProductCardProps) {
             {product.name}
           </h3>
           <div className="flex items-center gap-2 mb-2">
-            {product.originalPrice && (
-              <span className="text-[12px] line-through text-brand-gray">
-                {formatPKR(product.originalPrice)}
+            {product.price == null ? (
+              <span className="text-[12px] text-brand-gray font-medium">
+                Pricing coming soon
               </span>
+            ) : (
+              <>
+                {product.originalPrice && (
+                  <span className="text-[12px] line-through text-brand-gray">
+                    {formatPKR(product.originalPrice)}
+                  </span>
+                )}
+                <span
+                  className={`text-[14px] font-semibold ${
+                    product.originalPrice ? "text-brand-red" : "text-brand-dark"
+                  }`}
+                >
+                  {formatPKR(product.price)}
+                </span>
+              </>
             )}
-            <span
-              className={`text-[14px] font-semibold ${
-                product.originalPrice ? "text-brand-red" : "text-brand-dark"
-              }`}
-            >
-              {formatPKR(product.price)}
-            </span>
           </div>
           <p className="text-[11px] text-brand-green font-medium mb-3">
             ✓ Cash on Delivery Available

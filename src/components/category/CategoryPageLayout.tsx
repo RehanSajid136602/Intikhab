@@ -86,7 +86,7 @@ export function CategoryPageLayout({
 
     // Filter by price
     filtered = filtered.filter(
-      (p) => p.price >= priceRange[0] && p.price <= priceRange[1],
+      (p) => p.price == null || (p.price >= priceRange[0] && p.price <= priceRange[1]),
     );
 
     if (availability === "in-stock") {
@@ -100,10 +100,10 @@ export function CategoryPageLayout({
     // Sort
     switch (sortBy) {
       case "price-low":
-        filtered.sort((a, b) => a.price - b.price);
+        filtered.sort((a, b) => (a.price ?? 0) - (b.price ?? 0));
         break;
       case "price-high":
-        filtered.sort((a, b) => b.price - a.price);
+        filtered.sort((a, b) => (b.price ?? 0) - (a.price ?? 0));
         break;
       case "newest":
       case "latest":

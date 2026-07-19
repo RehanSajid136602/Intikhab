@@ -8,6 +8,8 @@ import { PRODUCT_TYPE_CONFIG } from "@/lib/sizeSystems";
 import { getMetadata } from "@/lib/seo";
 import { transformProduct } from "@/lib/transformers";
 
+export const revalidate = 60;
+
 interface PageProps {
   params: {
     productType: string;

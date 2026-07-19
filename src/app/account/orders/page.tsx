@@ -21,6 +21,8 @@ interface Order {
   total: number;
   status: string;
   createdAt: string;
+  city: string;
+  phone: string;
   items: OrderItem[];
 }
 
@@ -56,6 +58,8 @@ export default async function OrdersPage() {
       total: o.total,
       status: o.status,
       createdAt: o.createdAt,
+      city: o.city || "",
+      phone: o.phone || "",
       items: (itemsData || []).filter((i) => i.orderId === o.id).map((i) => ({
         productId: i.productId,
         name: i.name,
@@ -191,15 +195,25 @@ export default async function OrdersPage() {
                       <div className="flex items-center justify-between mt-3 pt-3 border-t border-zinc-100">
                         <p className="text-xs text-zinc-500">
                           {order.items.length} item{order.items.length > 1 ? "s" : ""}
+                          {order.city ? ` · ${order.city}` : ""}
                         </p>
                         <p className="text-sm font-semibold text-zinc-900">
                           {formatPKR(order.total)}
                         </p>
                       </div>
+                      <p className="text-xs text-zinc-400 mt-2">
+                        View order details →
+                      </p>
                     </Link>
                   ))}
                 </div>
               )}
+              <p className="text-xs text-zinc-500 mt-4 text-center">
+                Guest order?{" "}
+                <Link href="/track-order" className="text-zinc-900 font-medium underline underline-offset-2">
+                  Track with Order ID + phone
+                </Link>
+              </p>
             </div>
           </main>
         </div>

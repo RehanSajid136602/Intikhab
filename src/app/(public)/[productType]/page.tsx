@@ -6,6 +6,9 @@ import type { Product } from "@/types/product";
 import { notFound } from "next/navigation";
 import { PRODUCT_TYPE_CONFIG } from "@/lib/sizeSystems";
 import { transformProduct } from "@/lib/transformers";
+import { formatPKR } from "@/lib/utils";
+
+export const revalidate = 60;
 
 interface PageProps {
   params: {
@@ -145,7 +148,7 @@ export default async function ProductTypePage({ params }: PageProps) {
                         {product.name}
                       </h3>
                       <p className="text-brand-red font-bold">
-                        PKR {product.price.toLocaleString()}
+                        {formatPKR(product.price)}
                       </p>
                     </div>
                   </div>

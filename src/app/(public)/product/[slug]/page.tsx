@@ -6,8 +6,7 @@ import type { Product } from "@/types/product";
 import { getMetadata, SITE_URL } from "@/lib/seo";
 import { transformProduct } from "@/lib/transformers";
 
-export const dynamic = "force-dynamic";
-export const fetchCache = "force-no-store";
+export const revalidate = 60;
 
 interface ProductPageProps {
   params: { slug: string };
@@ -48,29 +47,34 @@ export async function generateMetadata({
 export default async function ProductPage({ params }: ProductPageProps) {
   const supabase = createClient();
 
-  // Fetch product by slug
-  const { data: productRow } = await supabase
-    .from("products")
-    .select("*")
-    .eq("slug", params.slug)
-    .in("status", ["active", "coming_soon"])
-    .single();
+  // Fetch product + all active products in parallel
+  const [productResult, allActiveResult] = await Promise.all([
+    supabase
+      .from("products")
+      .select("*")
+      .eq("slug", params.slug)
+      .in("status", ["active", "coming_soon"])
+      .single(),
+    supabase
+      .from("products")
+      .select("*")
+      .in("status", ["active", "coming_soon"])
+      .limit(20),
+  ]);
+
+  const productRow = productResult.data;
 
   if (!productRow) {
     notFound();
   }
 
-  // Fetch related products (same category)
-  const { data: relatedRows } = await supabase
-    .from("products")
-    .select("*")
-    .eq("category", productRow.category)
-    .in("status", ["active", "coming_soon"])
-    .neq("id", productRow.id)
-    .limit(4);
+  // Filter related products from the pre-fetched set
+  const relatedRows = (allActiveResult.data || [])
+    .filter((p: Record<string, unknown>) => p.category === productRow.category && p.id !== productRow.id)
+    .slice(0, 4);
 
   const product: Product = transformProduct(productRow);
-  const relatedProducts: Product[] = (relatedRows || []).map(transformProduct);
+  const relatedProducts: Product[] = relatedRows.map(transformProduct);
 
   // Generate dynamic JSON-LD Product Schema
   const jsonLd = {

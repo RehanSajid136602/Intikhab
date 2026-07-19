@@ -36,6 +36,7 @@ export const useCartStore = create<CartState>()(
           toast.error("This product is coming soon and cannot be added to the cart");
           return;
         }
+        const safePrice = product.price ?? 0;
         set((state) => {
           const baseName = product.name.split(" — ")[0];
           const selectedSizeStock = product.sizeStock?.find(
@@ -70,14 +71,14 @@ export const useCartStore = create<CartState>()(
                   : item,
               ),
               totalItems: state.totalItems + 1,
-              totalPrice: state.totalPrice + product.price,
+              totalPrice: state.totalPrice + safePrice,
             };
           }
           const newItem: CartItem = {
             lineId,
             id: product.id,
             name: baseName,
-            price: product.price,
+            price: safePrice,
             image: getFirstProductImage(product.images) || '',
             quantity: 1,
             size,
@@ -88,7 +89,7 @@ export const useCartStore = create<CartState>()(
             items: [...state.items, newItem],
             isOpen: true,
             totalItems: state.totalItems + 1,
-            totalPrice: state.totalPrice + product.price,
+            totalPrice: state.totalPrice + safePrice,
           };
         });
       },

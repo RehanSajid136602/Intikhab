@@ -187,7 +187,7 @@ export async function POST(request: NextRequest) {
       body.sizeSystem ||
       PRODUCT_TYPE_CONFIG[productType as keyof typeof PRODUCT_TYPE_CONFIG]
         .sizeSystem,
-    installment: body.installment ?? Math.ceil(body.price / 2),
+    installment: body.installment ?? (body.price ? Math.ceil(body.price / 2) : 0),
     description: body.description ?? "",
     sku: body.sku,
     status: body.status ?? "active",

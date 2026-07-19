@@ -35,6 +35,7 @@ export const checkoutSchema = z.object({
   province: z.string().min(2, "Province is too short").max(50).transform((val) => sanitizeText(val.trim())),
   city: z.string().min(2, "City is too short").max(50).transform((val) => sanitizeText(val.trim())),
   paymentMethod: z.enum(["cod", "jazzcash", "easypaisa"]),
+  receiptUrl: z.string().url().optional().nullable().transform((val) => val || null),
   orderNotes: z.string().optional().nullable().transform((val) => val ? sanitizeText(val.trim()) : null),
   couponCode: z.string().optional().nullable().transform((val) => val ? val.trim().toUpperCase() : null),
   items: z.array(
@@ -44,6 +45,14 @@ export const checkoutSchema = z.object({
       size: z.string().min(1, "Size is required").max(20),
     })
   ).min(1, "At least one item is required in the order"),
+}).superRefine((data, ctx) => {
+  if (data.paymentMethod !== "cod" && !data.receiptUrl) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "Payment receipt is required for JazzCash/Easypaisa orders",
+      path: ["receiptUrl"],
+    });
+  }
 });
 
 export const feedbackSchema = z.object({

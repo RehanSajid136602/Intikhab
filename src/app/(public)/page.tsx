@@ -7,6 +7,8 @@ import { createClient } from "@/lib/supabase/server";
 import type { Product } from "@/types/product";
 import { transformProduct } from "@/lib/transformers";
 
+export const revalidate = 60;
+
 export const metadata: Metadata = getMetadata({
   title: "Intikhab — Premium Shoes, Sneakers & Footwear Online",
   description: "Discover premium sneakers, formal shoes, casual shoes, loafers, boots, and everyday footwear at Intikhab.",

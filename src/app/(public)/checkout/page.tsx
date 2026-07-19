@@ -6,8 +6,9 @@ import { useRouter } from "next/navigation";
 import { useCartStore } from "@/stores/cartStore";
 import { formatPKR } from "@/lib/utils";
 import { toast } from "sonner";
-import { Trash2, Wallet, Banknote } from "lucide-react";
+import { Trash2, Wallet, Banknote, Upload, X } from "lucide-react";
 import { BRAND } from "@/lib/constants";
+import { useSession } from "@/lib/auth-client";
 import { getShippingFee } from "@/lib/shipping";
 
 const CITIES = [
@@ -41,7 +42,7 @@ const PROVINCE_MAP: Record<string, string> = {
   Quetta: "Balochistan",
   Sialkot: "Punjab",
   Murree: "Punjab",
-  Other: "",
+  Other: "Pakistan",
 };
 
 interface SavedAddress {
@@ -58,6 +59,7 @@ interface SavedAddress {
 export default function CheckoutPage() {
   const router = useRouter();
   const { items, totalPrice, clearCart } = useCartStore();
+  const { data: session } = useSession();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [stockErrors, setStockErrors] = useState<string[]>([]);
   const [stockChecking, setStockChecking] = useState(true);
@@ -81,38 +83,59 @@ export default function CheckoutPage() {
     easypaisaAccount: "",
   });
 
+  const [receiptFile, setReceiptFile] = useState<File | null>(null);
+  const [receiptUrl, setReceiptUrl] = useState<string>("");
+  const [receiptUploading, setReceiptUploading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [loggedInEmail, setLoggedInEmail] = useState<string | null>(null);
   const [savedAddresses, setSavedAddresses] = useState<SavedAddress[]>([]);
 
-  // Pre-fill from saved profile (Better Auth email + customers table)
+  // Use the same useSession hook as Navbar for consistent session state
   useEffect(() => {
-    async function fetchUser() {
+    if (!session?.user?.email) {
+      setLoggedInEmail(null);
+      return;
+    }
+    const email = session.user.email;
+    setLoggedInEmail(email);
+    setFormData((prev) => ({
+      ...prev,
+      email,
+    }));
+
+    async function fetchProfile() {
       try {
         const res = await fetch("/api/account/profile");
         const data = await res.json();
-        if (data.authEmail) {
-          setLoggedInEmail(data.authEmail);
+        if (data.profile) {
           setFormData((prev) => ({
             ...prev,
-            email: data.authEmail,
-            fullName: prev.fullName || data.profile?.fullName || data.authName || "",
-            phone: prev.phone || data.profile?.phone || "",
-            city: prev.city || data.profile?.city || "",
+            email,
+            fullName: prev.fullName || data.profile.fullName || "",
+            phone: prev.phone || data.profile.phone || "",
+            city: prev.city || data.profile.city || "",
           }));
-          setShippingFee(getShippingFee(data.profile?.city || ""));
-          const addressRes = await fetch("/api/account/addresses");
-          if (addressRes.ok) {
-            const addresses: SavedAddress[] = await addressRes.json();
-            setSavedAddresses(addresses);
-          }
+          setShippingFee(getShippingFee(data.profile.city || ""));
         }
       } catch {
-        // Not logged in — guest checkout
+        // profile fetch is best-effort
       }
     }
-    fetchUser();
-  }, []);
+    fetchProfile();
+
+    async function fetchAddresses() {
+      try {
+        const addressRes = await fetch("/api/account/addresses");
+        if (addressRes.ok) {
+          const addresses: SavedAddress[] = await addressRes.json();
+          setSavedAddresses(addresses);
+        }
+      } catch {
+        // addresses fetch is best-effort
+      }
+    }
+    fetchAddresses();
+  }, [session]);
 
   // Validate stock on mount
   React.useEffect(() => {
@@ -254,6 +277,14 @@ export default function CheckoutPage() {
       newErrors.easypaisaAccount = "Easypaisa account number is required";
     }
 
+    if (
+      (formData.paymentMethod === "jazzcash" || formData.paymentMethod === "easypaisa") &&
+      !receiptUrl &&
+      !receiptFile
+    ) {
+      newErrors.receipt = "Payment receipt is required for digital payments";
+    }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -269,6 +300,29 @@ export default function CheckoutPage() {
     setIsSubmitting(true);
 
     try {
+      // Upload receipt first if payment is JazzCash/Easypaisa
+      let finalReceiptUrl = receiptUrl;
+      if (receiptFile && !finalReceiptUrl) {
+        setReceiptUploading(true);
+        const uploadForm = new FormData();
+        uploadForm.append("file", receiptFile);
+        const uploadRes = await fetch("/api/upload/receipt", {
+          method: "POST",
+          body: uploadForm,
+        });
+        if (!uploadRes.ok) {
+          const uploadErr = await uploadRes.json();
+          toast.error(uploadErr.error || "Failed to upload receipt");
+          setIsSubmitting(false);
+          setReceiptUploading(false);
+          return;
+        }
+        const uploadData = await uploadRes.json();
+        finalReceiptUrl = uploadData.url;
+        setReceiptUrl(finalReceiptUrl);
+        setReceiptUploading(false);
+      }
+
       // Persist cart to Supabase before creating order
       await fetch("/api/cart", {
         method: "POST",
@@ -296,6 +350,7 @@ export default function CheckoutPage() {
           province: formData.province,
           city: formData.city,
           paymentMethod: formData.paymentMethod,
+          receiptUrl: finalReceiptUrl || null,
           orderNotes: formData.orderNotes || null,
           couponCode: couponCode.trim() || undefined,
           items: items.map((item) => ({
@@ -328,7 +383,13 @@ export default function CheckoutPage() {
           );
           toast.error(messages.join("\n"));
         } else {
-          toast.error(errorData.error || "Failed to place order");
+          const detailMsg = errorData.details
+            ? Object.entries(errorData.details)
+                .map(([key, val]) => `${key}: ${(val as { _errors?: string[] })._errors?.join(", ") || ""}`)
+                .filter((s) => s.includes(":"))
+                .join("\n")
+            : null;
+          toast.error(detailMsg || errorData.error || "Failed to place order");
         }
         setIsSubmitting(false);
         return;
@@ -345,7 +406,11 @@ export default function CheckoutPage() {
       whatsappMessage += `*Phone:* ${formData.phone}\n`;
       whatsappMessage += `*Email:* ${formData.email || "N/A"}\n`;
       whatsappMessage += `*Address:* ${formData.streetAddress}, ${formData.city}, ${formData.province} ${formData.postalCode}\n`;
-      whatsappMessage += `*Payment:* ${formData.paymentMethod.toUpperCase()}\n\n`;
+      whatsappMessage += `*Payment:* ${formData.paymentMethod.toUpperCase()}\n`;
+      if (finalReceiptUrl) {
+        whatsappMessage += `*Receipt:* ${finalReceiptUrl}\n`;
+      }
+      whatsappMessage += `\n`;
       whatsappMessage += `*Order Items:*\n`;
       items.forEach((item, index) => {
         whatsappMessage += `${index + 1}. ${item.name}\n`;
@@ -698,7 +763,7 @@ export default function CheckoutPage() {
                   </label>
 
                   {formData.paymentMethod === "jazzcash" && (
-                    <div className="ml-8 mt-2">
+                    <div className="ml-8 mt-2 space-y-3">
                       <input
                         type="text"
                         value={formData.jazzCashAccount}
@@ -720,6 +785,51 @@ export default function CheckoutPage() {
                           {errors.jazzCashAccount}
                         </p>
                       )}
+                      <div>
+                        <label className="block text-sm font-medium text-brand-dark mb-1">
+                          Upload Payment Receipt <span className="text-red-500">*</span>
+                        </label>
+                        <p className="text-xs text-brand-gray mb-2">
+                          Send payment to 0322-1234567 and upload the screenshot
+                        </p>
+                        {receiptUrl ? (
+                          <div className="flex items-center gap-2 p-2 bg-green-50 border border-green-200 rounded-lg">
+                            <span className="text-xs text-green-700 flex-1 truncate">Receipt uploaded ✓</span>
+                            <button
+                              type="button"
+                              onClick={() => { setReceiptFile(null); setReceiptUrl(""); }}
+                              className="text-red-500 hover:text-red-700"
+                            >
+                              <X className="w-4 h-4" />
+                            </button>
+                          </div>
+                        ) : (
+                          <label className="flex items-center gap-2 px-4 py-3 border-2 border-dashed border-brand-border rounded-lg cursor-pointer hover:border-brand-dark transition-colors">
+                            <Upload className="w-5 h-5 text-brand-gray" />
+                            <span className="text-sm text-brand-gray">
+                              {receiptFile ? receiptFile.name : "Choose image (jpg, png, webp)"}
+                            </span>
+                            <input
+                              type="file"
+                              accept="image/jpeg,image/png,image/webp"
+                              className="hidden"
+                              onChange={(e) => {
+                                const file = e.target.files?.[0];
+                                if (file) {
+                                  if (file.size > 5 * 1024 * 1024) {
+                                    toast.error("File must be under 5MB");
+                                    return;
+                                  }
+                                  setReceiptFile(file);
+                                }
+                              }}
+                            />
+                          </label>
+                        )}
+                        {errors.receipt && (
+                          <p className="text-red-500 text-sm mt-1">{errors.receipt}</p>
+                        )}
+                      </div>
                     </div>
                   )}
 
@@ -745,7 +855,7 @@ export default function CheckoutPage() {
                   </label>
 
                   {formData.paymentMethod === "easypaisa" && (
-                    <div className="ml-8 mt-2">
+                    <div className="ml-8 mt-2 space-y-3">
                       <input
                         type="text"
                         value={formData.easypaisaAccount}
@@ -767,6 +877,51 @@ export default function CheckoutPage() {
                           {errors.easypaisaAccount}
                         </p>
                       )}
+                      <div>
+                        <label className="block text-sm font-medium text-brand-dark mb-1">
+                          Upload Payment Receipt <span className="text-red-500">*</span>
+                        </label>
+                        <p className="text-xs text-brand-gray mb-2">
+                          Send payment to 0322-1234567 and upload the screenshot
+                        </p>
+                        {receiptUrl ? (
+                          <div className="flex items-center gap-2 p-2 bg-green-50 border border-green-200 rounded-lg">
+                            <span className="text-xs text-green-700 flex-1 truncate">Receipt uploaded ✓</span>
+                            <button
+                              type="button"
+                              onClick={() => { setReceiptFile(null); setReceiptUrl(""); }}
+                              className="text-red-500 hover:text-red-700"
+                            >
+                              <X className="w-4 h-4" />
+                            </button>
+                          </div>
+                        ) : (
+                          <label className="flex items-center gap-2 px-4 py-3 border-2 border-dashed border-brand-border rounded-lg cursor-pointer hover:border-brand-dark transition-colors">
+                            <Upload className="w-5 h-5 text-brand-gray" />
+                            <span className="text-sm text-brand-gray">
+                              {receiptFile ? receiptFile.name : "Choose image (jpg, png, webp)"}
+                            </span>
+                            <input
+                              type="file"
+                              accept="image/jpeg,image/png,image/webp"
+                              className="hidden"
+                              onChange={(e) => {
+                                const file = e.target.files?.[0];
+                                if (file) {
+                                  if (file.size > 5 * 1024 * 1024) {
+                                    toast.error("File must be under 5MB");
+                                    return;
+                                  }
+                                  setReceiptFile(file);
+                                }
+                              }}
+                            />
+                          </label>
+                        )}
+                        {errors.receipt && (
+                          <p className="text-red-500 text-sm mt-1">{errors.receipt}</p>
+                        )}
+                      </div>
                     </div>
                   )}
                 </div>

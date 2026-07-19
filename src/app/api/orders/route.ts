@@ -36,10 +36,18 @@ export async function POST(request: NextRequest) {
     province,
     city,
     paymentMethod,
+    receiptUrl,
     orderNotes,
     items,
     couponCode,
   } = result.data;
+
+  if (paymentMethod !== "cod" && !receiptUrl) {
+    return NextResponse.json(
+      { error: "Payment receipt is required for JazzCash/Easypaisa orders" },
+      { status: 400 },
+    );
+  }
 
   const supabase = createClient();
 
@@ -215,16 +223,17 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  await supabase
-    .from("orders")
-    .update({
-      subtotal,
-      shippingFee,
-      couponCode: normalizedCouponCode,
-      couponDiscount,
-      access_token_hash: accessTokenHash,
-    })
-    .eq("id", orderId);
+  const updateFields: Record<string, unknown> = {
+    subtotal,
+    shippingFee,
+    couponCode: normalizedCouponCode,
+    couponDiscount,
+    access_token_hash: accessTokenHash,
+  };
+  if (receiptUrl) {
+    updateFields.receiptUrl = receiptUrl;
+  }
+  await supabase.from("orders").update(updateFields).eq("id", orderId);
 
   if (normalizedCouponCode) {
     const { data: coupon } = await supabase
@@ -250,6 +259,7 @@ export async function POST(request: NextRequest) {
       city,
       phone,
       paymentMethod,
+      receiptUrl: receiptUrl || null,
       orderNotes,
       items: safeItems,
       subtotal,
@@ -330,6 +340,7 @@ export async function GET(request: NextRequest) {
     city: order.city,
     phone: order.phone,
     paymentMethod: order.paymentMethod,
+    receiptUrl: order.receiptUrl || null,
     orderNotes: order.orderNotes,
     items: itemsByOrder[order.id] || [],
     total: order.total,

@@ -26,7 +26,7 @@ export interface Product {
   productType: ProductType;
   category: Category;
   subcategory?: string;
-  price: number;
+  price: number | null;
   originalPrice?: number;
   images: string[];
   badge: ProductBadge;

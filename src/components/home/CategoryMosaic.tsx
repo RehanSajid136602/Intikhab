@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { motion, useInView } from 'framer-motion';
 import { useRef } from 'react';
 import { homepageImages } from '@/data/homepageImages';
+import { BLUR_DATA_URL } from '@/lib/constants';
 
 /**
  * Clean 4-column grid layout for Shop by Categories section
@@ -46,6 +47,8 @@ function CategoryMosaic() {
               sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, 25vw"
               className="object-cover transition-transform duration-500 group-hover:scale-105"
               quality={85}
+              placeholder="blur"
+              blurDataURL={BLUR_DATA_URL}
             />
             
             {/* DARK OVERLAY — only at bottom for label */}

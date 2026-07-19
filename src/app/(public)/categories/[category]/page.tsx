@@ -85,7 +85,7 @@ export async function generateMetadata({
   });
 }
 
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 
 export default async function ShoeCategoryPage({ params }: CategoryPageProps) {
   const config = CATEGORY_CONFIGS[params.category];

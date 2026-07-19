@@ -460,6 +460,27 @@ function OrderDetailModal({ order, onStatusUpdate }: OrderDetailModalProps) {
         </span>
       </div>
 
+      {/* Payment Receipt */}
+      {order.receiptUrl && (
+        <>
+          <hr className="border-brand-border" />
+          <div>
+            <h4 className="text-xs font-semibold text-brand-dark uppercase tracking-wider mb-2">
+              Payment Receipt
+            </h4>
+            <div className="relative w-full max-w-[200px] h-48 bg-brand-light-gray rounded-sm overflow-hidden">
+              <Image
+                src={order.receiptUrl}
+                alt="Payment receipt"
+                fill
+                className="object-contain"
+                sizes="200px"
+              />
+            </div>
+          </div>
+        </>
+      )}
+
       {/* Status Update */}
       <div className="flex items-center gap-3">
         <label className="text-xs font-medium text-brand-dark">

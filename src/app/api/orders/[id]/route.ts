@@ -59,6 +59,8 @@ export async function GET(
     shippingAddress: order.shippingAddress,
     city: order.city,
     phone: order.phone,
+    paymentMethod: order.paymentMethod,
+    receiptUrl: order.receiptUrl || null,
     items: (items || []).map((item) => ({
       productId: item.productId,
       name: item.name,
