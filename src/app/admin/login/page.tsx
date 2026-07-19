@@ -27,7 +27,7 @@ export default function AdminLoginPage() {
         if (session && session.user && session.user.email) {
           const allowed = await verifyAdminAccessAction(session.user.email);
           if (allowed) {
-            router.push('/admin');
+            window.location.href = '/admin';
             return;
           } else {
             setUserEmail(session.user.email);
@@ -68,7 +68,8 @@ export default function AdminLoginPage() {
         const allowed = await verifyAdminAccessAction(activeUser.email);
         if (allowed) {
           toast.success('Signed in successfully.');
-          router.push('/admin');
+          setIsLoading(false);
+          window.location.href = '/admin';
         } else {
           setUserEmail(activeUser.email);
           setIsUnauthorized(true);
