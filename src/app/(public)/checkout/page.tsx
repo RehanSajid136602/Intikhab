@@ -399,16 +399,26 @@ export default function CheckoutPage() {
       clearCart();
 
       // Build WhatsApp message with order details
-      let whatsappMessage = `🛒 *New Order - Intikhab*\n\n`;
+      const paymentLabels: Record<string, string> = {
+        cod: "COD",
+        jazzcash: "JazzCash",
+        easypaisa: "Easypaisa",
+      };
+      const paymentDisplay = paymentLabels[formData.paymentMethod] || formData.paymentMethod.toUpperCase();
+      const receiptShortUrl = finalReceiptUrl
+        ? `${window.location.origin}/r/${order.id}?token=${order.accessToken}`
+        : null;
+
+      let whatsappMessage = `🛍️ *New Order — Intikhab*\n\n`;
       whatsappMessage += `*Order ID: ${order.id}*\n`;
       whatsappMessage += `-------------------\n\n`;
       whatsappMessage += `*Customer:* ${formData.fullName}\n`;
       whatsappMessage += `*Phone:* ${formData.phone}\n`;
       whatsappMessage += `*Email:* ${formData.email || "N/A"}\n`;
       whatsappMessage += `*Address:* ${formData.streetAddress}, ${formData.city}, ${formData.province} ${formData.postalCode}\n`;
-      whatsappMessage += `*Payment:* ${formData.paymentMethod.toUpperCase()}\n`;
-      if (finalReceiptUrl) {
-        whatsappMessage += `*Receipt:* ${finalReceiptUrl}\n`;
+      whatsappMessage += `*Payment:* ${paymentDisplay}\n`;
+      if (receiptShortUrl) {
+        whatsappMessage += `*Receipt:* ${receiptShortUrl}\n`;
       }
       whatsappMessage += `\n`;
       whatsappMessage += `*Order Items:*\n`;

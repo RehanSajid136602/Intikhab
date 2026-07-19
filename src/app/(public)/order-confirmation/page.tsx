@@ -154,10 +154,13 @@ export default function OrderConfirmationPage() {
       })
       .join(', ');
     const city = orderData.city || 'Pakistan';
+    const receiptShortUrl = orderData.receiptUrl && token
+      ? `${window.location.origin}/r/${orderData.id}?token=${token}`
+      : null;
     let message =
       `Hi, I just placed order #${orderData.id} for ${itemNames} — total ${formatPKR(orderData.total)}, delivery to ${city}. Please confirm.`;
-    if (orderData.receiptUrl) {
-      message += `\n\nReceipt: ${orderData.receiptUrl}`;
+    if (receiptShortUrl) {
+      message += `\n\nReceipt: ${receiptShortUrl}`;
     }
     // Business WhatsApp: +92 332 3130689 → wa.me/923323130689
     const phoneNumber = toWhatsAppNumber(BRAND.phone) || '923323130689';
