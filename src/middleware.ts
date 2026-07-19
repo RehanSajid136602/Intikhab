@@ -27,13 +27,17 @@ export async function middleware(request: NextRequest) {
     }
 
     // Read the session cookie — check both standard and __Secure- prefix (HTTPS)
-    const sessionToken =
+    const rawCookieValue =
       request.cookies.get('better-auth.session_token')?.value ||
       request.cookies.get('__Secure-better-auth.session_token')?.value;
 
-    if (!sessionToken) {
+    if (!rawCookieValue) {
       return NextResponse.redirect(new URL('/admin/login', request.url));
     }
+
+    // Better Auth stores the cookie as "{token}.{signature}".
+    // The database only has the raw token, so extract it before the dot.
+    const sessionToken = rawCookieValue.split('.')[0];
 
     // Validate session via direct database lookup (edge-compatible Supabase REST API).
     // This replaces the former self-referential fetch to /api/auth/get-session,
