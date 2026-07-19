@@ -28,8 +28,6 @@ function UtilityBar() {
           <Link href="/contact" className="hover:text-brand-dark transition-colors">
             Contact Us
           </Link>
-          <span className="text-brand-border">|</span>
-          <span>Free Delivery on Prepaid Orders</span>
         </div>
         <div className="md:hidden text-xs text-brand-gray">
           <span>📞 {BRAND.phone}</span>

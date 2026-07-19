@@ -19,7 +19,7 @@ function AnnouncementBar() {
         >
           <div className="marquee-content flex items-center whitespace-nowrap pl-full">
             <span className="text-white text-xs font-medium tracking-wider uppercase">
-              Summer Collection &apos;25 LIVE! Enjoy up to 50% OFF on your favorite articles. Free Delivery on all Prepaid Orders above PKR 5,000. Shop Now →
+              Summer Collection &apos;25 LIVE! Enjoy up to 50% OFF on your favorite articles. Shop Now →
             </span>
           </div>
           <button

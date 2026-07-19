@@ -16,7 +16,7 @@ const slides = [
       <>
         Nationwide
         <br />
-        <span className="italic font-light">Free Delivery</span>
+        Delivery
         <br />
         On All Prepaid Orders
       </>

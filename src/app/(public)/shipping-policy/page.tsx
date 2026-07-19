@@ -36,7 +36,7 @@ export default function ShippingPolicyPage() {
             Shipping Fee
           </h2>
           <p>
-            Shipping is confirmed during checkout or by support after order placement. If free delivery applies, it will be shown clearly before confirmation.
+            Shipping is confirmed during checkout or by support after order placement.
           </p>
         </div>
 
