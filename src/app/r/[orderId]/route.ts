@@ -17,11 +17,11 @@ export async function GET(
 
   const { data: order } = await supabase
     .from("orders")
-    .select("receipt_url, access_token_hash")
+    .select("receipturl, access_token_hash")
     .eq("id", orderId)
     .maybeSingle();
 
-  if (!order || !order.receipt_url) {
+  if (!order || !order.receipturl) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
 
@@ -30,5 +30,5 @@ export async function GET(
     return NextResponse.json({ error: "Invalid token" }, { status: 403 });
   }
 
-  return NextResponse.redirect(order.receipt_url, 302);
+  return NextResponse.redirect(order.receipturl, 302);
 }
