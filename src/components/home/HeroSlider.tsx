@@ -21,7 +21,6 @@ const slides = [
         On All Prepaid Orders
       </>
     ),
-    subtitle: 'Shop from PKR 3,200',
     alignment: 'left' as const,
   },
   {
@@ -127,7 +126,9 @@ function HeroSlider() {
                 <h1 className="text-4xl md:text-[52px] font-bold text-white leading-tight mb-3 tracking-tight">
                   {slide.title}
                 </h1>
-                <p className="text-white/80 text-sm md:text-base mb-6 font-medium">{slide.subtitle}</p>
+                {slide.subtitle && (
+                  <p className="text-white/80 text-sm md:text-base mb-6 font-medium">{slide.subtitle}</p>
+                )}
                 <Link
                   href="/products"
                   className="inline-block bg-white text-brand-dark px-8 py-3.5 text-xs font-bold uppercase tracking-widest hover:bg-brand-dark hover:text-white transition-all duration-200 shadow-lg hover:shadow-xl"
