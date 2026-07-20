@@ -4,13 +4,18 @@ import Link from 'next/link';
 import { Facebook, Instagram, Mail, MessageCircle, Phone } from 'lucide-react';
 import { footerLinks } from '@/data/navigation';
 import { BRAND } from '@/lib/constants';
+import { BUSINESS, SERVICE_CITIES, buildShippingCitiesLine } from '@/lib/business';
 
 /**
  * Full 5-column footer with contact info, quick links, help, collections, legal,
  * social media icons, payment methods row, and copyright.
+ *
+ * Business name, phone, WhatsApp, email, and service-area copy are sourced
+ * from `@/lib/business` so they stay consistent and crawlable everywhere.
  */
 function Footer() {
-  const { getInTouch, quickLinks, help, collections, legal } = footerLinks;
+  const { quickLinks, help, collections, legal } = footerLinks;
+  const shippingCitiesLine = buildShippingCitiesLine(SERVICE_CITIES);
 
   return (
     <footer className="border-t border-brand-border bg-brand-surface pt-12 pb-6">
@@ -23,20 +28,20 @@ function Footer() {
               Get In Touch
             </h3>
             <div className="space-y-3 text-sm text-brand-gray">
-              <a href={`mailto:${getInTouch.email}`} className="flex items-center gap-2 text-brand-gray hover:text-brand-red transition-colors">
-                <Mail className="h-4 w-4" /> {getInTouch.email}
+              <a href={`mailto:${BUSINESS.email}`} className="flex items-center gap-2 text-brand-gray hover:text-brand-red transition-colors">
+                <Mail className="h-4 w-4" /> {BUSINESS.email}
               </a>
-              <a href={`tel:${getInTouch.phone.replace(/\s/g, '')}`} className="flex items-center gap-2 hover:text-brand-red">
-                <Phone className="h-4 w-4" /> {getInTouch.phone}
+              <a href={`tel:${BUSINESS.phone.replace(/\s/g, '')}`} className="flex items-center gap-2 hover:text-brand-red">
+                <Phone className="h-4 w-4" /> {BUSINESS.phoneDisplay}
               </a>
               <p className="font-semibold text-brand-dark mt-4">
                 Customer Services Timing
               </p>
               <div className="space-y-2 text-sm text-brand-gray">
-                <p>{getInTouch.hours.split(',')[0]}</p>
-                <p>{getInTouch.hours.split(',')[1]}</p>
-                <a href={`https://wa.me/${getInTouch.phone.replace(/\D/g, '').replace(/^0/, '')}`} className="mt-2 flex items-center gap-2 text-brand-gray hover:text-brand-red transition-colors duration-200" target="_blank" rel="noreferrer">
-                  <MessageCircle className="h-4 w-4" /> WhatsApp Chat
+                <p>{BUSINESS.supportHours.split(',')[0]}</p>
+                <p>{BUSINESS.supportHours.split(',')[1]}</p>
+                <a href={BUSINESS.whatsapp} className="mt-2 flex items-center gap-2 text-brand-gray hover:text-brand-red transition-colors duration-200" target="_blank" rel="noreferrer">
+                  <MessageCircle className="h-4 h-4" /> WhatsApp Chat
                 </a>
               </div>
             </div>
@@ -131,17 +136,22 @@ function Footer() {
           </div>
         </div>
 
-        {/* Payment Methods Row */}
-        <div className="border-t border-brand-border pt-6 pb-4 flex flex-col md:flex-row justify-between items-center gap-4">
-          <div className="flex flex-wrap items-center justify-center gap-3 text-sm text-brand-gray md:justify-start">
-            <span>Payment options:</span>
-            <span className="font-medium">Cash on Delivery</span>
-            <span className="font-medium">Manual JazzCash</span>
-            <span className="font-medium">Manual Easypaisa</span>
-          </div>
-          <p className="text-xs text-brand-gray">
-            &copy; {new Date().getFullYear()} {BRAND.name}. All rights reserved.
+        {/* Payment Methods + Service Area Row */}
+        <div className="border-t border-brand-border pt-6 pb-4">
+          <p className="text-sm text-brand-gray text-center md:text-left mb-4">
+            {BUSINESS.name} — {BUSINESS.serviceAreaText} {shippingCitiesLine}
           </p>
+          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+            <div className="flex flex-wrap items-center justify-center gap-3 text-sm text-brand-gray md:justify-start">
+              <span>Payment options:</span>
+              <span className="font-medium">Cash on Delivery</span>
+              <span className="font-medium">Manual JazzCash</span>
+              <span className="font-medium">Manual Easypaisa</span>
+            </div>
+            <p className="text-xs text-brand-gray">
+              &copy; {new Date().getFullYear()} {BUSINESS.name}. All rights reserved.
+            </p>
+          </div>
         </div>
       </div>
     </footer>

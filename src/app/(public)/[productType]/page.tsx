@@ -26,6 +26,7 @@ const CATEGORIES = ["men", "women", "kids", "unisex"] as const;
 
 import { getMetadata } from "@/lib/seo";
 import { getFirstProductImage } from "@/lib/utils";
+import { buildProductAlt } from "@/lib/seo";
 
 export async function generateMetadata({
   params,
@@ -35,8 +36,8 @@ export async function generateMetadata({
     productType.charAt(0).toUpperCase() + productType.slice(1);
 
   return getMetadata({
-    title: `${productTypeLabel} | Intikhab`,
-    description: `Shop our collection of ${productTypeLabel}. Premium quality, nationwide delivery. Cash on delivery available.`,
+    title: `Buy ${productTypeLabel} Online in Pakistan | Intikhab`,
+    description: `Shop our collection of ${productTypeLabel.toLowerCase()} online in Pakistan at Intikhab. Premium quality, free nationwide delivery, and cash on delivery available.`,
     path: `/${productType}`,
   });
 }
@@ -129,9 +130,12 @@ export default async function ProductTypePage({ params }: PageProps) {
                       {(() => {
                         const img = getFirstProductImage(product.images);
                         return img ? (
-                          <Image
+                           <Image
                             src={img}
-                            alt={product.name}
+                            alt={buildProductAlt(product.name, {
+                              productType: product.productType,
+                              category: product.category,
+                            })}
                             fill
                             className="object-cover group-hover:scale-105 transition-transform"
                             sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"

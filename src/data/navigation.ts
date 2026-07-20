@@ -72,12 +72,6 @@ export const mainNavItems: NavItem[] = [
 ];
 
 export const footerLinks = {
-  getInTouch: {
-    email: 'intikhab.pakistan@gmail.com',
-    phone: '+92 332 3130689',
-    hours: 'Monday–Saturday, 10:00 am to 9:30 pm',
-    whatsapp: true,
-  },
   quickLinks: [
     { label: 'About Us', href: '/about' },
     { label: 'Shop All', href: '/products' },

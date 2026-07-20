@@ -1,21 +1,12 @@
 import { LegalPageLayout } from '@/components/legal/LegalPageLayout';
-import { Metadata } from 'next';
+import type { Metadata } from 'next';
+import { getMetadata } from '@/lib/seo';
 
-export const metadata: Metadata = {
+export const metadata: Metadata = getMetadata({
   title: 'Terms & Conditions | Intikhab Shoe Store',
   description: 'Read our Terms & Conditions for purchasing shoes online in Pakistan. Learn about order placement, payment terms, shipping policies, and consumer rights.',
-  openGraph: {
-    title: 'Terms & Conditions | Intikhab Shoe Store',
-    description: 'Read our Terms & Conditions for purchasing shoes online in Pakistan. Learn about order placement, payment terms, shipping policies, and consumer rights.',
-    url: '/terms-and-conditions',
-    type: 'website',
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: 'Terms & Conditions | Intikhab Shoe Store',
-    description: 'Read our Terms & Conditions for purchasing shoes online in Pakistan. Learn about order placement, payment terms, shipping policies, and consumer rights.',
-  },
-};
+  path: '/terms-and-conditions',
+});
 
 export default function TermsAndConditionsPage() {
   const currentDate = new Date().toLocaleDateString('en-US', {

@@ -17,6 +17,8 @@ import { ReturnPolicySnippet } from "@/components/ReturnPolicySnippet";
 import { useCartStore } from "@/stores/cartStore";
 import { formatPKR } from "@/lib/utils";
 import { BRAND } from "@/lib/constants";
+import { productJsonLd } from "@/lib/schema";
+import { buildProductH1, buildProductAlt } from "@/lib/seo";
 import type { Product } from "@/types/product";
 
 const FALLBACK_IMAGE = "/images/intikhab/intikhab-hero-premium-sneakers.webp";
@@ -64,33 +66,15 @@ export default function ProductDetailClient({
     window.open(whatsappUrl, "_blank");
   };
 
-  const structuredData = {
-    "@context": "https://schema.org",
-    "@type": "Product",
-    name: product.name,
-    image: getValidImage(product.images?.[0]),
-    description: product.description,
-    offers: {
-      "@type": "Offer",
-      price: product.price,
-      priceCurrency: "PKR",
-      availability: product.inStock
-        ? "https://schema.org/InStock"
-        : "https://schema.org/OutOfStock",
-    },
-    brand: {
-      "@type": "Brand",
-      name: product.brand,
-    },
-  };
-
   const sizes = product.sizeStock?.map((ss) => ss.size) || [];
+
+  const productLd = productJsonLd(product);
 
   return (
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(productLd) }}
       />
 
       <div className="min-h-screen bg-white py-8 md:py-12 px-4">
@@ -130,7 +114,11 @@ export default function ProductDetailClient({
                   >
                     <Image
                       src={getValidImage(product.images?.[selectedImageIndex])}
-                      alt={`${product.name} - Image ${selectedImageIndex + 1}`}
+                      alt={buildProductAlt(product.name, {
+                        productType: product.productType,
+                        category: product.category,
+                        index: selectedImageIndex,
+                      })}
                       fill
                       className={`object-contain p-8 transition-transform duration-300 ${
                         isZoomed ? "scale-150" : "scale-100"
@@ -187,7 +175,11 @@ export default function ProductDetailClient({
                     >
                       <Image
                         src={getValidImage(image)}
-                        alt={`Thumbnail ${index + 1}`}
+                        alt={buildProductAlt(product.name, {
+                          productType: product.productType,
+                          category: product.category,
+                          index,
+                        })}
                         fill
                         className="object-contain p-2"
                         sizes="80px"
@@ -206,7 +198,10 @@ export default function ProductDetailClient({
                   {product.brand}
                 </p>
                 <h1 className="text-3xl md:text-4xl font-bold text-brand-dark leading-tight">
-                  {product.name}
+                  {buildProductH1(product.name, {
+                    productType: product.productType,
+                    category: product.category,
+                  })}
                 </h1>
               </div>
 

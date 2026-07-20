@@ -5,7 +5,7 @@ import type { Product } from "@/types/product";
 import { notFound } from "next/navigation";
 import { PRODUCT_TYPE_CONFIG } from "@/lib/sizeSystems";
 
-import { getMetadata } from "@/lib/seo";
+import { getMetadata, buildCategoryTitle, buildCategoryMetaDescription, buildCategoryH1, buildCategoryIntro } from "@/lib/seo";
 import { transformProduct } from "@/lib/transformers";
 
 export const revalidate = 60;
@@ -43,13 +43,13 @@ export async function generateMetadata({
     ? subcategory.charAt(0).toUpperCase() + subcategory.slice(1)
     : "";
 
-  const title = subcategory
-    ? `${categoryLabel}'s ${subcategoryLabel} ${productTypeLabel} | Intikhab`
-    : `${categoryLabel}'s ${productTypeLabel} | Intikhab`;
+  const term = subcategory
+    ? `${categoryLabel}'s ${subcategoryLabel} ${productTypeLabel}`
+    : `${categoryLabel}'s ${productTypeLabel}`;
 
-  const description = subcategory
-    ? `Discover our exclusive range of ${categoryLabel}'s ${subcategoryLabel} ${productTypeLabel}. Premium quality, nationwide delivery. Cash on delivery available.`
-    : `Discover our exclusive range of ${categoryLabel}'s ${productTypeLabel}. Premium quality, nationwide delivery. Cash on delivery available.`;
+  const title = buildCategoryTitle(term);
+
+  const description = buildCategoryMetaDescription(term);
 
   const path = subcategory
     ? `/${productType}/${category}?subcategory=${subcategory}`
@@ -107,7 +107,7 @@ export default async function ProductCategoryPage({
 
   const products: Product[] = (data || []).map(transformProduct);
 
-  // Generate title and description
+  // Generate H1 + intro copy from the category term
   const productTypeLabel =
     productType.charAt(0).toUpperCase() + productType.slice(1);
   const categoryLabel = category.charAt(0).toUpperCase() + category.slice(1);
@@ -115,13 +115,12 @@ export default async function ProductCategoryPage({
     ? subcategory.charAt(0).toUpperCase() + subcategory.slice(1)
     : "";
 
-  const title = subcategory
+  const term = subcategory
     ? `${categoryLabel}'s ${subcategoryLabel} ${productTypeLabel}`
     : `${categoryLabel}'s ${productTypeLabel}`;
 
-  const description = subcategory
-    ? `Discover our exclusive range of ${categoryLabel}'s ${subcategoryLabel} ${productTypeLabel}. Premium quality, nationwide delivery.`
-    : `Discover our exclusive range of ${categoryLabel}'s ${productTypeLabel}. Premium quality, nationwide delivery.`;
+  const title = buildCategoryH1(term);
+  const description = buildCategoryIntro(term);
 
   return (
     <CategoryPageLayout

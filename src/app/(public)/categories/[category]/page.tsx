@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { getMetadata } from "@/lib/seo";
+import { getMetadata, buildCategoryTitle, buildCategoryMetaDescription, buildCategoryH1, buildCategoryIntro } from "@/lib/seo";
 import { createClient } from "@/lib/supabase/server";
 import { CategoryPageLayout } from "@/components/category/CategoryPageLayout";
 import { transformProducts } from "@/lib/transformers";
@@ -79,8 +79,8 @@ export async function generateMetadata({
   }
 
   return getMetadata({
-    title: config.metaTitle,
-    description: config.metaDesc,
+    title: buildCategoryTitle(config.name),
+    description: buildCategoryMetaDescription(config.name),
     path: `/categories/${params.category}`,
   });
 }
@@ -136,8 +136,8 @@ export default async function ShoeCategoryPage({ params }: CategoryPageProps) {
 
   return (
     <CategoryPageLayout
-      title={config.h1}
-      description={config.intro}
+      title={buildCategoryH1(config.name)}
+      description={buildCategoryIntro(config.name)}
       products={filteredProducts}
       category={params.category}
       productType="shoes"

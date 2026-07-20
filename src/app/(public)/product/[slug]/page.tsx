@@ -3,8 +3,9 @@ import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { ProductDetailPage } from "@/components/products/ProductDetailPage";
 import type { Product } from "@/types/product";
-import { getMetadata, SITE_URL } from "@/lib/seo";
+import { getMetadata, buildProductTitle, buildProductMetaDescription } from "@/lib/seo";
 import { transformProduct } from "@/lib/transformers";
+import { productJsonLd } from "@/lib/schema";
 
 export const revalidate = 60;
 
@@ -19,7 +20,7 @@ export async function generateMetadata({
 
   const { data } = await supabase
     .from("products")
-    .select("name, description, category, images")
+    .select("*")
     .eq("slug", params.slug)
     .in("status", ["active", "coming_soon"])
     .single();
@@ -28,19 +29,25 @@ export async function generateMetadata({
     return { title: "Product Not Found | Intikhab" };
   }
 
-  const categoryLabel = data.category
-    ? (data.category as string).charAt(0).toUpperCase() + (data.category as string).slice(1)
-    : "Footwear";
+  const product = transformProduct(data);
 
-  const title = `${data.name} — ${categoryLabel} | Intikhab`;
-  const description = `Buy ${data.name} from Intikhab. Premium ${data.category || "footwear"} designed for comfort, style, and everyday wear.`;
-  const ogImage = data.images && (data.images as string[])[0] ? (data.images as string[])[0] : undefined;
+  const title = buildProductTitle(product.name);
+  const description = buildProductMetaDescription(product.name, {
+    productType: product.productType,
+    category: product.category,
+    description: product.description,
+    price: product.price,
+    inStock: product.inStock,
+  });
+  const ogImage = product.images && product.images[0] ? product.images[0] : undefined;
+  const isComingSoon = product.status === "coming_soon";
 
   return getMetadata({
     title,
     description,
     path: `/product/${params.slug}`,
     ogImage,
+    noindex: isComingSoon,
   });
 }
 
@@ -76,32 +83,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
   const product: Product = transformProduct(productRow);
   const relatedProducts: Product[] = relatedRows.map(transformProduct);
 
-  // Generate dynamic JSON-LD Product Schema
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "Product",
-    "name": product.name,
-    "image": product.images.map((img) =>
-      img.startsWith("http") ? img : `${SITE_URL}${img}`
-    ),
-    "description": product.description,
-    "brand": {
-      "@type": "Brand",
-      "name": "Intikhab",
-    },
-    "category": product.category,
-    "sku": product.sku || product.id,
-    "offers": {
-      "@type": "Offer",
-      "url": `${SITE_URL}/product/${product.slug}`,
-      "priceCurrency": "PKR",
-      "price": product.price,
-      "availability": product.inStock
-        ? "https://schema.org/InStock"
-        : "https://schema.org/OutOfStock",
-      "itemCondition": "https://schema.org/NewCondition",
-    },
-  };
+  const jsonLd = productJsonLd(product);
 
   return (
     <>

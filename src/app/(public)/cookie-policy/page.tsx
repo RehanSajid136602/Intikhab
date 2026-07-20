@@ -1,21 +1,12 @@
 import { LegalPageLayout } from '@/components/legal/LegalPageLayout';
-import { Metadata } from 'next';
+import type { Metadata } from 'next';
+import { getMetadata } from '@/lib/seo';
 
-export const metadata: Metadata = {
+export const metadata: Metadata = getMetadata({
   title: 'Cookie Policy | Intikhab Shoe Store',
   description: 'Understand how Intikhab uses cookies to enhance your shopping experience. Learn about cookie types, usage, and how to manage your preferences.',
-  openGraph: {
-    title: 'Cookie Policy | Intikhab Shoe Store',
-    description: 'Understand how Intikhab uses cookies to enhance your shopping experience. Learn about cookie types, usage, and how to manage your preferences.',
-    url: '/cookie-policy',
-    type: 'website',
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: 'Cookie Policy | Intikhab Shoe Store',
-    description: 'Understand how Intikhab uses cookies to enhance your shopping experience. Learn about cookie types, usage, and how to manage your preferences.',
-  },
-};
+  path: '/cookie-policy',
+});
 
 export default function CookiePolicyPage() {
   const currentDate = new Date().toLocaleDateString('en-US', {

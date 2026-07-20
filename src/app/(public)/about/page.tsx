@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { PageHeader, PageShell } from "@/components/ui/PageShell";
 import { getMetadata } from "@/lib/seo";
+import { BUSINESS, SERVICE_CITIES, buildShippingCitiesLine } from "@/lib/business";
 
 export const metadata: Metadata = getMetadata({
   title: "About Intikhab — Premium Footwear in Pakistan",
@@ -11,6 +12,7 @@ export const metadata: Metadata = getMetadata({
 });
 
 export default function AboutPage() {
+  const citiesLine = buildShippingCitiesLine(SERVICE_CITIES);
   return (
     <PageShell>
       <PageHeader
@@ -34,11 +36,12 @@ export default function AboutPage() {
         </div>
 
         <div className="mt-10 rounded-card bg-brand-dark px-6 py-8 text-white md:px-10">
-          <p className="eyebrow text-brand-sand">Need help choosing?</p>
+          <p className="eyebrow text-brand-sand">Serving customers across Pakistan</p>
           <h2 className="mt-3 text-2xl font-bold md:text-3xl">
             Message us before you order.
           </h2>
           <p className="mt-3 max-w-2xl text-sm leading-relaxed text-white/75">
+            {BUSINESS.name} delivers nationwide from {BUSINESS.baseCity}. {citiesLine}{" "}
             If you are unsure about size, delivery, or product availability, contact support and we will help before you checkout.
           </p>
           <div className="mt-6 flex flex-wrap gap-3">

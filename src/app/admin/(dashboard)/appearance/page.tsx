@@ -154,7 +154,7 @@ export default function AdminAppearancePage() {
               <label className="block text-xs font-semibold text-brand-gray uppercase tracking-wider mb-1.5">Logo</label>
               <div className="border border-brand-border border-dashed rounded-sm p-4 flex items-center justify-center h-24 bg-brand-light-gray/50">
                 <span className="flex flex-col items-center gap-1 text-brand-gray">
-                  <Image className="w-5 h-5" />
+                  <Image className="w-5 h-5" alt="" />
                   <span className="text-xs">Configurable via Supabase Storage</span>
                 </span>
               </div>
@@ -163,7 +163,7 @@ export default function AdminAppearancePage() {
               <label className="block text-xs font-semibold text-brand-gray uppercase tracking-wider mb-1.5">Favicon</label>
               <div className="border border-brand-border border-dashed rounded-sm p-4 flex items-center justify-center h-24 bg-brand-light-gray/50">
                 <span className="flex flex-col items-center gap-1 text-brand-gray">
-                  <Image className="w-5 h-5" />
+                  <Image className="w-5 h-5" alt="" />
                   <span className="text-xs">Configurable via Supabase Storage</span>
                 </span>
               </div>
@@ -201,7 +201,7 @@ export default function AdminAppearancePage() {
             <label className="block text-xs font-semibold text-brand-gray uppercase tracking-wider mb-1.5">Hero Image</label>
             <div className="border border-brand-border border-dashed rounded-sm p-4 flex items-center justify-center h-32 bg-brand-light-gray/50 max-w-lg">
               <span className="flex flex-col items-center gap-1 text-brand-gray">
-                <Image className="w-5 h-5" />
+                  <Image className="w-5 h-5" alt="" />
                 <span className="text-xs">Configurable via Supabase Storage</span>
               </span>
             </div>

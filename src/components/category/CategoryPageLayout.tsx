@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import React, { useState, useMemo, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Filter, Search, X } from "lucide-react";
@@ -136,7 +137,17 @@ export function CategoryPageLayout({
     <div className="min-h-screen bg-brand-background">
       {/* Hero Section */}
       <section className="relative bg-brand-dark text-white py-16 md:py-24">
-        <div className="store-container">
+        {heroImage && (
+          <Image
+            src={heroImage}
+            alt=""
+            fill
+            priority
+            className="object-cover opacity-20"
+            sizes="100vw"
+          />
+        )}
+        <div className="store-container relative z-10">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -147,12 +158,6 @@ export function CategoryPageLayout({
             <p className="text-lg text-gray-300">{description}</p>
           </motion.div>
         </div>
-        {heroImage && (
-          <div
-            className="absolute inset-0 opacity-20 bg-cover bg-center"
-            style={{ backgroundImage: `url(${heroImage})` }}
-          />
-        )}
       </section>
 
       {/* Products Section */}
@@ -347,22 +352,14 @@ export function CategoryPageLayout({
             <div className="flex-1">
               {hasProducts ? (
                 <motion.div
-                  layout
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.4 }}
                   className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6"
                 >
-                  <AnimatePresence>
-                    {filteredAndSortedProducts.map((product, index) => (
-                      <motion.div
-                        key={product.id}
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.4, delay: index * 0.05 }}
-                        layout
-                      >
-                        <ProductCard product={product} showImageCarousel />
-                      </motion.div>
-                    ))}
-                  </AnimatePresence>
+                  {filteredAndSortedProducts.map((product) => (
+                    <ProductCard key={product.id} product={product} showImageCarousel />
+                  ))}
                 </motion.div>
               ) : (
                 <div className="text-center py-16">

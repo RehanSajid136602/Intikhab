@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { LegalPageLayout } from "@/components/legal/LegalPageLayout";
 import { getMetadata } from "@/lib/seo";
+import { SERVICE_CITIES, buildShippingCitiesLine } from "@/lib/business";
 
 export const metadata: Metadata = getMetadata({
   title: "Shipping Policy | Intikhab",
@@ -10,6 +11,7 @@ export const metadata: Metadata = getMetadata({
 });
 
 export default function ShippingPolicyPage() {
+  const citiesLine = buildShippingCitiesLine(SERVICE_CITIES);
   return (
     <LegalPageLayout title="Shipping Policy" lastUpdated="June 24, 2026">
       <section className="space-y-6 text-brand-gray">
@@ -18,7 +20,9 @@ export default function ShippingPolicyPage() {
             Delivery Coverage
           </h2>
           <p>
-            Intikhab ships orders across Pakistan. Delivery availability and timelines may vary by city, address quality, courier coverage, and public holidays.
+            Intikhab ships orders across Pakistan. {citiesLine} Delivery
+            availability and timelines may vary by city, address quality,
+            courier coverage, and public holidays.
           </p>
         </div>
 

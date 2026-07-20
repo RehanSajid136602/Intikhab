@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { BLUR_DATA_URL } from "@/lib/constants";
 import { toast } from "sonner";
+import { buildProductH1, buildProductAlt } from "@/lib/seo";
 import type { Product, SizeStock } from "@/types/product";
 import { ProductCard } from "@/components/products/ProductCard";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
@@ -114,7 +115,11 @@ export function ProductDetailPage({
             <div className="relative aspect-square bg-brand-light-gray rounded-sm overflow-hidden mb-4 group">
               <Image
                 src={getValidImage(product.images?.[activeImage])}
-                alt={`${product.brand} ${product.name} - ${product.category}'s ${product.productType}`}
+                alt={buildProductAlt(product.name, {
+                  productType: product.productType,
+                  category: product.category,
+                  index: activeImage,
+                })}
                 fill
                 className="object-contain p-8"
                 sizes="(max-width: 768px) 100vw, 50vw"
@@ -176,7 +181,11 @@ export function ProductDetailPage({
                   >
                     <Image
                       src={getValidImage(img)}
-                      alt={`${product.name} ${i + 1}`}
+                      alt={buildProductAlt(product.name, {
+                        productType: product.productType,
+                        category: product.category,
+                        index: i,
+                      })}
                       fill
                       className="object-contain p-1"
                       sizes="80px"
@@ -199,7 +208,10 @@ export function ProductDetailPage({
             )}
 
             <h1 className="text-3xl md:text-4xl font-bold text-brand-dark">
-              {product.name}
+              {buildProductH1(product.name, {
+                productType: product.productType,
+                category: product.category,
+              })}
             </h1>
 
              <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-brand-gray">

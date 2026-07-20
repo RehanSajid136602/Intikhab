@@ -9,6 +9,7 @@ import { useWishlistStore } from "@/stores/wishlistStore";
 import { useProductImageCarousel } from "@/hooks/useProductImageCarousel";
 import { ProductBadgeComponent } from "./ProductBadge";
 import { formatPKR, isNewProduct } from "@/lib/utils";
+import { buildProductAlt } from "@/lib/seo";
 import { BLUR_DATA_URL } from "@/lib/constants";
 import { toast } from "sonner";
 import type { Product } from "@/types/product";
@@ -105,7 +106,10 @@ function ProductCard({ product, showImageCarousel }: ProductCardProps) {
             >
               <Image
                 src={currentImage}
-                alt={`${product.name} — ${product.brand} ${product.category} sneaker`}
+                alt={buildProductAlt(product.name, {
+                  productType: product.productType,
+                  category: product.category,
+                })}
                 fill
                 className="object-contain p-4 transition-transform duration-500 group-hover:scale-105"
                 sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"

@@ -1,22 +1,13 @@
 import { LegalPageLayout } from '@/components/legal/LegalPageLayout';
 import { BRAND } from '@/lib/constants';
-import { Metadata } from 'next';
+import type { Metadata } from 'next';
+import { getMetadata } from '@/lib/seo';
 
-export const metadata: Metadata = {
+export const metadata: Metadata = getMetadata({
   title: 'Privacy Policy | Intikhab Shoe Store',
   description: 'Learn how Intikhab protects your personal information. Our Privacy Policy explains data collection, usage, and your rights under Pakistani law.',
-  openGraph: {
-    title: 'Privacy Policy | Intikhab Shoe Store',
-    description: 'Learn how Intikhab protects your personal information. Our Privacy Policy explains data collection, usage, and your rights under Pakistani law.',
-    url: '/privacy-policy',
-    type: 'website',
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: 'Privacy Policy | Intikhab Shoe Store',
-    description: 'Learn how Intikhab protects your personal information. Our Privacy Policy explains data collection, usage, and your rights under Pakistani law.',
-  },
-};
+  path: '/privacy-policy',
+});
 
 export default function PrivacyPolicyPage() {
   const currentDate = new Date().toLocaleDateString('en-US', {

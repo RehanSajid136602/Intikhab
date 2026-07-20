@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
@@ -71,11 +72,12 @@ export default async function AccountPage() {
           <main className="lg:col-span-3 space-y-6">
             {user.image && (
               <div className="flex items-center gap-4 bg-white border border-zinc-200 rounded-xl p-5">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
+                <Image
                   src={user.image}
                   alt=""
-                  className="w-16 h-16 rounded-full"
+                  width={64}
+                  height={64}
+                  className="rounded-full"
                 />
                 <div>
                   <p className="text-lg font-semibold text-zinc-900">{user.name || "User"}</p>

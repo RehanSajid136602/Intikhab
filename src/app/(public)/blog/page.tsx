@@ -1,10 +1,12 @@
-import { Metadata } from 'next';
+import type { Metadata } from 'next';
+import { getMetadata } from '@/lib/seo';
 
-export const metadata: Metadata = {
+export const metadata: Metadata = getMetadata({
   title: 'Blog | Intikhab',
   description: 'Blog posts coming soon. Stay tuned for the latest updates on shoes, fashion trends, and more.',
-  robots: { index: false, follow: false },
-};
+  path: '/blog',
+  noindex: true,
+});
 
 export default function BlogPage() {
   return (

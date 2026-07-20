@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { breadcrumbListJsonLd } from '@/lib/schema';
 
 interface BreadcrumbItem {
   label: string;
@@ -20,16 +21,7 @@ interface BreadcrumbsProps {
  * Each segment is a link except the last (current page).
  */
 export function Breadcrumbs({ items, className }: BreadcrumbsProps) {
-  const structuredData = {
-    '@context': 'https://schema.org',
-    '@type': 'BreadcrumbList',
-    itemListElement: items.map((item, index) => ({
-      '@type': 'ListItem',
-      position: index + 1,
-      name: item.label,
-      item: item.href ? `https://intikhab.pk${item.href}` : undefined,
-    })),
-  };
+  const structuredData = breadcrumbListJsonLd(items);
 
   return (
     <>

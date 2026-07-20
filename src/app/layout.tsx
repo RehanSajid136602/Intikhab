@@ -5,6 +5,7 @@ import Script from 'next/script';
 import './globals.css';
 
 import { SITE_NAME, SITE_URL, DEFAULT_TITLE, DEFAULT_DESCRIPTION, DEFAULT_KEYWORDS, DEFAULT_OG_IMAGE } from '@/lib/seo';
+import { organizationJsonLd, websiteJsonLd } from '@/lib/schema';
 
 const poppins = Poppins({
   subsets: ['latin'],
@@ -73,6 +74,14 @@ export default function RootLayout({
   return (
     <html lang="en" className={poppins.variable}>
       <body className="bg-white font-poppins">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd()) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd()) }}
+        />
         {children}
         <Toaster position="top-right" richColors />
         {process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID && (
